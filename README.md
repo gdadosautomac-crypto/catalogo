@@ -1,6 +1,6 @@
 # 📊 Gestão de Dados & Automação
 
-Repositório oficial do setor de Dados & Automação do grupo.
+Repositório oficial do setor de Dados & Automação do grupo Marcolan.
 
 Este repositório centraliza todos os ativos técnicos relacionados a:
 
