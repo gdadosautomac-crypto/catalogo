@@ -1,0 +1,381 @@
+{
+  "name": "Contas a Receber - Alumiaço Recife",
+  "nodes": [
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "field": "weeks",
+              "triggerAtDay": [
+                1,
+                2,
+                3,
+                4,
+                5
+              ],
+              "triggerAtHour": 6
+            }
+          ]
+        }
+      },
+      "id": "03a085f0-531a-4bba-828a-56cceebbb9ac",
+      "name": "Schedule Trigger",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.1,
+      "position": [
+        432,
+        368
+      ]
+    },
+    {
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "select \n\tmb.tipo_unidade, \n\tmb.unidade, \n\tmb.nome_cliente, \n\tmb.cod_pedido, \n\tmb.coes, \n\tmc.ramo_atividade, \n\tmb.status_pedido, \n\tROUND(mb.valor_final_pedido::numeric,2) as valor_final_pedido, \n\tROUND(mb.valor_entregue::numeric,2) as valor_entregue, \n\tROUND(\n\tcase \n\t\twhen status_pedido = 'Finalizado' then total_titulo\t\n\t\twhen (mb.status_pedido = 'Em Separacao' and cs.tipotitulo = 'VENDA') then total_titulo - (mb.valor_final_pedido - mb.valor_entregue) \n\t\twhen (mb.status_pedido = 'Em Separacao' and cs.tipotitulo = 'ESTOQUE') then total_titulo\n\tend::NUMERIC,2) as total_devido, \n\t(saldo.saldo) as Saldo, \n\trota_entrega \nfrom main_balanco mb \n\tleft join coes_sistema cs on mb.unidade = cs.unidade and mb.coes = cs.coes\n\tleft join mapeamento_clientes mc on (mb.cod_cliente = mc.codcliente and mb.unidade = mc.unidade)\n\tleft join (\n\t\tselect \n\t\t\tunidade, \n\t\t\tid, \n\t\t\tsum(replace(total,',','.')::numeric) as saldo \n\t\tfrom saldo \n\t\twhere \n\t\t\ttipo <> 'FORNECEDOR' \n\t\tgroup by unidade, id \n\t) saldo on saldo.unidade = mc.unidade and saldo.id::numeric = mc.codcliente::numeric \nwhere \n\tstatus_pedido in ('Em Separacao', 'Finalizado') and cs.ativo = 'S' and status_pagamento = 'Pendente' and mb.unidade = 'Alumiaco Recife' \norder by nome_cliente desc, status_pedido asc, cod_pedido::numeric asc ",
+        "options": {}
+      },
+      "id": "d918c660-27a6-4d66-bfb4-b1c7026acc4a",
+      "name": "Postgres",
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 2.3,
+      "position": [
+        1008,
+        368
+      ],
+      "credentials": {
+        "postgres": {
+          "id": "G50fA6A0L90xaBIe",
+          "name": "Postgres account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "xlsx",
+        "options": {
+          "fileName": "={{ $('ARQUIVO').item.json.arq }}"
+        }
+      },
+      "id": "9f208ad3-e111-4052-ad83-af44d12c46cf",
+      "name": "Convert to File",
+      "type": "n8n-nodes-base.convertToFile",
+      "typeVersion": 1.1,
+      "position": [
+        1184,
+        368
+      ]
+    },
+    {
+      "parameters": {},
+      "id": "7ba41d21-8a4c-4b93-88de-0c587886b2c6",
+      "name": "Wait",
+      "type": "n8n-nodes-base.wait",
+      "typeVersion": 1.1,
+      "position": [
+        1728,
+        368
+      ],
+      "webhookId": "68e669d0-9dc7-4c9a-8862-5f631667f3f7"
+    },
+    {
+      "parameters": {
+        "operation": "upload",
+        "bucketName": "marcolanoperacoes",
+        "fileName": "={{ $('ARQUIVO').item.json.arq }}",
+        "additionalFields": {
+          "acl": "publicReadWrite"
+        }
+      },
+      "id": "54adf02d-0fdd-4b22-9d48-8da35664aba8",
+      "name": "AWS S31",
+      "type": "n8n-nodes-base.awsS3",
+      "typeVersion": 2,
+      "position": [
+        1360,
+        368
+      ],
+      "credentials": {
+        "aws": {
+          "id": "wojq9Jq4bZgupPjh",
+          "name": "AWS account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "delete",
+        "bucketName": "marcolanoperacoes",
+        "fileKey": "={{ $('ARQUIVO').item.json.arq }}",
+        "options": {}
+      },
+      "id": "e11f695b-95a8-4371-bd60-d98055cb65da",
+      "name": "AWS S33",
+      "type": "n8n-nodes-base.awsS3",
+      "typeVersion": 2,
+      "position": [
+        1904,
+        368
+      ],
+      "credentials": {
+        "aws": {
+          "id": "wojq9Jq4bZgupPjh",
+          "name": "AWS account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "c9777b34-96c3-49cb-9e8f-5171d677c039",
+              "name": "arq",
+              "value": "=Contas a Receber - Alumiaco Recife - d{{ $now.day }}-{{ $now.hour }}h{{ $now.minute }}m{{ $now.second }}s",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "c4ba3baa-2fc2-4bde-b860-ecc63dd13bca",
+      "name": "ARQUIVO",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.3,
+      "position": [
+        832,
+        368
+      ]
+    },
+    {
+      "parameters": {
+        "operation": "getAll",
+        "bucketName": "marcolanoperacoes",
+        "returnAll": true,
+        "options": {}
+      },
+      "id": "7f29303e-6775-4691-af28-c98398ae667a",
+      "name": "AWS S3",
+      "type": "n8n-nodes-base.awsS3",
+      "typeVersion": 2,
+      "position": [
+        1152,
+        752
+      ],
+      "credentials": {
+        "aws": {
+          "id": "wojq9Jq4bZgupPjh",
+          "name": "AWS account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "delete",
+        "bucketName": "marcolanoperacoes",
+        "fileKey": "=LançamentosErrados2024-08-20T10:26:14.901-03:00\t",
+        "options": {}
+      },
+      "id": "5855dd40-1cae-4234-9dd7-5183ce62bdb7",
+      "name": "AWS S37",
+      "type": "n8n-nodes-base.awsS3",
+      "typeVersion": 2,
+      "position": [
+        1328,
+        752
+      ],
+      "credentials": {
+        "aws": {
+          "id": "wojq9Jq4bZgupPjh",
+          "name": "AWS account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{ $('Token').item.json.Link }}send-document/xlsx",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "={{ $('Token').item.json.Name }}",
+              "value": "={{ $('Token').item.json.Value }}"
+            }
+          ]
+        },
+        "sendBody": true,
+        "contentType": "form-urlencoded",
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "phone",
+              "value": "=5581984225589"
+            },
+            {
+              "name": "fileName",
+              "value": "=Contas a Receber - Alumiaço Recife"
+            },
+            {
+              "name": "document",
+              "value": "=https://marcolanoperacoes.s3.amazonaws.com/{{ $('ARQUIVO').item.json.arq }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "b03d9e51-31f4-4624-8bae-3e417d6e65a6",
+      "name": "Jeanne",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.1,
+      "position": [
+        1552,
+        368
+      ]
+    },
+    {
+      "parameters": {
+        "documentId": {
+          "__rl": true,
+          "value": "https://docs.google.com/spreadsheets/d/1J9xHE08UPG2QnDrjFsiy3VU3Z8ziZT9aO9MF7ct5ruA/edit?usp=sharing",
+          "mode": "url"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 564051929,
+          "mode": "list",
+          "cachedResultName": "Token",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1J9xHE08UPG2QnDrjFsiy3VU3Z8ziZT9aO9MF7ct5ruA/edit#gid=564051929"
+        },
+        "options": {}
+      },
+      "id": "39a7a295-017f-4092-826f-54fee619ae67",
+      "name": "Token",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.3,
+      "position": [
+        624,
+        368
+      ],
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "HfbTEVMQHA5O66Ya",
+          "name": "Sheets JG e Japa"
+        }
+      }
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Schedule Trigger": {
+      "main": [
+        [
+          {
+            "node": "Token",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Postgres": {
+      "main": [
+        [
+          {
+            "node": "Convert to File",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Convert to File": {
+      "main": [
+        [
+          {
+            "node": "AWS S31",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Wait": {
+      "main": [
+        [
+          {
+            "node": "AWS S33",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "AWS S31": {
+      "main": [
+        [
+          {
+            "node": "Jeanne",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "ARQUIVO": {
+      "main": [
+        [
+          {
+            "node": "Postgres",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Jeanne": {
+      "main": [
+        [
+          {
+            "node": "Wait",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Token": {
+      "main": [
+        [
+          {
+            "node": "ARQUIVO",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "7871366d-98ad-4058-81ea-c73ace9ca7e7",
+  "meta": {
+    "instanceId": "a5e8675e548a032fda81ee9dc775b4fc0a1b2003aee794fb0b37064013276a0f"
+  },
+  "id": "yb5ZS4yfCqBfpAms",
+  "tags": [
+    {
+      "updatedAt": "2025-03-21T11:52:03.823Z",
+      "createdAt": "2025-03-21T11:52:03.823Z",
+      "id": "VQmA23kx6h1wy92X",
+      "name": "GUIS"
+    },
+    {
+      "updatedAt": "2025-03-24T11:52:02.582Z",
+      "createdAt": "2025-03-24T11:52:02.582Z",
+      "id": "uPLi4lJcaKHP324Z",
+      "name": "Setor - Financeiro"
+    }
+  ]
+}

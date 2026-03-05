@@ -1,0 +1,385 @@
+{
+  "name": "Estoque e Vendas Mensal de Ferragens",
+  "nodes": [
+    {
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "select\n\tecp.classe, \n\tecp.cod_produto, \n\tecp.nome_produto, \n\tecp.estoque_qtd,\n\tcoalesce(itens.vendamensal,0) as VendaMensal,\n\tecp.custo_unt,\n\tecp.preco_venda\nfrom estoque_completo_produtos ecp \n\tleft join (\n\t\tselect \n\t\t\tcod_produto, SUM(replace(QTD_PRODUTO,',','.')::numeric) as VendaMensal\n\t\tfrom pedidos p \n\t\t\tleft join coes c on p.coes = c.nome \n\t\twhere\n\t\t\tunidade = 'GM Maceio' and categoria_produto = 'FERRAGEM' \n\t\t\tand classe_produto like ('%POL%') and c.gerafaturamento = 'SIM'\n\t\t\tand data_pedido::Date >= to_char(NOW()::DATE, 'yyyy-mm-01')::date \n\t\tgroup by cod_produto\n\t) itens on itens.cod_produto::numeric = ecp.id_produto::numeric\nwhere \n\tunidade = 'GM Maceio' and categoria = 'FERRAGEM' and classe like ('%POL%')",
+        "options": {}
+      },
+      "id": "7ff5b1ce-44e4-4f2f-8279-61453884f5ce",
+      "name": "Postgres",
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 2.3,
+      "position": [
+        1008,
+        368
+      ],
+      "credentials": {
+        "postgres": {
+          "id": "G50fA6A0L90xaBIe",
+          "name": "Postgres account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "xlsx",
+        "options": {
+          "fileName": "={{ $('ARQUIVO').item.json.arq }}"
+        }
+      },
+      "id": "d5551889-71f5-46a0-bb1e-eb584c511e00",
+      "name": "Convert to File",
+      "type": "n8n-nodes-base.convertToFile",
+      "typeVersion": 1.1,
+      "position": [
+        1184,
+        368
+      ]
+    },
+    {
+      "parameters": {},
+      "id": "e302fa3e-875c-42c3-93d5-1aec6113db45",
+      "name": "Wait",
+      "type": "n8n-nodes-base.wait",
+      "typeVersion": 1.1,
+      "position": [
+        1728,
+        368
+      ],
+      "webhookId": "9737d547-ce11-49aa-987d-8183d37fcbfa"
+    },
+    {
+      "parameters": {
+        "operation": "upload",
+        "bucketName": "marcolanoperacoes",
+        "fileName": "={{ $('ARQUIVO').item.json.arq }}",
+        "additionalFields": {
+          "acl": "publicReadWrite"
+        }
+      },
+      "id": "9c512b23-2878-4129-8d8c-a321d0694df1",
+      "name": "AWS S31",
+      "type": "n8n-nodes-base.awsS3",
+      "typeVersion": 2,
+      "position": [
+        1360,
+        368
+      ],
+      "credentials": {
+        "aws": {
+          "id": "wojq9Jq4bZgupPjh",
+          "name": "AWS account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "delete",
+        "bucketName": "marcolanoperacoes",
+        "fileKey": "={{ $('ARQUIVO').item.json.arq }}",
+        "options": {}
+      },
+      "id": "4fe5d374-8655-4888-855e-9c2ed275b717",
+      "name": "AWS S33",
+      "type": "n8n-nodes-base.awsS3",
+      "typeVersion": 2,
+      "position": [
+        1904,
+        368
+      ],
+      "credentials": {
+        "aws": {
+          "id": "wojq9Jq4bZgupPjh",
+          "name": "AWS account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "delete",
+        "bucketName": "marcolanoperacoes",
+        "fileKey": "=Documentos Devolvidos - d25-6h0m1s",
+        "options": {}
+      },
+      "id": "09c47a9e-5970-40ad-a427-6bf7538420c3",
+      "name": "AWS S37",
+      "type": "n8n-nodes-base.awsS3",
+      "typeVersion": 2,
+      "position": [
+        1088,
+        624
+      ],
+      "credentials": {
+        "aws": {
+          "id": "wojq9Jq4bZgupPjh",
+          "name": "AWS account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "getAll",
+        "bucketName": "marcolanoperacoes",
+        "returnAll": true,
+        "options": {}
+      },
+      "id": "ea98fcb9-838d-42b1-998a-f1ea793aa4b3",
+      "name": "AWS S3",
+      "type": "n8n-nodes-base.awsS3",
+      "typeVersion": 2,
+      "position": [
+        864,
+        624
+      ],
+      "credentials": {
+        "aws": {
+          "id": "wojq9Jq4bZgupPjh",
+          "name": "AWS account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "c9777b34-96c3-49cb-9e8f-5171d677c039",
+              "name": "arq",
+              "value": "=Estoque_GM_Maceio - d{{ $now.day }}-{{ $now.hour }}h{{ $now.minute }}m{{ $now.second }}s",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "6c431a75-1ce4-4b97-aa50-9ee27b60f7fd",
+      "name": "ARQUIVO",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.3,
+      "position": [
+        832,
+        368
+      ]
+    },
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "field": "weeks",
+              "triggerAtDay": [
+                1,
+                3,
+                6
+              ],
+              "triggerAtHour": 22
+            }
+          ]
+        }
+      },
+      "id": "39fa571b-e3ca-461a-8470-68dd5db172cc",
+      "name": "Schedule Trigger1",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.1,
+      "position": [
+        464,
+        368
+      ]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{ $('Token').item.json.Link }}send-document/xlsx",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "={{ $('Token').item.json.Name }}",
+              "value": "={{ $('Token').item.json.Value }}"
+            }
+          ]
+        },
+        "sendBody": true,
+        "contentType": "form-urlencoded",
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "phone",
+              "value": "=5582999970073"
+            },
+            {
+              "name": "fileName",
+              "value": "=Estoque e Vendas Mensal - Ferragens de Polimero - Mês Corrente"
+            },
+            {
+              "name": "document",
+              "value": "=https://marcolanoperacoes.s3.amazonaws.com/{{ $('ARQUIVO').item.json.arq }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "94154066-02f7-4f66-9cf7-12dc8d717850",
+      "name": "Camila",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.1,
+      "position": [
+        1552,
+        368
+      ]
+    },
+    {
+      "parameters": {
+        "documentId": {
+          "__rl": true,
+          "value": "https://docs.google.com/spreadsheets/d/1J9xHE08UPG2QnDrjFsiy3VU3Z8ziZT9aO9MF7ct5ruA/edit?usp=sharing",
+          "mode": "url"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 564051929,
+          "mode": "list",
+          "cachedResultName": "Token",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1J9xHE08UPG2QnDrjFsiy3VU3Z8ziZT9aO9MF7ct5ruA/edit#gid=564051929"
+        },
+        "options": {}
+      },
+      "id": "f13506f3-f24b-42ba-b09c-3b80d0eb986a",
+      "name": "Token",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.3,
+      "position": [
+        640,
+        368
+      ],
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "HfbTEVMQHA5O66Ya",
+          "name": "Sheets JG e Japa"
+        }
+      }
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Postgres": {
+      "main": [
+        [
+          {
+            "node": "Convert to File",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Convert to File": {
+      "main": [
+        [
+          {
+            "node": "AWS S31",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Wait": {
+      "main": [
+        [
+          {
+            "node": "AWS S33",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "AWS S31": {
+      "main": [
+        [
+          {
+            "node": "Camila",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "ARQUIVO": {
+      "main": [
+        [
+          {
+            "node": "Postgres",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Schedule Trigger1": {
+      "main": [
+        [
+          {
+            "node": "Token",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Camila": {
+      "main": [
+        [
+          {
+            "node": "Wait",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Token": {
+      "main": [
+        [
+          {
+            "node": "ARQUIVO",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "0334bf81-decd-4847-bb38-1bcbf51f42cc",
+  "meta": {
+    "instanceId": "a5e8675e548a032fda81ee9dc775b4fc0a1b2003aee794fb0b37064013276a0f"
+  },
+  "id": "ERj4Pt4gMyGol7tr",
+  "tags": [
+    {
+      "updatedAt": "2025-03-24T14:24:48.667Z",
+      "createdAt": "2025-03-24T14:24:48.667Z",
+      "id": "DRs3JJesnD7xa1AS",
+      "name": "Setor - Comercial"
+    },
+    {
+      "updatedAt": "2025-03-24T14:39:50.325Z",
+      "createdAt": "2025-03-24T14:39:50.325Z",
+      "id": "qH4ffcGAZZcTC7Bc",
+      "name": "GM Maceió"
+    },
+    {
+      "updatedAt": "2025-03-21T11:52:03.823Z",
+      "createdAt": "2025-03-21T11:52:03.823Z",
+      "id": "VQmA23kx6h1wy92X",
+      "name": "GUIS"
+    }
+  ]
+}

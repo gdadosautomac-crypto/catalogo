@@ -1,0 +1,349 @@
+{
+  "name": "WHATSAPP-FILA-CONSUMIDOR",
+  "nodes": [
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "field": "seconds"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.3,
+      "position": [
+        0,
+        0
+      ],
+      "id": "ae2207c1-6739-4e54-a5db-304fb2a4bdb9",
+      "name": "Schedule Trigger"
+    },
+    {
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "SELECT *\nFROM whatsapp_fila\nWHERE status = 'pendente'\nORDER BY \n  CASE prioridade\n    WHEN 'alta' THEN 1\n    WHEN 'normal' THEN 2\n    WHEN 'baixa' THEN 3\n  END,\n  criado_em\nLIMIT 1\nFOR UPDATE SKIP LOCKED;\n",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 2.6,
+      "position": [
+        208,
+        0
+      ],
+      "id": "3f41ddb0-dbdc-4c1b-a5d6-83356b54455f",
+      "name": "Execute a SQL query",
+      "credentials": {
+        "postgres": {
+          "id": "G50fA6A0L90xaBIe",
+          "name": "Postgres account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "0f956148-0470-4cc9-868f-2e0530cc4d27",
+              "leftValue": "={{ $json.id }}",
+              "rightValue": 0,
+              "operator": {
+                "type": "number",
+                "operation": "exists",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        416,
+        0
+      ],
+      "id": "b48ff14a-d3f2-46d0-b277-f79b13d8c8e5",
+      "name": "If"
+    },
+    {
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "UPDATE whatsapp_fila\nSET status = 'enviando'\nWHERE id = {{ $json.id }};\n",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 2.6,
+      "position": [
+        656,
+        -16
+      ],
+      "id": "9f9ff1d8-5289-4798-bbd0-c171720591c6",
+      "name": "Execute a SQL query1",
+      "credentials": {
+        "postgres": {
+          "id": "G50fA6A0L90xaBIe",
+          "name": "Postgres account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "amount": 10
+      },
+      "type": "n8n-nodes-base.wait",
+      "typeVersion": 1.1,
+      "position": [
+        864,
+        -16
+      ],
+      "id": "cbda36d7-812b-4682-8dde-e14c260fb41c",
+      "name": "Wait",
+      "webhookId": "d0725a4e-6dfd-453e-a3b7-ed3d89e1f802"
+    },
+    {
+      "parameters": {
+        "rules": {
+          "values": [
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 3
+                },
+                "conditions": [
+                  {
+                    "leftValue": "={{ $('Execute a SQL query').item.json.tipo_envio }}",
+                    "rightValue": "texto",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    },
+                    "id": "536d29f1-52bf-4250-9471-ae3dd27627e3"
+                  }
+                ],
+                "combinator": "and"
+              }
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 3
+                },
+                "conditions": [
+                  {
+                    "id": "2782ef7a-aa0a-42da-9701-51f1cfe14ed3",
+                    "leftValue": "={{ $('Execute a SQL query').item.json.tipo_envio }}",
+                    "rightValue": "documento",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals",
+                      "name": "filter.operator.equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              }
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 3.4,
+      "position": [
+        1072,
+        -16
+      ],
+      "id": "2da55f8a-7dbe-43b0-a70f-91ff5e41d679",
+      "name": "Switch"
+    },
+    {
+      "parameters": {
+        "phone": "={{ $('Execute a SQL query').item.json.telefone }}",
+        "text": "={{ $('Execute a SQL query').item.json.mensagem }}",
+        "additionalFields": {}
+      },
+      "type": "n8n-nodes-zapi.zapi",
+      "typeVersion": 1,
+      "position": [
+        1280,
+        -112
+      ],
+      "id": "a5de124c-e998-4e05-96fc-2ab4f0ab8c20",
+      "name": "Send text",
+      "credentials": {
+        "zapiApi": {
+          "id": "cGI15AvSkFAV8Qrr",
+          "name": "Z-API account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "UPDATE whatsapp_fila\nSET status = 'enviado',\n    enviado_em = now()\nWHERE id = {{ $('Execute a SQL query').item.json.id }};\n",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 2.6,
+      "position": [
+        1504,
+        -16
+      ],
+      "id": "714bd3c0-38f4-40cc-8334-14152fc3bc14",
+      "name": "Execute a SQL query2",
+      "credentials": {
+        "postgres": {
+          "id": "G50fA6A0L90xaBIe",
+          "name": "Postgres account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "DELETE\nFROM whatsapp_fila\nWHERE id = {{ $('Execute a SQL query').item.json.id }};\n",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 2.6,
+      "position": [
+        1712,
+        -16
+      ],
+      "id": "8d84df62-0787-4a0b-b185-e29458292aba",
+      "name": "Execute a SQL query3",
+      "credentials": {
+        "postgres": {
+          "id": "G50fA6A0L90xaBIe",
+          "name": "Postgres account"
+        }
+      }
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Schedule Trigger": {
+      "main": [
+        [
+          {
+            "node": "Execute a SQL query",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Execute a SQL query": {
+      "main": [
+        [
+          {
+            "node": "If",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If": {
+      "main": [
+        [
+          {
+            "node": "Execute a SQL query1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Execute a SQL query1": {
+      "main": [
+        [
+          {
+            "node": "Wait",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Wait": {
+      "main": [
+        [
+          {
+            "node": "Switch",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Switch": {
+      "main": [
+        [
+          {
+            "node": "Send text",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        []
+      ]
+    },
+    "Send text": {
+      "main": [
+        [
+          {
+            "node": "Execute a SQL query2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Execute a SQL query2": {
+      "main": [
+        [
+          {
+            "node": "Execute a SQL query3",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "e62531fb-bbce-402d-b99f-d3d4c2573a8d",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "a5e8675e548a032fda81ee9dc775b4fc0a1b2003aee794fb0b37064013276a0f"
+  },
+  "id": "1cHO8H0WxtijaRoO",
+  "tags": [
+    {
+      "updatedAt": "2026-01-14T11:04:00.895Z",
+      "createdAt": "2025-03-21T11:47:30.374Z",
+      "id": "CvCy3KNJKyMxSQ3C",
+      "name": "GDA"
+    }
+  ]
+}

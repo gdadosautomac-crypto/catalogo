@@ -1,0 +1,382 @@
+{
+  "name": "Sugestão de Compras - Diário Alum. Recife",
+  "nodes": [
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "field": "weeks",
+              "triggerAtDay": [
+                1,
+                2,
+                3,
+                4,
+                5
+              ],
+              "triggerAtHour": 7,
+              "triggerAtMinute": 32
+            }
+          ]
+        }
+      },
+      "id": "52f9c73d-dcb8-45a8-a3f0-e0a15b33aefb",
+      "name": "Schedule Trigger",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.1,
+      "position": [
+        160,
+        368
+      ]
+    },
+    {
+      "parameters": {
+        "operation": "xlsx",
+        "options": {
+          "fileName": "={{ $('ARQUIVO').item.json.arq }}"
+        }
+      },
+      "id": "1f066d97-395d-429c-87a3-83cae0a25be9",
+      "name": "Convert to File",
+      "type": "n8n-nodes-base.convertToFile",
+      "typeVersion": 1.1,
+      "position": [
+        1072,
+        144
+      ]
+    },
+    {
+      "parameters": {},
+      "id": "f1aa092b-efcb-4bb4-a432-086d764981d8",
+      "name": "Wait",
+      "type": "n8n-nodes-base.wait",
+      "typeVersion": 1.1,
+      "position": [
+        1648,
+        144
+      ],
+      "webhookId": "599b7b00-8cbe-4385-bd51-1a04f8de1dc8"
+    },
+    {
+      "parameters": {
+        "operation": "upload",
+        "bucketName": "marcolanoperacoes",
+        "fileName": "={{ $('ARQUIVO').item.json.arq }}",
+        "additionalFields": {
+          "acl": "publicReadWrite"
+        }
+      },
+      "id": "06397c88-a137-4b8b-954c-3db39e0b7013",
+      "name": "AWS S31",
+      "type": "n8n-nodes-base.awsS3",
+      "typeVersion": 2,
+      "position": [
+        1280,
+        144
+      ],
+      "credentials": {
+        "aws": {
+          "id": "wojq9Jq4bZgupPjh",
+          "name": "AWS account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "delete",
+        "bucketName": "marcolanoperacoes",
+        "fileKey": "={{ $('ARQUIVO').item.json.arq }}",
+        "options": {}
+      },
+      "id": "8190e675-f308-44b2-8351-1835807b56cc",
+      "name": "AWS S33",
+      "type": "n8n-nodes-base.awsS3",
+      "typeVersion": 2,
+      "position": [
+        1824,
+        144
+      ],
+      "credentials": {
+        "aws": {
+          "id": "wojq9Jq4bZgupPjh",
+          "name": "AWS account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "c9777b34-96c3-49cb-9e8f-5171d677c039",
+              "name": "arq",
+              "value": "=SugestaoDiaria - d{{ $now.day }}-{{ $now.hour }}h{{ $now.minute }}m{{ $now.second }}s",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "d72df3df-fde6-43d2-a96f-f3ae686e74fe",
+      "name": "ARQUIVO",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.3,
+      "position": [
+        688,
+        144
+      ]
+    },
+    {
+      "parameters": {
+        "operation": "getAll",
+        "bucketName": "marcolanoperacoes",
+        "returnAll": true,
+        "options": {}
+      },
+      "id": "c21461d1-7e47-4574-87a0-844032b02632",
+      "name": "AWS S3",
+      "type": "n8n-nodes-base.awsS3",
+      "typeVersion": 2,
+      "position": [
+        640,
+        448
+      ],
+      "credentials": {
+        "aws": {
+          "id": "wojq9Jq4bZgupPjh",
+          "name": "AWS account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "delete",
+        "bucketName": "marcolanoperacoes",
+        "fileKey": "=LançamentosErrados2024-08-20T10:26:14.901-03:00\t",
+        "options": {}
+      },
+      "id": "f1c33450-4e93-4b84-b89a-97acde6a7ec2",
+      "name": "AWS S37",
+      "type": "n8n-nodes-base.awsS3",
+      "typeVersion": 2,
+      "position": [
+        832,
+        448
+      ],
+      "credentials": {
+        "aws": {
+          "id": "wojq9Jq4bZgupPjh",
+          "name": "AWS account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "documentId": {
+          "__rl": true,
+          "value": "https://docs.google.com/spreadsheets/d/1J9xHE08UPG2QnDrjFsiy3VU3Z8ziZT9aO9MF7ct5ruA/edit?usp=sharing",
+          "mode": "url"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 564051929,
+          "mode": "list",
+          "cachedResultName": "Token",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1J9xHE08UPG2QnDrjFsiy3VU3Z8ziZT9aO9MF7ct5ruA/edit#gid=564051929"
+        },
+        "options": {}
+      },
+      "id": "1d5e353b-df18-40c2-a4c1-f7d70468140a",
+      "name": "Token",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.3,
+      "position": [
+        368,
+        368
+      ],
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "HfbTEVMQHA5O66Ya",
+          "name": "Sheets JG e Japa"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{ $('Token').item.json.Link }}send-document/xlsx",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "={{ $('Token').item.json.Name }}",
+              "value": "={{ $('Token').item.json.Value }}"
+            }
+          ]
+        },
+        "sendBody": true,
+        "contentType": "form-urlencoded",
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "phone",
+              "value": "=5581982174045"
+            },
+            {
+              "name": "fileName",
+              "value": "=Sugestão Completa"
+            },
+            {
+              "name": "document",
+              "value": "=https://marcolanoperacoes.s3.amazonaws.com/{{ $('ARQUIVO').item.json.arq }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "ad4ddf42-01ea-40f7-a79f-7a8b97d13000",
+      "name": "Marcia",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.1,
+      "position": [
+        1472,
+        144
+      ]
+    },
+    {
+      "parameters": {
+        "operation": "executeQuery",
+        "query": " WITH reservado_aberto AS (\n         SELECT p.tipo_unidade,\n            p.unidade,\n            p.cod_produto,\n            p.categoria_produto,\n            p.classe_produto,\n            p.sub_classe_produto,\n            p.sub_classe_produto,\n            sum(replace(p.qtd_produto, ','::text, '.'::text)::numeric) AS qtd_produto\n           FROM pedidos p\n          WHERE p.status_pedido = 'Aberto'::text AND p.tipo_pedido = 'Serie'::text\n          GROUP BY p.tipo_unidade, p.unidade, p.cod_produto, p.categoria_produto, p.classe_produto, p.sub_classe_produto\n        ), reservado_separacao AS (\n         SELECT vendas_1.tipo_unidade,\n            vendas_1.unidade,\n            vendas_1.cod_produto,\n            vendas_1.categoria_produto,\n            vendas_1.classe_produto,\n            vendas_1.sub_classe_produto,\n            sum(replace(vendas_1.qtd_produto, ','::text, '.'::text)::numeric) AS qtd_produto_vendido,\n            sum(entregas.qtd_entregue) AS qtd_entregue\n           FROM pedidos vendas_1\n             LEFT JOIN ( SELECT entregas_1.unidade,\n                    entregas_1.cod_pedido,\n                    entregas_1.cod_item,\n                    sum(replace(entregas_1.qtd_entregue::text, ','::text, '.'::text)::numeric) AS qtd_entregue\n                   FROM entregas entregas_1\n                  GROUP BY entregas_1.unidade, entregas_1.cod_pedido, entregas_1.cod_item) entregas ON vendas_1.unidade = entregas.unidade::text AND vendas_1.id_item::text = concat(entregas.cod_pedido, entregas.cod_item)\n          WHERE vendas_1.status_pedido = 'Em Separacao'::text AND vendas_1.tipo_pedido = 'Serie'::text\n          GROUP BY vendas_1.tipo_unidade, vendas_1.unidade, vendas_1.cod_produto, vendas_1.categoria_produto, vendas_1.classe_produto, vendas_1.sub_classe_produto\n        ), estoque_total AS (\n         SELECT ecp.tipo_unidade,\n            ecp.unidade,\n            ecp.categoria,\n            ecp.classe,\n            ecp.subclasse,\n            ecp.nome_produto,\n            ecp.estoque_qtd,\n            ecp.estoque_metro,\n            ecp.estoque_peso,\n            ecp.custo,\n            ecp.id_produto,\n            ecp.custo_unt,\n            ecp.fator_conversao,\n            ecp.preco_venda,\n            ecp.cod_produto\n           FROM estoque_completo_produtos ecp\n        ), vendas_total AS (\n         SELECT p.unidade,\n            p.cod_produto,\n            round(sum(replace(p.qtd_produto, ','::text, '.'::text)::numeric), 2) AS qtd_vendido,\n            round(sum(replace(p.qtd_produto, ','::text, '.'::text)::numeric) / 11::numeric, 0) AS qtd_vendido_semanas,\n            round(sum(replace(p.valor_unitario_total_com_desconto, ','::text, '.'::text)::numeric), 2) AS valor_vendido,\n            round(sum(replace(p.custo_unitario_total_produto, ','::text, '.'::text)::numeric), 2) AS custo_vendido\n           FROM pedidos p\n             LEFT JOIN coes c ON c.nome::text = p.coes\n          WHERE c.gerafaturamento::text = 'SIM'::text AND p.data_pedido::date >= (now()::date - '90 days'::interval)\n          GROUP BY p.unidade, p.cod_produto\n        ), qtd_comprada AS (\n         SELECT pc.unidade,\n            pc.cod_produto,\n            ecp.categoria,\n            ecp.classe,\n            ecp.subclasse,\n            ecp.nome_produto,\n            sum(replace(pc.qtd_comprada::text, ','::text, '.'::text)::numeric) AS qtd_comprada\n           FROM pedidos_compras pc\n             LEFT JOIN estoque_completo_produtos ecp ON pc.cod_produto::text = ecp.id_produto::text AND pc.unidade::text = ecp.unidade::text\n          WHERE pc.status::text = '1'::text AND pc.tipo_unidade::text <> 'Tempera'::text\n          GROUP BY pc.unidade, pc.cod_produto, ecp.categoria, ecp.classe, ecp.subclasse, ecp.nome_produto\n        ), fornecedor AS (\n         SELECT x.unidade,\n            x.cod_produto,\n            x.pedido,\n            x.data_pedido,\n            compras.fornecedor\n           FROM ( SELECT pc.unidade,\n                    pc.cod_produto,\n                    max(pc.pedido::text) AS pedido,\n                    max(pc.data_pedido::date) AS data_pedido\n                   FROM pedidos_compras pc\n                  GROUP BY pc.unidade, pc.cod_produto) x\n             LEFT JOIN pedidos_compras compras ON x.unidade::text = compras.unidade::text AND x.cod_produto::text = compras.cod_produto::text AND x.pedido = compras.pedido::text\n        )\n SELECT estoque.unidade::text AS unidade,\n    estoque.categoria::text AS categoria,\n    estoque.classe::text AS classe,\n    estoque.nome_produto::text AS nome_produto,\n    COALESCE(COALESCE(estoque.estoque_qtd - COALESCE(sep.qtd_produto_vendido - sep.qtd_entregue, 0::numeric) - COALESCE(abt.qtd_produto, 0::numeric), 0::numeric)::text, 0::text) AS estoque_disponivel,\n    COALESCE(qtd.qtd_comprada, 0::numeric)::text AS qtd_comprada,\n    COALESCE(estoque.fator_conversao::text, 0::text) AS fator_conversao,\n    COALESCE(estoque.custo_unt::text, 0::text) AS custo_unitario,\n    COALESCE(vendas.qtd_vendido, 0::numeric)::text AS qtd_total_vendas,\n    COALESCE(vendas.qtd_vendido_semanas, 0::numeric)::text AS qtd_vendido_semanas,\n    COALESCE((estoque.estoque_qtd - COALESCE(sep.qtd_produto_vendido - sep.qtd_entregue, 0::numeric) - COALESCE(abt.qtd_produto, 0::numeric) + COALESCE(qtd.qtd_comprada, 0::numeric) - COALESCE(vendas.qtd_vendido, 0::numeric))::text, 0::text) AS sugestao,\n    estoque.subclasse,\n    COALESCE(vendas.valor_vendido::text, 0::text) AS valor_vendido,\n    COALESCE(vendas.custo_vendido::text, 0::text) AS custo_vendido,\n    COALESCE(estoque.preco_venda::text, 0::text) AS preco_venda_unit,\n    estoque.tipo_unidade,\n    u.matriz,\n    fornecedor.fornecedor,\n    estoque.cod_produto AS id_produto\n   FROM estoque_total estoque\n     LEFT JOIN vendas_total vendas ON vendas.unidade = estoque.unidade::text AND vendas.cod_produto = estoque.id_produto::text\n     LEFT JOIN reservado_aberto abt(tipo_unidade, unidade, cod_produto, categoria_produto, classe_produto, sub_classe_produto, sub_classe_produto_1, qtd_produto) ON abt.unidade = estoque.unidade::text AND abt.cod_produto = estoque.id_produto::text\n     LEFT JOIN reservado_separacao sep ON sep.unidade = estoque.unidade::text AND sep.cod_produto = estoque.id_produto::text\n     LEFT JOIN qtd_comprada qtd ON qtd.unidade::text = estoque.unidade::text AND qtd.cod_produto::text = estoque.id_produto::text\n     LEFT JOIN unidades u ON u.unidade::text = estoque.unidade::text\n     LEFT JOIN fornecedor ON fornecedor.unidade::text = estoque.unidade::text AND fornecedor.cod_produto::text = estoque.id_produto::text\n  WHERE estoque.unidade in ('GM Recife','Alumiaco Recife', 'Agreste Vidros', 'OLINDA')",
+        "options": {}
+      },
+      "id": "8c21df65-a373-4f2f-97b5-b95d71bba32f",
+      "name": "Postgres2",
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 2.3,
+      "position": [
+        864,
+        144
+      ],
+      "credentials": {
+        "postgres": {
+          "id": "G50fA6A0L90xaBIe",
+          "name": "Postgres account"
+        }
+      }
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Schedule Trigger": {
+      "main": [
+        [
+          {
+            "node": "Token",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Wait": {
+      "main": [
+        [
+          {
+            "node": "AWS S33",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "ARQUIVO": {
+      "main": [
+        [
+          {
+            "node": "Postgres2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "AWS S31": {
+      "main": [
+        [
+          {
+            "node": "Marcia",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Convert to File": {
+      "main": [
+        [
+          {
+            "node": "AWS S31",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Token": {
+      "main": [
+        [
+          {
+            "node": "ARQUIVO",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Marcia": {
+      "main": [
+        [
+          {
+            "node": "Wait",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Postgres2": {
+      "main": [
+        [
+          {
+            "node": "Convert to File",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": true,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "96e51672-15a8-4b96-8980-580211bfdcdd",
+  "meta": {
+    "instanceId": "a5e8675e548a032fda81ee9dc775b4fc0a1b2003aee794fb0b37064013276a0f"
+  },
+  "id": "JjeU4QLTfjRlm04x",
+  "tags": [
+    {
+      "updatedAt": "2025-03-21T11:52:03.823Z",
+      "createdAt": "2025-03-21T11:52:03.823Z",
+      "id": "VQmA23kx6h1wy92X",
+      "name": "GUIS"
+    },
+    {
+      "updatedAt": "2025-03-24T14:43:35.059Z",
+      "createdAt": "2025-03-24T14:43:35.059Z",
+      "id": "JCrxrJRiE0qZeEcm",
+      "name": "Setor - Compras"
+    }
+  ]
+}

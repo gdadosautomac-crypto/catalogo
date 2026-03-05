@@ -1,0 +1,343 @@
+{
+  "name": "Movimentação Avulsa - Belga",
+  "nodes": [
+    {
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "select \n\tma.usuario, \n\tma.tipo, \n\tma.motivo, \n\tma.codigo_interno, \n\tma.produto, \n\tma.quantidade, \n\tma.saldo, \n\tma.valor \nfrom movimentacoes_avulsas ma \nwhere ma.unidade = 'BELGA POLIMEROS' AND ma.data_movimentacao::date = current_date - 1",
+        "options": {}
+      },
+      "id": "b1443cfa-dcc3-41e6-bb7b-0e2566eae168",
+      "name": "Postgres",
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 2.3,
+      "position": [
+        512,
+        -64
+      ],
+      "credentials": {
+        "postgres": {
+          "id": "G50fA6A0L90xaBIe",
+          "name": "Postgres account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "field": "weeks",
+              "triggerAtDay": [
+                1,
+                2,
+                3,
+                4,
+                5,
+                6
+              ],
+              "triggerAtHour": 5,
+              "triggerAtMinute": 7
+            }
+          ]
+        }
+      },
+      "id": "662a38b1-32a8-487c-901e-d22077913a49",
+      "name": "Schedule Trigger",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.1,
+      "position": [
+        -48,
+        -64
+      ]
+    },
+    {
+      "parameters": {
+        "operation": "upload",
+        "bucketName": "marcolanoperacoes",
+        "fileName": "={{ $('ARQUIVO1').item.json.arq }}",
+        "additionalFields": {
+          "acl": "publicReadWrite"
+        }
+      },
+      "id": "dfd4d01f-fb81-4dbe-b5e9-a18ed02ec077",
+      "name": "AWS S31",
+      "type": "n8n-nodes-base.awsS3",
+      "typeVersion": 2,
+      "position": [
+        912,
+        -64
+      ],
+      "credentials": {
+        "aws": {
+          "id": "wojq9Jq4bZgupPjh",
+          "name": "AWS account"
+        }
+      }
+    },
+    {
+      "parameters": {},
+      "id": "48d7e133-262f-4a70-b5b2-27206c77d708",
+      "name": "Wait",
+      "type": "n8n-nodes-base.wait",
+      "typeVersion": 1.1,
+      "position": [
+        1280,
+        -64
+      ],
+      "webhookId": "d688624b-ab2a-43a9-91e7-36ac16323160"
+    },
+    {
+      "parameters": {
+        "operation": "delete",
+        "bucketName": "marcolanoperacoes",
+        "fileKey": "={{ $('ARQUIVO').item.json.arq }}",
+        "options": {}
+      },
+      "id": "096147f6-7352-4bc8-b4c9-d7ee4e4b8807",
+      "name": "AWS S33",
+      "type": "n8n-nodes-base.awsS3",
+      "typeVersion": 2,
+      "position": [
+        1456,
+        -64
+      ],
+      "credentials": {
+        "aws": {
+          "id": "wojq9Jq4bZgupPjh",
+          "name": "AWS account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "documentId": {
+          "__rl": true,
+          "value": "https://docs.google.com/spreadsheets/d/1J9xHE08UPG2QnDrjFsiy3VU3Z8ziZT9aO9MF7ct5ruA/edit?usp=sharing",
+          "mode": "url"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 564051929,
+          "mode": "list",
+          "cachedResultName": "Token",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1J9xHE08UPG2QnDrjFsiy3VU3Z8ziZT9aO9MF7ct5ruA/edit#gid=564051929"
+        },
+        "options": {}
+      },
+      "id": "bb394750-6f51-40a7-8145-0c9e58c240ae",
+      "name": "Token",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.3,
+      "position": [
+        144,
+        -64
+      ],
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "8Ytd3zZKAOSyZNqC",
+          "name": "Sheets Andre"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "c9777b34-96c3-49cb-9e8f-5171d677c039",
+              "name": "arq",
+              "value": "=Mov. Avulsa - BELGA - d{{ $now.day }}-{{ $now.hour }}h{{ $now.minute }}m{{ $now.second }}s",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "b2a803cd-c650-4f3a-b922-2c059b843526",
+      "name": "ARQUIVO1",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.3,
+      "position": [
+        320,
+        -64
+      ]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{ $('Token').item.json.Link }}send-document/xlsx",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "={{ $('Token').item.json.Name }}",
+              "value": "={{ $('Token').item.json.Value }}"
+            }
+          ]
+        },
+        "sendBody": true,
+        "contentType": "form-urlencoded",
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "phone",
+              "value": "=5581987473570"
+            },
+            {
+              "name": "fileName",
+              "value": "=Movimentções Avulsas Belga - {{ $today.minus({ days: 1 }).format('DD') }}"
+            },
+            {
+              "name": "document",
+              "value": "=https://marcolanoperacoes.s3.amazonaws.com/{{ $('ARQUIVO1').item.json.arq }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "42f3b8eb-b476-4c34-95e4-ac08a283c224",
+      "name": "Dedé",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.1,
+      "position": [
+        1104,
+        -64
+      ]
+    },
+    {
+      "parameters": {
+        "operation": "xlsx",
+        "options": {}
+      },
+      "id": "3e6fd079-44bb-43af-a0fe-5cd27760b410",
+      "name": "ARQUIVO",
+      "type": "n8n-nodes-base.convertToFile",
+      "typeVersion": 1.1,
+      "position": [
+        720,
+        -64
+      ]
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Postgres": {
+      "main": [
+        [
+          {
+            "node": "ARQUIVO",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Schedule Trigger": {
+      "main": [
+        [
+          {
+            "node": "Token",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "AWS S31": {
+      "main": [
+        [
+          {
+            "node": "Dedé",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Wait": {
+      "main": [
+        [
+          {
+            "node": "AWS S33",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Token": {
+      "main": [
+        [
+          {
+            "node": "ARQUIVO1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "ARQUIVO1": {
+      "main": [
+        [
+          {
+            "node": "Postgres",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Dedé": {
+      "main": [
+        [
+          {
+            "node": "Wait",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "ARQUIVO": {
+      "main": [
+        [
+          {
+            "node": "AWS S31",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": true,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "90bd5bed-3289-4840-9045-21a863ee779b",
+  "meta": {
+    "instanceId": "a5e8675e548a032fda81ee9dc775b4fc0a1b2003aee794fb0b37064013276a0f"
+  },
+  "id": "REg7VmAEAJ9XW2Sr",
+  "tags": [
+    {
+      "updatedAt": "2025-03-24T14:40:59.830Z",
+      "createdAt": "2025-03-24T14:40:59.830Z",
+      "id": "vK8d40ObLmVSMtwq",
+      "name": "Belga Polímeros"
+    },
+    {
+      "updatedAt": "2026-01-14T11:04:00.895Z",
+      "createdAt": "2025-03-21T11:47:30.374Z",
+      "id": "CvCy3KNJKyMxSQ3C",
+      "name": "GDA"
+    },
+    {
+      "updatedAt": "2025-03-21T11:52:53.040Z",
+      "createdAt": "2025-03-21T11:52:53.040Z",
+      "id": "9sBc8DYqQwfJKaa4",
+      "name": "Setor - Data Science"
+    }
+  ]
+}

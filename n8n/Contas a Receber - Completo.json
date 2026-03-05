@@ -1,0 +1,394 @@
+{
+  "name": "Contas a Receber - Completo",
+  "nodes": [
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "field": "weeks",
+              "triggerAtDay": [
+                1,
+                2,
+                3,
+                4,
+                5,
+                0
+              ],
+              "triggerAtHour": 6
+            }
+          ]
+        }
+      },
+      "id": "48e44a29-3726-44fa-8067-b4febbd11ee5",
+      "name": "Schedule Trigger",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.1,
+      "position": [
+        0,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "(\nselect \n\tdd.tipo_unidade, \n\tdd.unidade, \n\tdd.cliente, \n\t'' as cod_pedido, \n\t'' as coes, \n\tmc.ramo_atividade, \n\tdd.tipo as status_pedido,\n\t0::NUMERIC as valor_final_pedido, \n\t0::numeric as valor_entregue, \n\treplace(dd.valortitulo,',','.')::numeric as total_devido, \n\t0::NUMERIC as Saldo, \n\tmc.rota,\t\n\tmc.nome_fantasia,\t\n\t'' as cod_romaneios,\t\n\t'' as datas_entregas,\n\tdd.observacoes as pedido_cliente,\n\tdd.emissaotitulo as DataVencimento\nfrom documentos_devolvidos dd \n\tleft join mapeamento_clientes mc on dd.unidade = mc.unidade and dd.codcliente = mc.codcliente \n) union all (\nselect \n\tmb.tipo_unidade, \n\tmb.unidade, \n\tmb.nome_cliente, \n\tmb.cod_pedido, \n\tmb.coes, \n\tmc.ramo_atividade, \n\tmb.status_pedido, \n\tROUND(mb.valor_final_pedido::numeric,2) as valor_final_pedido, \n\tROUND(mb.valor_entregue::numeric,2) as valor_entregue, \n\tROUND(\n\tcase  \t\n\t\twhen status_pedido = 'Finalizado' then total_titulo\t\n\t\twhen (mb.status_pedido = 'Em Separacao' and cs.tipotitulo = 'VENDA') then total_titulo - (mb.valor_final_pedido - mb.valor_entregue)\t\n\t\twhen (mb.status_pedido = 'Em Separacao' and cs.tipotitulo = 'ESTOQUE') then total_titulo\n\tend::NUMERIC,2) as total_devido, \n\t(saldo.saldo) as Saldo, \n\trota_entrega ,\t\n\tmc.nome_fantasia,\t\n\tmb.cod_romaneios,\t\n\tmb.datas_entregas::text,\n\tmb.pedido_cliente,\n\t'' as DataVencimento\nfrom main_balanco mb \n\tleft join (\n\t\tselect \n\t\t\tunidade, \n\t\t\tcoes, \n\t\t\ttipotitulo, \n\t\t\tativo \n\t\tfrom coes_sistema cs \n\t\tgroup by unidade, coes, tipotitulo, ativo\n\t) cs on mb.unidade = cs.unidade and mb.coes = cs.coes \n\tleft join mapeamento_clientes mc on ( mb.cod_cliente = mc.codcliente and mb.unidade = mc.unidade )\n\tleft join (\n\t\tselect \n\t\t\tunidade, \n\t\t\tid, \n\t\t\tsum(replace(total,',','.')::numeric) as saldo \n\t\tfrom saldo where tipo <> 'FORNECEDOR' \n\t\tgroup by unidade, id \n\t) saldo on saldo.unidade = mc.unidade and saldo.id::numeric = mc.codcliente::numeric \nwhere \n\tstatus_pedido in ('Em Separacao', 'Finalizado') and cs.ativo = 'S' \n\tand status_pagamento = 'Pendente' and mb.datas_entregas not like '%2021%'\n) union all (\n\tselect \n\t\tpf.tipo_unidade, \n\t\tpf.unidade, \n\t\tpf.nome_cliente, \n\t\t'' as cod_pedido, \n\t\t'' as coes, \n\t\tmc.ramo_atividade, \n\t\tpf.tipo_documento as status_pedido,\n\t\t0::NUMERIC as valor_final_pedido, \n\t\t0::numeric as valor_entregue, \n\t\treplace(pf.valor_titulo,',','.')::numeric as total_devido, \n\t\t0::NUMERIC as Saldo, \n\t\tmc.rota,\t\n\t\tmc.nome_fantasia,\t\n\t\t'' as cod_romaneios,\t\n\t\tpf.data_emissao as emissaotitulo ,\n\t\tpf.tipo_documento as pedido_cliente,\n\t\t(pf. data_vencimento::date)::text as DataVencimento\n\tfrom painel_financeiro pf \n\t\tleft join mapeamento_clientes mc on pf.unidade = mc.unidade and pf.cod_cliente = mc.codcliente  \n\twhere tipo_documento in ('boleto', 'cheque') and data_emissao::date  >= '2023-06-01' AND status = '1'\n)",
+        "options": {}
+      },
+      "id": "0ee35609-a30f-45bf-a628-03c8b7e7088d",
+      "name": "Postgres",
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 2.3,
+      "position": [
+        592,
+        0
+      ],
+      "credentials": {
+        "postgres": {
+          "id": "G50fA6A0L90xaBIe",
+          "name": "Postgres account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "xlsx",
+        "options": {
+          "fileName": "={{ $('ARQUIVO').item.json.arq }}"
+        }
+      },
+      "id": "2891ed4c-e822-43d7-ab5f-ad126e9d37a5",
+      "name": "Convert to File",
+      "type": "n8n-nodes-base.convertToFile",
+      "typeVersion": 1.1,
+      "position": [
+        768,
+        0
+      ]
+    },
+    {
+      "parameters": {},
+      "id": "fdadd158-8848-40a8-a258-fb7ebfc82101",
+      "name": "Wait",
+      "type": "n8n-nodes-base.wait",
+      "typeVersion": 1.1,
+      "position": [
+        1312,
+        0
+      ],
+      "webhookId": "4791b544-01fb-493a-97db-6a080be1e752"
+    },
+    {
+      "parameters": {
+        "operation": "upload",
+        "bucketName": "marcolanoperacoes",
+        "fileName": "={{ $('ARQUIVO').item.json.arq }}",
+        "additionalFields": {
+          "acl": "publicReadWrite"
+        }
+      },
+      "id": "dca33d5d-bbad-45b6-985e-b1f17e1bd76e",
+      "name": "AWS S31",
+      "type": "n8n-nodes-base.awsS3",
+      "typeVersion": 2,
+      "position": [
+        944,
+        0
+      ],
+      "credentials": {
+        "aws": {
+          "id": "wojq9Jq4bZgupPjh",
+          "name": "AWS account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "delete",
+        "bucketName": "marcolanoperacoes",
+        "fileKey": "={{ $('ARQUIVO').item.json.arq }}",
+        "options": {}
+      },
+      "id": "24616670-a623-47a2-8b70-bbdfc7e6ca86",
+      "name": "AWS S33",
+      "type": "n8n-nodes-base.awsS3",
+      "typeVersion": 2,
+      "position": [
+        1488,
+        0
+      ],
+      "credentials": {
+        "aws": {
+          "id": "wojq9Jq4bZgupPjh",
+          "name": "AWS account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{ $('Token').item.json.Link }}send-document/xlsx",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "={{ $('Token').item.json.Name }}",
+              "value": "={{ $('Token').item.json.Value }}"
+            }
+          ]
+        },
+        "sendBody": true,
+        "contentType": "form-urlencoded",
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "phone",
+              "value": "=5581994541473"
+            },
+            {
+              "name": "fileName",
+              "value": "=Contas a Receber - Completo"
+            },
+            {
+              "name": "document",
+              "value": "=https://marcolanoperacoes.s3.amazonaws.com/{{ $('ARQUIVO').item.json.arq }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "4dbfd38e-1a5f-4dab-9483-bacb5d5a7a9d",
+      "name": "Grupo do Financeiro",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.1,
+      "position": [
+        1120,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "c9777b34-96c3-49cb-9e8f-5171d677c039",
+              "name": "arq",
+              "value": "=Contas a Receber Completo - d{{ $now.day }}-{{ $now.hour }}h{{ $now.minute }}m{{ $now.second }}s",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "992aa6aa-b32b-4edc-877c-5a40bb302c80",
+      "name": "ARQUIVO",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.3,
+      "position": [
+        400,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "operation": "getAll",
+        "bucketName": "marcolanoperacoes",
+        "returnAll": true,
+        "options": {}
+      },
+      "id": "a4e1b6b1-b97e-444a-afef-bd6f60ba0a61",
+      "name": "AWS S3",
+      "type": "n8n-nodes-base.awsS3",
+      "typeVersion": 2,
+      "position": [
+        720,
+        384
+      ],
+      "credentials": {
+        "aws": {
+          "id": "wojq9Jq4bZgupPjh",
+          "name": "AWS account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "delete",
+        "bucketName": "marcolanoperacoes",
+        "fileKey": "=LançamentosErrados2024-08-20T10:26:14.901-03:00\t",
+        "options": {}
+      },
+      "id": "a5a2a346-fa27-466d-96d7-e4bf7189c1a8",
+      "name": "AWS S37",
+      "type": "n8n-nodes-base.awsS3",
+      "typeVersion": 2,
+      "position": [
+        912,
+        384
+      ],
+      "credentials": {
+        "aws": {
+          "id": "wojq9Jq4bZgupPjh",
+          "name": "AWS account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "documentId": {
+          "__rl": true,
+          "value": "https://docs.google.com/spreadsheets/d/1J9xHE08UPG2QnDrjFsiy3VU3Z8ziZT9aO9MF7ct5ruA/edit?usp=sharing",
+          "mode": "url"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 564051929,
+          "mode": "list",
+          "cachedResultName": "Token",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1J9xHE08UPG2QnDrjFsiy3VU3Z8ziZT9aO9MF7ct5ruA/edit#gid=564051929"
+        },
+        "options": {}
+      },
+      "id": "968fa108-5f07-4a14-b515-69bb9c320326",
+      "name": "Token",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.3,
+      "position": [
+        208,
+        0
+      ],
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "HfbTEVMQHA5O66Ya",
+          "name": "Sheets JG e Japa"
+        }
+      }
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Schedule Trigger": {
+      "main": [
+        [
+          {
+            "node": "Token",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Postgres": {
+      "main": [
+        [
+          {
+            "node": "Convert to File",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Convert to File": {
+      "main": [
+        [
+          {
+            "node": "AWS S31",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Wait": {
+      "main": [
+        [
+          {
+            "node": "AWS S33",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "AWS S31": {
+      "main": [
+        [
+          {
+            "node": "Grupo do Financeiro",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Grupo do Financeiro": {
+      "main": [
+        [
+          {
+            "node": "Wait",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "ARQUIVO": {
+      "main": [
+        [
+          {
+            "node": "Postgres",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Token": {
+      "main": [
+        [
+          {
+            "node": "ARQUIVO",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "AWS S3": {
+      "main": [
+        [
+          {
+            "node": "AWS S37",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "ff34c745-62c8-446d-99fc-21314f06eba1",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "a5e8675e548a032fda81ee9dc775b4fc0a1b2003aee794fb0b37064013276a0f"
+  },
+  "id": "zp2vGK4xbN3Uowu6",
+  "tags": [
+    {
+      "updatedAt": "2025-03-21T11:52:03.823Z",
+      "createdAt": "2025-03-21T11:52:03.823Z",
+      "id": "VQmA23kx6h1wy92X",
+      "name": "GUIS"
+    },
+    {
+      "updatedAt": "2025-03-24T11:52:02.582Z",
+      "createdAt": "2025-03-24T11:52:02.582Z",
+      "id": "uPLi4lJcaKHP324Z",
+      "name": "Setor - Financeiro"
+    }
+  ]
+}

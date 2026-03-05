@@ -1,0 +1,382 @@
+{
+  "name": "Contas a Receber - Imbravidros",
+  "nodes": [
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "field": "weeks",
+              "triggerAtDay": [
+                1,
+                2,
+                3,
+                4,
+                5,
+                0
+              ],
+              "triggerAtHour": 6
+            }
+          ]
+        }
+      },
+      "id": "6eb366eb-13bd-4ddd-93cc-1bea8f494ba2",
+      "name": "Schedule Trigger",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.1,
+      "position": [
+        400,
+        368
+      ]
+    },
+    {
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "select \n\tmb.tipo_unidade, \n\tmb.unidade, \n\tmb.nome_cliente, \n\tmb.cod_pedido, \n\tmb.coes, \n\tmc.ramo_atividade, \n\tmb.status_pedido, \n\tROUND(mb.valor_final_pedido::numeric,2) as valor_final_pedido, \n\tROUND(mb.valor_entregue::numeric,2) as valor_entregue, \n\tROUND(\n\tcase  \t\n\t\twhen status_pedido = 'Finalizado' then total_titulo\t\n\t\twhen (mb.status_pedido = 'Em Separacao' and cs.tipotitulo = 'VENDA') then total_titulo - (mb.valor_final_pedido - mb.valor_entregue)\t\n\t\twhen (mb.status_pedido = 'Em Separacao' and cs.tipotitulo = 'ESTOQUE') then total_titulo\n\tend::NUMERIC,2) as total_devido, \n\t(saldo.saldo) as Saldo, \n\trota_entrega \nfrom main_balanco mb \n\tleft join coes_sistema cs on mb.unidade = cs.unidade and mb.coes = cs.coes\n\tleft join mapeamento_clientes mc on (mb.cod_cliente = mc.codcliente and mb.unidade = mc.unidade)\n\tleft join ( \n\t\tselect \n\t\t\tunidade, \n\t\t\tid, \n\t\t\tsum(replace(total,',','.')::numeric) as saldo \n\t\tfrom saldo where tipo <> 'FORNECEDOR' \n\t\tgroup by unidade, id \n\t) saldo on saldo.unidade = mc.unidade and saldo.id::numeric = mc.codcliente::numeric \nwhere status_pedido in ('Em Separacao', 'Finalizado') and cs.ativo = 'S' \nand status_pagamento = 'Pendente' and mb.unidade = 'INBRAVIDROS'",
+        "options": {}
+      },
+      "id": "1889cf26-3073-4d8b-b89b-bb1c8cd6e1c5",
+      "name": "Postgres",
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 2.3,
+      "position": [
+        1008,
+        368
+      ],
+      "credentials": {
+        "postgres": {
+          "id": "G50fA6A0L90xaBIe",
+          "name": "Postgres account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "xlsx",
+        "options": {
+          "fileName": "={{ $('ARQUIVO').item.json.arq }}"
+        }
+      },
+      "id": "6d030daa-fe84-4e22-a51b-da53f2b558ad",
+      "name": "Convert to File",
+      "type": "n8n-nodes-base.convertToFile",
+      "typeVersion": 1.1,
+      "position": [
+        1184,
+        368
+      ]
+    },
+    {
+      "parameters": {},
+      "id": "cc7599de-54b7-4b16-a078-ff298145183c",
+      "name": "Wait",
+      "type": "n8n-nodes-base.wait",
+      "typeVersion": 1.1,
+      "position": [
+        1728,
+        368
+      ],
+      "webhookId": "7916076c-0eac-4a32-8ff2-a2de6c158f94"
+    },
+    {
+      "parameters": {
+        "operation": "upload",
+        "bucketName": "marcolanoperacoes",
+        "fileName": "={{ $('ARQUIVO').item.json.arq }}",
+        "additionalFields": {
+          "acl": "publicReadWrite"
+        }
+      },
+      "id": "201c76fb-ab98-4ce7-a93d-122580d39b58",
+      "name": "AWS S31",
+      "type": "n8n-nodes-base.awsS3",
+      "typeVersion": 2,
+      "position": [
+        1360,
+        368
+      ],
+      "credentials": {
+        "aws": {
+          "id": "wojq9Jq4bZgupPjh",
+          "name": "AWS account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "delete",
+        "bucketName": "marcolanoperacoes",
+        "fileKey": "={{ $('ARQUIVO').item.json.arq }}",
+        "options": {}
+      },
+      "id": "cb01f8c1-f461-4bfa-a011-e854928b877b",
+      "name": "AWS S33",
+      "type": "n8n-nodes-base.awsS3",
+      "typeVersion": 2,
+      "position": [
+        1904,
+        368
+      ],
+      "credentials": {
+        "aws": {
+          "id": "wojq9Jq4bZgupPjh",
+          "name": "AWS account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "c9777b34-96c3-49cb-9e8f-5171d677c039",
+              "name": "arq",
+              "value": "=Contas a Receber - Imbravidros - d{{ $now.day }}-{{ $now.hour }}h{{ $now.minute }}m{{ $now.second }}s",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "41ef4093-efac-4ae8-b33b-ebb5e26ce7f6",
+      "name": "ARQUIVO",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.3,
+      "position": [
+        800,
+        368
+      ]
+    },
+    {
+      "parameters": {
+        "operation": "getAll",
+        "bucketName": "marcolanoperacoes",
+        "returnAll": true,
+        "options": {}
+      },
+      "id": "fdddfd29-e8a3-47c2-a175-e93d27de8a50",
+      "name": "AWS S3",
+      "type": "n8n-nodes-base.awsS3",
+      "typeVersion": 2,
+      "position": [
+        1152,
+        752
+      ],
+      "credentials": {
+        "aws": {
+          "id": "wojq9Jq4bZgupPjh",
+          "name": "AWS account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "delete",
+        "bucketName": "marcolanoperacoes",
+        "fileKey": "=LançamentosErrados2024-08-20T10:26:14.901-03:00\t",
+        "options": {}
+      },
+      "id": "80f8b1cf-3bf0-4cd3-8bd9-130d4a47f9ea",
+      "name": "AWS S37",
+      "type": "n8n-nodes-base.awsS3",
+      "typeVersion": 2,
+      "position": [
+        1328,
+        752
+      ],
+      "credentials": {
+        "aws": {
+          "id": "wojq9Jq4bZgupPjh",
+          "name": "AWS account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{ $('Token').item.json.Link }}send-document/xlsx",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "={{ $('Token').item.json.Name }}",
+              "value": "={{ $('Token').item.json.Value }}"
+            }
+          ]
+        },
+        "sendBody": true,
+        "contentType": "form-urlencoded",
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "phone",
+              "value": "=5581992344157"
+            },
+            {
+              "name": "fileName",
+              "value": "=Contas a Receber - Imbravidros"
+            },
+            {
+              "name": "document",
+              "value": "=https://marcolanoperacoes.s3.amazonaws.com/{{ $('ARQUIVO').item.json.arq }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "f7a4d2d7-6e8d-464d-b539-7376a32e8598",
+      "name": "Wemille",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.1,
+      "position": [
+        1552,
+        368
+      ]
+    },
+    {
+      "parameters": {
+        "documentId": {
+          "__rl": true,
+          "value": "https://docs.google.com/spreadsheets/d/1J9xHE08UPG2QnDrjFsiy3VU3Z8ziZT9aO9MF7ct5ruA/edit?usp=sharing",
+          "mode": "url"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 564051929,
+          "mode": "list",
+          "cachedResultName": "Token",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1J9xHE08UPG2QnDrjFsiy3VU3Z8ziZT9aO9MF7ct5ruA/edit#gid=564051929"
+        },
+        "options": {}
+      },
+      "id": "cb964e36-98c3-4214-98cb-aedd4eb9d4ec",
+      "name": "Token",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.3,
+      "position": [
+        608,
+        368
+      ],
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "HfbTEVMQHA5O66Ya",
+          "name": "Sheets JG e Japa"
+        }
+      }
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Schedule Trigger": {
+      "main": [
+        [
+          {
+            "node": "Token",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Postgres": {
+      "main": [
+        [
+          {
+            "node": "Convert to File",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Convert to File": {
+      "main": [
+        [
+          {
+            "node": "AWS S31",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Wait": {
+      "main": [
+        [
+          {
+            "node": "AWS S33",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "AWS S31": {
+      "main": [
+        [
+          {
+            "node": "Wemille",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "ARQUIVO": {
+      "main": [
+        [
+          {
+            "node": "Postgres",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Wemille": {
+      "main": [
+        [
+          {
+            "node": "Wait",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Token": {
+      "main": [
+        [
+          {
+            "node": "ARQUIVO",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "74d85df8-db9b-45b6-aef0-d0fc90cd1eab",
+  "meta": {
+    "instanceId": "a5e8675e548a032fda81ee9dc775b4fc0a1b2003aee794fb0b37064013276a0f"
+  },
+  "id": "53jSjg0byG9gUwaV",
+  "tags": [
+    {
+      "updatedAt": "2025-03-21T11:52:03.823Z",
+      "createdAt": "2025-03-21T11:52:03.823Z",
+      "id": "VQmA23kx6h1wy92X",
+      "name": "GUIS"
+    },
+    {
+      "updatedAt": "2025-03-24T11:52:02.582Z",
+      "createdAt": "2025-03-24T11:52:02.582Z",
+      "id": "uPLi4lJcaKHP324Z",
+      "name": "Setor - Financeiro"
+    }
+  ]
+}

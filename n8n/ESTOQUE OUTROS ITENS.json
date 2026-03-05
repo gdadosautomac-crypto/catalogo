@@ -1,0 +1,498 @@
+{
+  "name": "ESTOQUE OUTROS ITENS",
+  "nodes": [
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "loose",
+            "version": 1
+          },
+          "conditions": [
+            {
+              "id": "60816164-891d-4979-97dd-3918a086e4ae",
+              "leftValue": "={{parseFloat($json[\"DISPONIVEL\"])}}",
+              "rightValue": "={{parseFloat(0)}}",
+              "operator": {
+                "type": "number",
+                "operation": "lt"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {
+          "looseTypeValidation": true
+        }
+      },
+      "id": "0c8992ba-cf57-4999-930c-14cc7e680f64",
+      "name": "If1",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2,
+      "position": [
+        192,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{ $('CODIGOS, LINKS e TELEFONES').item.json.link }}send-text",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "={{ $('CODIGOS, LINKS e TELEFONES').item.json.link2 }}",
+              "value": "={{ $('CODIGOS, LINKS e TELEFONES').item.json.link1 }}"
+            }
+          ]
+        },
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "phone",
+              "value": "={{ $json.max_phone }}"
+            },
+            {
+              "name": "message",
+              "value": "=*{{ $json.unidade }}*\n\n{{ $json.concatenated_MSG }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "eac21eae-a997-4f9b-9c39-64d30a55310f",
+      "name": "MSG Grupo Produção7",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.1,
+      "position": [
+        912,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "0a892ef2-5a17-4390-9a02-b2ef7d590bab",
+              "name": "MSG",
+              "value": "=*{{$json[\"DS_PRO\"]}}:*\n\n*Estoque atual:* {{parseFloat($json[\"NU_ESTOQAT\"]).format(0)}} \n*Mínimo definido:* {{parseFloat($json[\"QTD_CONSUMO\"]).format(0)}} \n\n*Comprar no mínimo:* {{($json[\"DISPONIVEL\"]*-1).format(0)}} \n\n*Comprado a caminho:* {{ parseFloat($json.QTDE_PCO).format(0) }}\n__________________________________\n\n",
+              "type": "string"
+            },
+            {
+              "id": "ee155d2f-eebb-4a18-9941-b349a5dd0f64",
+              "name": "unidade",
+              "value": "={{ $json.unidade }}",
+              "type": "string"
+            },
+            {
+              "id": "2a8efa51-41aa-41e9-9e9b-0d83a27f7b91",
+              "name": "phone",
+              "value": "={{ $json.phone }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "f90efd07-11fa-479c-8d10-3d8fc7bb8389",
+      "name": "Edit Fields",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.3,
+      "position": [
+        368,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "fieldsToSummarize": {
+          "values": [
+            {
+              "aggregation": "concatenate",
+              "field": "MSG",
+              "separateBy": "="
+            },
+            {
+              "aggregation": "max",
+              "field": "phone"
+            }
+          ]
+        },
+        "fieldsToSplitBy": "unidade",
+        "options": {}
+      },
+      "id": "c4b481ee-39ed-4c36-8e6b-2c966c3a4697",
+      "name": "Summarize",
+      "type": "n8n-nodes-base.summarize",
+      "typeVersion": 1,
+      "position": [
+        544,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "id": "7919dcdf-a548-4447-923b-0a6856c74a8d",
+      "name": "Loop Over Items",
+      "type": "n8n-nodes-base.splitInBatches",
+      "typeVersion": 3,
+      "position": [
+        -224,
+        112
+      ]
+    },
+    {
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "set @unidade = '{{ $json.unidade }}';\nset @phone = '{{ $json.phone }}';\n{{ String($('CODIGOS, LINKS e TELEFONES').item.json.SQL) }}",
+        "options": {
+          "connectionTimeoutMillis": 10000
+        }
+      },
+      "id": "b68a70ba-d24e-430b-b477-a9ced13cd200",
+      "name": "SQL",
+      "type": "n8n-nodes-base.mySql",
+      "typeVersion": 2.2,
+      "position": [
+        0,
+        192
+      ],
+      "alwaysOutputData": false,
+      "credentials": {
+        "mySql": {
+          "id": "TCMIvEsjEY93g6mS",
+          "name": "MySQL WILL"
+        }
+      },
+      "onError": "continueRegularOutput"
+    },
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "field": "weeks",
+              "triggerAtDay": [
+                1,
+                2,
+                3,
+                4,
+                5
+              ],
+              "triggerAtHour": 7,
+              "triggerAtMinute": 5
+            }
+          ]
+        }
+      },
+      "id": "f2c2267d-5078-44a7-a36a-1c83b4f48917",
+      "name": "Schedule Trigger",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.1,
+      "position": [
+        -944,
+        112
+      ]
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 1
+          },
+          "conditions": [
+            {
+              "id": "323a8c07-054c-4a25-bd3e-0addb47b2380",
+              "leftValue": "={{ $json[\"DISPONIVEL\"] }}",
+              "rightValue": "=",
+              "operator": {
+                "type": "string",
+                "operation": "exists",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "id": "c7ecdeee-7f9a-40ad-a990-709f26455d0a",
+      "name": "If",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2,
+      "position": [
+        0,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "workflowId": "Mzncl2PY653mQvrF",
+        "options": {}
+      },
+      "id": "8ff844c7-1d4b-4ad2-bcf7-bfd6441806fd",
+      "name": "LINKs SHEETS",
+      "type": "n8n-nodes-base.executeWorkflow",
+      "typeVersion": 1,
+      "position": [
+        -768,
+        112
+      ]
+    },
+    {
+      "parameters": {
+        "workflowId": "Du7x4YkD8xJLMMZo",
+        "options": {}
+      },
+      "id": "bdbdff37-27e7-4a65-b600-d38bc751bbc2",
+      "name": "CODIGOS, LINKS e TELEFONES",
+      "type": "n8n-nodes-base.executeWorkflow",
+      "typeVersion": 1,
+      "position": [
+        -400,
+        112
+      ]
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "9cac78a2-6c62-4261-bcfd-9740923cf9aa",
+              "name": "CODIGO",
+              "value": "ESTOQUE OUTROS ITENS",
+              "type": "string"
+            },
+            {
+              "id": "1c4d9d4d-b475-4df1-8257-6bf3c56df1e9",
+              "name": "TIPO",
+              "value": "AUTO",
+              "type": "string"
+            },
+            {
+              "id": "54e4a748-1d55-4ae3-84a6-1c37d2182e4b",
+              "name": "Solicitante",
+              "value": "=",
+              "type": "string"
+            },
+            {
+              "id": "efc5ac4e-b973-4252-be35-d5109272579d",
+              "name": "sheets",
+              "value": "={{ String($('LINKs SHEETS').item.json.sheets) }}",
+              "type": "string"
+            }
+          ]
+        },
+        "includeOtherFields": true,
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        -576,
+        112
+      ],
+      "id": "e87ec4b4-91df-43c9-9eb4-f72d5dd71122",
+      "name": "CODIGO"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "53879f3a-d37a-455d-9627-5a65187592f0",
+              "leftValue": "={{ $json.unidade }}",
+              "rightValue": "ALAGOAS",
+              "operator": {
+                "type": "string",
+                "operation": "equals",
+                "name": "filter.operator.equals"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.filter",
+      "typeVersion": 2.2,
+      "position": [
+        720,
+        0
+      ],
+      "id": "0aac61a3-aa69-4c12-9176-9443ebec038a",
+      "name": "Filter"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "If1": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Edit Fields": {
+      "main": [
+        [
+          {
+            "node": "Summarize",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Summarize": {
+      "main": [
+        [
+          {
+            "node": "Filter",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Loop Over Items": {
+      "main": [
+        [
+          {
+            "node": "If",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "SQL",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "SQL": {
+      "main": [
+        [
+          {
+            "node": "Loop Over Items",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Schedule Trigger": {
+      "main": [
+        [
+          {
+            "node": "LINKs SHEETS",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If": {
+      "main": [
+        [
+          {
+            "node": "If1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "LINKs SHEETS": {
+      "main": [
+        [
+          {
+            "node": "CODIGO",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "CODIGO": {
+      "main": [
+        [
+          {
+            "node": "CODIGOS, LINKS e TELEFONES",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "CODIGOS, LINKS e TELEFONES": {
+      "main": [
+        [
+          {
+            "node": "Loop Over Items",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Filter": {
+      "main": [
+        [
+          {
+            "node": "MSG Grupo Produção7",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": true,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "1e6735f5-8996-4dab-a428-287b25466744",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "a5e8675e548a032fda81ee9dc775b4fc0a1b2003aee794fb0b37064013276a0f"
+  },
+  "id": "QAc1yUneSA6zZZ2F",
+  "tags": [
+    {
+      "updatedAt": "2025-03-21T16:08:01.406Z",
+      "createdAt": "2025-03-21T16:08:01.406Z",
+      "id": "TOQ3ATxyyu1bCn2c",
+      "name": "AUTO"
+    },
+    {
+      "updatedAt": "2025-03-21T11:31:29.426Z",
+      "createdAt": "2025-03-21T11:31:29.426Z",
+      "id": "RkprmC0aTVoaMnTe",
+      "name": "E.Ind"
+    }
+  ]
+}

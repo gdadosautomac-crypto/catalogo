@@ -1,0 +1,635 @@
+{
+  "name": "RETALHO HORA",
+  "nodes": [
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "field": "hours",
+              "triggerAtMinute": 4
+            }
+          ]
+        }
+      },
+      "id": "e62474ad-e356-4814-85f5-0a5ee68c60b6",
+      "name": "Schedule Trigger",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.1,
+      "position": [
+        -1344,
+        112
+      ]
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "loose",
+            "version": 1
+          },
+          "conditions": [
+            {
+              "id": "a09f20ff-bd6d-4ceb-b031-34d8ca5d51ff",
+              "leftValue": "={{parseFloat($json.appended_TOT_M2[0])}}",
+              "rightValue": "={{parseFloat($json.appended_TOT_M2[1])}}",
+              "operator": {
+                "type": "number",
+                "operation": "gt"
+              }
+            },
+            {
+              "id": "2210ae48-6232-4d0e-9ac9-4ba24d9be6f7",
+              "leftValue": "={{parseFloat($json.appended_TOT_QTD[0])}}",
+              "rightValue": "={{parseFloat($json.appended_TOT_QTD[1])}}",
+              "operator": {
+                "type": "number",
+                "operation": "gt"
+              }
+            }
+          ],
+          "combinator": "or"
+        },
+        "options": {
+          "looseTypeValidation": true
+        }
+      },
+      "id": "cab9daef-2bc5-4d63-8fe4-f850cfde57f0",
+      "name": "Total > 5",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2,
+      "position": [
+        192,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "id": "39090eca-6408-4036-93f6-82cbbbf22155",
+      "name": "Loop Over Items",
+      "type": "n8n-nodes-base.splitInBatches",
+      "typeVersion": 3,
+      "position": [
+        -416,
+        112
+      ]
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 1
+          },
+          "conditions": [
+            {
+              "id": "7b05cd93-0efc-4c4f-8b55-71bede10d178",
+              "leftValue": "={{ $json.TOT_QTD }}",
+              "rightValue": "={{ parseInt(0) }}",
+              "operator": {
+                "type": "string",
+                "operation": "exists",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "id": "ee711b41-1c90-4c7d-ae64-2bf8ea524699",
+      "name": "If1",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2,
+      "position": [
+        -208,
+        32
+      ],
+      "onError": "continueRegularOutput"
+    },
+    {
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "set @unidade = '{{ $json.unidade }}';\nset @phone = '{{ $json.phone }}';\n{{ String($('CODIGOS, LINKS e TELEFONES').item.json.SQL) }}",
+        "options": {
+          "replaceEmptyStrings": false
+        }
+      },
+      "id": "9343c8aa-4f1b-40f5-a9d1-da8ceb7ff2ef",
+      "name": "SQL",
+      "type": "n8n-nodes-base.mySql",
+      "typeVersion": 2.2,
+      "position": [
+        -208,
+        192
+      ],
+      "alwaysOutputData": false,
+      "credentials": {
+        "mySql": {
+          "id": "TCMIvEsjEY93g6mS",
+          "name": "MySQL WILL"
+        }
+      },
+      "onError": "continueRegularOutput"
+    },
+    {
+      "parameters": {
+        "fieldsToSummarize": {
+          "values": [
+            {
+              "aggregation": "append",
+              "field": "DIA"
+            },
+            {
+              "aggregation": "append",
+              "field": "00h"
+            },
+            {
+              "aggregation": "append",
+              "field": "01h"
+            },
+            {
+              "aggregation": "append",
+              "field": "02h"
+            },
+            {
+              "aggregation": "append",
+              "field": "03h"
+            },
+            {
+              "aggregation": "append",
+              "field": "04h"
+            },
+            {
+              "aggregation": "append",
+              "field": "05h"
+            },
+            {
+              "aggregation": "append",
+              "field": "06h"
+            },
+            {
+              "aggregation": "append",
+              "field": "07h"
+            },
+            {
+              "aggregation": "append",
+              "field": "08h"
+            },
+            {
+              "aggregation": "append",
+              "field": "09h"
+            },
+            {
+              "aggregation": "append",
+              "field": "10h"
+            },
+            {
+              "aggregation": "append",
+              "field": "11h"
+            },
+            {
+              "aggregation": "append",
+              "field": "12h"
+            },
+            {
+              "aggregation": "append",
+              "field": "13h"
+            },
+            {
+              "aggregation": "append",
+              "field": "14h"
+            },
+            {
+              "aggregation": "append",
+              "field": "15h"
+            },
+            {
+              "aggregation": "append",
+              "field": "16h"
+            },
+            {
+              "aggregation": "append",
+              "field": "17h"
+            },
+            {
+              "aggregation": "append",
+              "field": "18h"
+            },
+            {
+              "aggregation": "append",
+              "field": "19h"
+            },
+            {
+              "aggregation": "append",
+              "field": "20h"
+            },
+            {
+              "aggregation": "append",
+              "field": "21h"
+            },
+            {
+              "aggregation": "append",
+              "field": "22h"
+            },
+            {
+              "aggregation": "append",
+              "field": "23h"
+            },
+            {
+              "aggregation": "append",
+              "field": "QTD00h"
+            },
+            {
+              "aggregation": "append",
+              "field": "QTD01h"
+            },
+            {
+              "aggregation": "append",
+              "field": "QTD02h"
+            },
+            {
+              "aggregation": "append",
+              "field": "QTD03h"
+            },
+            {
+              "aggregation": "append",
+              "field": "QTD04h"
+            },
+            {
+              "aggregation": "append",
+              "field": "QTD05h"
+            },
+            {
+              "aggregation": "append",
+              "field": "QTD06h"
+            },
+            {
+              "aggregation": "append",
+              "field": "QTD07h"
+            },
+            {
+              "aggregation": "append",
+              "field": "QTD08h"
+            },
+            {
+              "aggregation": "append",
+              "field": "QTD09h"
+            },
+            {
+              "aggregation": "append",
+              "field": "QTD10h"
+            },
+            {
+              "aggregation": "append",
+              "field": "QTD11h"
+            },
+            {
+              "aggregation": "append",
+              "field": "QTD12h"
+            },
+            {
+              "aggregation": "append",
+              "field": "QTD13h"
+            },
+            {
+              "aggregation": "append",
+              "field": "QTD14h"
+            },
+            {
+              "aggregation": "append",
+              "field": "QTD15h"
+            },
+            {
+              "aggregation": "append",
+              "field": "QTD16h"
+            },
+            {
+              "aggregation": "append",
+              "field": "QTD17h"
+            },
+            {
+              "aggregation": "append",
+              "field": "QTD18h"
+            },
+            {
+              "aggregation": "append",
+              "field": "QTD19h"
+            },
+            {
+              "aggregation": "append",
+              "field": "QTD20h"
+            },
+            {
+              "aggregation": "append",
+              "field": "QTD21h"
+            },
+            {
+              "aggregation": "append",
+              "field": "QTD22h"
+            },
+            {
+              "aggregation": "append",
+              "field": "QTD23h"
+            },
+            {
+              "aggregation": "append",
+              "field": "TOT_M2"
+            },
+            {
+              "aggregation": "append",
+              "field": "TOT_QTD"
+            },
+            {
+              "aggregation": "max",
+              "field": "phone"
+            }
+          ]
+        },
+        "fieldsToSplitBy": "=unidade",
+        "options": {}
+      },
+      "id": "59e8b80f-8021-4b3c-b7f8-c623d76a5a23",
+      "name": "Summarize",
+      "type": "n8n-nodes-base.summarize",
+      "typeVersion": 1,
+      "position": [
+        0,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{ $('CODIGOS, LINKS e TELEFONES').first().json.link }}send-text",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "={{ $('CODIGOS, LINKS e TELEFONES').first().json.link2 }}",
+              "value": "={{ $('CODIGOS, LINKS e TELEFONES').first().json.link1 }}"
+            }
+          ]
+        },
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "phone",
+              "value": "={{ $json.max_phone }}"
+            },
+            {
+              "name": "message",
+              "value": "=       *Retalhos {{$json[\"appended_DIA\"][0]}}:* \n\n*00h* {{$json[\"appended_QTD00h\"][0]}} pçs     {{$json[\"appended_00h\"][0]}} m²\n*01h* {{$json[\"appended_QTD01h\"][0]}} pçs     {{$json[\"appended_01h\"][0]}} m²\n*02h* {{$json[\"appended_QTD02h\"][0]}} pçs     {{$json[\"appended_02h\"][0]}} m²\n*03h* {{$json[\"appended_QTD03h\"][0]}} pçs     {{$json[\"appended_03h\"][0]}} m²\n*04h* {{$json[\"appended_QTD04h\"][0]}} pçs     {{$json[\"appended_04h\"][0]}} m²\n*05h* {{$json[\"appended_QTD05h\"][0]}} pçs     {{$json[\"appended_05h\"][0]}} m²\n*06h* {{$json[\"appended_QTD06h\"][0]}} pçs     {{$json[\"appended_06h\"][0]}} m²\n*07h* {{$json[\"appended_QTD07h\"][0]}} pçs     {{$json[\"appended_07h\"][0]}} m²\n*08h* {{$json[\"appended_QTD08h\"][0]}} pçs     {{$json[\"appended_08h\"][0]}} m²\n*09h* {{$json[\"appended_QTD09h\"][0]}} pçs     {{$json[\"appended_09h\"][0]}} m²\n*10h* {{$json[\"appended_QTD10h\"][0]}} pçs     {{$json[\"appended_10h\"][0]}} m²\n*11h* {{$json[\"appended_QTD11h\"][0]}} pçs     {{$json[\"appended_11h\"][0]}} m²\n*12h* {{$json[\"appended_QTD12h\"][0]}} pçs     {{$json[\"appended_12h\"][0]}} m²\n*13h* {{$json[\"appended_QTD13h\"][0]}} pçs     {{$json[\"appended_13h\"][0]}} m²\n*14h* {{$json[\"appended_QTD14h\"][0]}} pçs     {{$json[\"appended_14h\"][0]}} m²\n*15h* {{$json[\"appended_QTD15h\"][0]}} pçs     {{$json[\"appended_15h\"][0]}} m²\n*16h* {{$json[\"appended_QTD16h\"][0]}} pçs     {{$json[\"appended_16h\"][0]}} m²\n*17h* {{$json[\"appended_QTD17h\"][0]}} pçs     {{$json[\"appended_17h\"][0]}} m²\n*18h* {{$json[\"appended_QTD18h\"][0]}} pçs     {{$json[\"appended_18h\"][0]}} m²\n*19h* {{$json[\"appended_QTD19h\"][0]}} pçs     {{$json[\"appended_19h\"][0]}} m²\n*20h* {{$json[\"appended_QTD20h\"][0]}} pçs     {{$json[\"appended_20h\"][0]}} m²\n*21h* {{$json[\"appended_QTD21h\"][0]}} pçs     {{$json[\"appended_21h\"][0]}} m²\n*22h* {{$json[\"appended_QTD22h\"][0]}} pçs     {{$json[\"appended_22h\"][0]}} m²\n*23h* {{$json[\"appended_QTD23h\"][0]}} pçs     {{$json[\"appended_23h\"][0]}} m²\n\n\n*TOT* {{$json[\"appended_TOT_QTD\"][0]}} pçs     {{$json[\"appended_TOT_M2\"][0]}} m²"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "50016456-c6ec-485c-80ff-9b92fd056bd0",
+      "name": "MSG Grupo Produção",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.1,
+      "position": [
+        384,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "fieldToSplitOut": "CODIGO",
+        "include": "allOtherFields",
+        "options": {}
+      },
+      "id": "e209b5f6-e233-4af1-a8f2-a55d1f4717c7",
+      "name": "Split Out",
+      "type": "n8n-nodes-base.splitOut",
+      "typeVersion": 1,
+      "position": [
+        -784,
+        112
+      ]
+    },
+    {
+      "parameters": {
+        "workflowId": "Mzncl2PY653mQvrF",
+        "options": {}
+      },
+      "id": "ac00da57-eb09-412c-830f-c57c30ff845f",
+      "name": "LINKs SHEETS",
+      "type": "n8n-nodes-base.executeWorkflow",
+      "typeVersion": 1,
+      "position": [
+        -1136,
+        112
+      ]
+    },
+    {
+      "parameters": {
+        "workflowId": "Du7x4YkD8xJLMMZo",
+        "options": {}
+      },
+      "id": "55ab0b57-f138-4a89-9fce-7b111427b103",
+      "name": "CODIGOS, LINKS e TELEFONES",
+      "type": "n8n-nodes-base.executeWorkflow",
+      "typeVersion": 1,
+      "position": [
+        -608,
+        112
+      ]
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "9cac78a2-6c62-4261-bcfd-9740923cf9aa",
+              "name": "CODIGO",
+              "value": "[\"RETALHO HORA ATUAL\",\"RETALHO HORA ANTERIOR\"]",
+              "type": "array"
+            },
+            {
+              "id": "1c4d9d4d-b475-4df1-8257-6bf3c56df1e9",
+              "name": "TIPO",
+              "value": "AUTO",
+              "type": "string"
+            },
+            {
+              "id": "54e4a748-1d55-4ae3-84a6-1c37d2182e4b",
+              "name": "Solicitante",
+              "value": "=",
+              "type": "string"
+            },
+            {
+              "id": "efc5ac4e-b973-4252-be35-d5109272579d",
+              "name": "sheets",
+              "value": "={{ String($('LINKs SHEETS').item.json.sheets) }}",
+              "type": "string"
+            }
+          ]
+        },
+        "includeOtherFields": true,
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        -960,
+        112
+      ],
+      "id": "fe2bafcb-20ef-49c8-8682-e40eae5b7ced",
+      "name": "CODIGO"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Schedule Trigger": {
+      "main": [
+        [
+          {
+            "node": "LINKs SHEETS",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Total > 5": {
+      "main": [
+        [
+          {
+            "node": "MSG Grupo Produção",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        []
+      ]
+    },
+    "Loop Over Items": {
+      "main": [
+        [
+          {
+            "node": "If1",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "SQL",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If1": {
+      "main": [
+        [
+          {
+            "node": "Summarize",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "SQL": {
+      "main": [
+        [
+          {
+            "node": "Loop Over Items",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Summarize": {
+      "main": [
+        [
+          {
+            "node": "Total > 5",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Split Out": {
+      "main": [
+        [
+          {
+            "node": "CODIGOS, LINKS e TELEFONES",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "LINKs SHEETS": {
+      "main": [
+        [
+          {
+            "node": "CODIGO",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "CODIGO": {
+      "main": [
+        [
+          {
+            "node": "Split Out",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "CODIGOS, LINKS e TELEFONES": {
+      "main": [
+        [
+          {
+            "node": "Loop Over Items",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": true,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "d9202fc4-7c7b-4299-b860-6075cecbb068",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "a5e8675e548a032fda81ee9dc775b4fc0a1b2003aee794fb0b37064013276a0f"
+  },
+  "id": "qbmruC0JlGSLXsoF",
+  "tags": [
+    {
+      "updatedAt": "2025-03-21T16:08:01.406Z",
+      "createdAt": "2025-03-21T16:08:01.406Z",
+      "id": "TOQ3ATxyyu1bCn2c",
+      "name": "AUTO"
+    },
+    {
+      "updatedAt": "2025-03-21T11:31:29.426Z",
+      "createdAt": "2025-03-21T11:31:29.426Z",
+      "id": "RkprmC0aTVoaMnTe",
+      "name": "E.Ind"
+    }
+  ]
+}

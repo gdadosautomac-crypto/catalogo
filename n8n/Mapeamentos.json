@@ -1,0 +1,1014 @@
+{
+  "name": "Mapeamentos",
+  "nodes": [
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "field": "hours",
+              "hoursInterval": 3
+            }
+          ]
+        }
+      },
+      "id": "e374e8ee-660c-4c61-92f1-0ce76ee47e48",
+      "name": "Schedule Trigger",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.1,
+      "position": [
+        -1200,
+        480
+      ]
+    },
+    {
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "select \n\tp.unidade,\n\tp.nome_produto, \n\tp.categoria_produto, \n\tp.classe_produto,  \n\tmcp.nivel, \n\tmcp.nivel_custo \nfrom pedidos p \n\tleft join mapeamento_categorias_python mcp on CONCAT(p.categoria_produto, p.classe_produto) = CONCAT(mcp.categoria, mcp.classe) \nwhere \n\tdata_pedido::date >= '2025-01-01' and nivel is null \ngroup by p.unidade, p.nome_produto, p.categoria_produto, p.classe_produto, mcp.nivel, mcp.nivel_custo",
+        "options": {}
+      },
+      "id": "c18d91ae-2397-4d4d-9189-ef8ae2319782",
+      "name": "Cat_python",
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 2.3,
+      "position": [
+        0,
+        0
+      ],
+      "credentials": {
+        "postgres": {
+          "id": "G50fA6A0L90xaBIe",
+          "name": "Postgres account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "select \n\tcoes, \n\tunidade \nfrom pedidos p \n    left join coes c on p.coes = c.nome \nwhere \n    c.nome is null and p.coes is not null \ngroup by coes, unidade",
+        "options": {}
+      },
+      "id": "79d009c9-09cf-4d6c-8058-df91d29d1a0d",
+      "name": "Coes",
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 2.3,
+      "position": [
+        0,
+        192
+      ],
+      "credentials": {
+        "postgres": {
+          "id": "G50fA6A0L90xaBIe",
+          "name": "Postgres account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "select \n\tu.tipo_unidade, \n\tu.und, \n\tund.unidade \nfrom (\n\tselect \n\t\ttipo_unidade, \n\t\tunidade as und \n\tfrom pedidos \n\tgroup by tipo_unidade, unidade \n) u \n\tleft join unidades und on u.und = und.unidade \nwhere und.unidade is null",
+        "options": {}
+      },
+      "id": "ac440af4-ac6f-44cd-8429-cfa5306021ef",
+      "name": "Unidades",
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 2.3,
+      "position": [
+        0,
+        544
+      ],
+      "credentials": {
+        "postgres": {
+          "id": "G50fA6A0L90xaBIe",
+          "name": "Postgres account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "select \n\t'Conta Interna' as tipo_documento, \n\tx.unidade, \n\tx.nome_cliente as conta, \n\ty.nome_cliente as mapeamento \nfrom painel_financeiro x \n\tleft join mapeamento_contas_internas y on x.nome_cliente = y.nome_cliente and x.unidade = y.unidade \nwhere \n\tx.tipo_documento = 'Conta Interna' and y.nome_cliente is null \ngroup by x.unidade, x.nome_cliente, y.nome_cliente",
+        "options": {}
+      },
+      "id": "2c4ec77a-3019-41ab-99d6-7809fe3163b4",
+      "name": "Contas Internas",
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 2.3,
+      "position": [
+        0,
+        368
+      ],
+      "credentials": {
+        "postgres": {
+          "id": "G50fA6A0L90xaBIe",
+          "name": "Postgres account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "select \n\tma.unidade, \n\tma.data_movimentacao::date, \n\tma.usuario, \n\tma.descricao, \n\tma.motivo as motivo_ma, \n\tmma.motivo as motivo_mma, \n\tmma.demonstracao \nfrom movimentacoes_avulsas ma \n\tleft join mapeamento_mov_avulsas mma on ma.motivo = mma.motivo \nwhere data_movimentacao::date between to_char(now()::date, 'yyyy-mm-01')::date and current_date \n\tand mma.motivo is null \ngroup by ma.unidade, ma.data_movimentacao::date, ma.usuario, ma.descricao, ma.motivo, mma.motivo, mma.demonstracao",
+        "options": {}
+      },
+      "id": "6209fdc9-f467-408c-84c2-bd1997126c9b",
+      "name": "Mov. Avulsas",
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 2.3,
+      "position": [
+        0,
+        720
+      ],
+      "credentials": {
+        "postgres": {
+          "id": "G50fA6A0L90xaBIe",
+          "name": "Postgres account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "select \n\tp.categoria_produto, \n\tmc.categoria, \n\tunidade \nfrom pedidos p \nleft join mapeamento_categorias mc on p.categoria_produto = mc.categoria \nwhere mc.nivel is null and p.categoria_produto is not null \ngroup by p.categoria_produto, mc.categoria, unidade",
+        "options": {}
+      },
+      "id": "ba8a3e9f-79a0-42bb-a088-42375cc3389e",
+      "name": "Categorias",
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 2.3,
+      "position": [
+        0,
+        912
+      ],
+      "credentials": {
+        "postgres": {
+          "id": "G50fA6A0L90xaBIe",
+          "name": "Postgres account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{ $('Token').item.json.Link }}send-text",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "={{ $('Token').item.json.Name }}",
+              "value": "={{ $('Token').item.json.Value }}"
+            }
+          ]
+        },
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "phone",
+              "value": "120363182992032906-group"
+            },
+            {
+              "name": "message",
+              "value": "=----------------------------------------\n*ATENÇÃO!!!!*\n\n{{ $json[\"name\"] }}\n----------------------------------------"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "6d4a920e-a0bb-4c8c-80d4-6ff2cda7ed92",
+      "name": "Grupo de Mapeamentos",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.1,
+      "position": [
+        512,
+        448
+      ]
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "2b0a9406-d612-4d7f-834f-c4953774c922",
+              "name": "name",
+              "value": "=*{{ $json.unidade }}* criou a seguinte combinação:\n\nProduto: *{{ $json.nome_produto }}*\nCATEGORIA: *{{ $json.categoria_produto }}*\nCLASSE: *{{ $json.classe_produto }}*\n\nTabela: mapeamento_categorias_python mcp ",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "a7b492e7-bb04-475e-915c-948af741d73d",
+      "name": "Edit Fields",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.3,
+      "position": [
+        240,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "76e9f1f0-49af-4333-947e-3d52f9d20949",
+              "name": "name",
+              "value": "=*Conta Interna não mapeada*\n\nUnidade: *{{ $json.unidade }}*\nConta Interna: *{{ $json.conta }}*\n\nTabela: mapeamento_contas_internas mci",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "ce0b2143-0405-4a13-9a96-ffb11dc94858",
+      "name": "Edit Fields2",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.3,
+      "position": [
+        240,
+        368
+      ]
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "a62b96c8-2542-4bdb-a830-04bad3a95b9d",
+              "name": "name",
+              "value": "=*Unidade não mapeada*\n\nUnidade: *{{ $json[\"und\"] }}*\nTipo Unidade: *{{ $json.tipo_unidade }}*\n\nTabela: unidade u",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "65fd6ec6-d6c7-4f5f-a85d-34b5a2ddca07",
+      "name": "Edit Fields3",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.3,
+      "position": [
+        240,
+        544
+      ]
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "08370215-783f-4fd9-917f-7096bad99b9c",
+              "name": "name",
+              "value": "=*Motivo de Mov. Avulsa não mapeado*\n\nUnidade: *{{ $json.unidade }}*\nUsuário: *{{ $json.usuario }}*\n\nDescrição: *{{ $json.descricao }}*\nMotivo: *{{ $json.motivo_ma }}*\n\nTabela: mapeamento_mov_avulsas mma",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "38c7365a-525f-4885-990a-45c1f65b18f9",
+      "name": "Edit Fields4",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.3,
+      "position": [
+        240,
+        720
+      ]
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "4325564c-f425-45fc-9e3a-0f88d1decd2a",
+              "name": "name",
+              "value": "=Categoria *{{ $json.categoria_produto }}* não mapeada. Criada pela unidade *{{ $json.unidade }}*\n\nTabela: mapeamento_categorias mc",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "a12f879e-c818-4ad0-b4c7-b166ffc1e5a9",
+      "name": "Edit Fields5",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.3,
+      "position": [
+        240,
+        912
+      ]
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "67635111-9ce7-4241-8c47-a3eee9d491ff",
+              "name": "name",
+              "value": "=Coes *{{ $json.coes }}* não mapeado. Criado pela unidade *{{ $json.unidade }}*\n\nTabela: coes c",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "570357d8-e244-4024-b14e-ccbda78c901e",
+      "name": "Edit Fields1",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.3,
+      "position": [
+        240,
+        192
+      ]
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 1
+          },
+          "conditions": [
+            {
+              "id": "4210d1ba-3657-4907-81bb-443cb3697cc2",
+              "leftValue": "={{ parseInt($json.Hour) }}",
+              "rightValue": "={{ parseInt(5) }}",
+              "operator": {
+                "type": "number",
+                "operation": "gt"
+              }
+            },
+            {
+              "id": "299d5cf4-7b3f-4b5b-b43f-b0fde1af6ebc",
+              "leftValue": "={{ parseInt($json.Hour) }}",
+              "rightValue": "={{ parseInt(18) }}",
+              "operator": {
+                "type": "number",
+                "operation": "lt"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "id": "aea36643-b997-4b56-b7f6-c65530e3225d",
+      "name": "If1",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2,
+      "position": [
+        -832,
+        480
+      ]
+    },
+    {
+      "parameters": {
+        "operation": "xlsx",
+        "options": {
+          "fileName": "={{ $('ARQUIVO').item.json.arq }}"
+        }
+      },
+      "id": "a29e5132-2325-418c-abe8-00cead811c4c",
+      "name": "Convert to File1",
+      "type": "n8n-nodes-base.convertToFile",
+      "typeVersion": 1.1,
+      "position": [
+        -1120,
+        1232
+      ]
+    },
+    {
+      "parameters": {
+        "operation": "upload",
+        "bucketName": "marcolanoperacoes",
+        "fileName": "={{ $('ARQUIVO').item.json.arq }}",
+        "additionalFields": {
+          "acl": "publicReadWrite"
+        }
+      },
+      "id": "1b264bdf-fc9b-4577-ac9b-ce3708107562",
+      "name": "AWS S31",
+      "type": "n8n-nodes-base.awsS3",
+      "typeVersion": 2,
+      "position": [
+        -928,
+        1232
+      ],
+      "credentials": {
+        "aws": {
+          "id": "wojq9Jq4bZgupPjh",
+          "name": "AWS account"
+        }
+      }
+    },
+    {
+      "parameters": {},
+      "id": "365006f4-9ca2-4388-9a5c-ef4746697594",
+      "name": "Wait",
+      "type": "n8n-nodes-base.wait",
+      "typeVersion": 1.1,
+      "position": [
+        -480,
+        1184
+      ],
+      "webhookId": "c6f2a495-ffe0-4044-866f-a217c1c6919e"
+    },
+    {
+      "parameters": {
+        "operation": "delete",
+        "bucketName": "marcolanoperacoes",
+        "fileKey": "={{ $('ARQUIVO').item.json.arq }}",
+        "options": {}
+      },
+      "id": "75bb072a-38ed-4a04-b56f-525d186f8bf1",
+      "name": "AWS S33",
+      "type": "n8n-nodes-base.awsS3",
+      "typeVersion": 2,
+      "position": [
+        -304,
+        1184
+      ],
+      "credentials": {
+        "aws": {
+          "id": "wojq9Jq4bZgupPjh",
+          "name": "AWS account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "c9777b34-96c3-49cb-9e8f-5171d677c039",
+              "name": "arq",
+              "value": "=Mapeamentos - {{ $now.day }}/{{ $now.month }}/{{ $now.year }} {{ $now.hour }}h{{ $now.minute }}m{{ $now.second }}s",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "418f5087-0274-4add-95cf-fe5b3a3c5145",
+      "name": "ARQUIVO",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.3,
+      "position": [
+        -1328,
+        832
+      ]
+    },
+    {
+      "parameters": {
+        "operation": "getAll",
+        "bucketName": "marcolanoperacoes",
+        "returnAll": true,
+        "options": {}
+      },
+      "id": "b6a40a66-02a1-4759-8dce-d8aa7fe8d31c",
+      "name": "AWS S3",
+      "type": "n8n-nodes-base.awsS3",
+      "typeVersion": 2,
+      "position": [
+        -768,
+        752
+      ],
+      "credentials": {
+        "aws": {
+          "id": "wojq9Jq4bZgupPjh",
+          "name": "AWS account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "delete",
+        "bucketName": "marcolanoperacoes",
+        "fileKey": "={{ $json.Key }}",
+        "options": {}
+      },
+      "id": "a742a7b5-9553-4619-a9a3-daf647004b55",
+      "name": "AWS S37",
+      "type": "n8n-nodes-base.awsS3",
+      "typeVersion": 2,
+      "position": [
+        -560,
+        752
+      ],
+      "credentials": {
+        "aws": {
+          "id": "wojq9Jq4bZgupPjh",
+          "name": "AWS account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{ $('Token1').item.json.Link }}send-document/xlsx",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "={{ $('Token1').item.json.Name }}",
+              "value": "={{ $('Token1').item.json.Value }}"
+            }
+          ]
+        },
+        "sendBody": true,
+        "contentType": "form-urlencoded",
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "phone",
+              "value": "=5581981598765"
+            },
+            {
+              "name": "fileName",
+              "value": "=Mapeamentos - Contas Internos"
+            },
+            {
+              "name": "document",
+              "value": "=https://marcolanoperacoes.s3.amazonaws.com/{{ $('ARQUIVO').item.json.arq }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "0dd3a5c7-ef49-4de0-9954-05cfa0391c1e",
+      "name": "João",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.1,
+      "position": [
+        -704,
+        1104
+      ]
+    },
+    {
+      "parameters": {
+        "rules": {
+          "values": [
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict"
+                },
+                "conditions": [
+                  {
+                    "leftValue": "",
+                    "rightValue": "",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              }
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "ca895b89-d085-4c75-a16d-4d791628d26d",
+      "name": "Switch",
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 3,
+      "position": [
+        -256,
+        448
+      ]
+    },
+    {
+      "parameters": {
+        "documentId": {
+          "__rl": true,
+          "value": "https://docs.google.com/spreadsheets/d/1J9xHE08UPG2QnDrjFsiy3VU3Z8ziZT9aO9MF7ct5ruA/edit?usp=sharing",
+          "mode": "url"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 564051929,
+          "mode": "list",
+          "cachedResultName": "Token",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1J9xHE08UPG2QnDrjFsiy3VU3Z8ziZT9aO9MF7ct5ruA/edit#gid=564051929"
+        },
+        "options": {}
+      },
+      "id": "a8f25cee-0b87-4c80-9c42-880bb259139e",
+      "name": "Token",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.3,
+      "position": [
+        -544,
+        384
+      ],
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "HfbTEVMQHA5O66Ya",
+          "name": "Sheets JG e Japa"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "field": "hours",
+              "hoursInterval": 3
+            }
+          ]
+        }
+      },
+      "id": "6f296e73-a51d-44ab-9d0f-e0e4edbb7e5f",
+      "name": "Schedule Trigger1",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.1,
+      "position": [
+        -1696,
+        832
+      ],
+      "disabled": true
+    },
+    {
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "select \n\t'Conta Interna' as tipo_documento, \n\tx.unidade, \n\tx.nome_cliente as conta, \n\ty.nome_cliente as mapeamento \nfrom painel_financeiro x \n\tleft join mapeamento_contas_internas y on x.nome_cliente = y.nome_cliente and x.unidade = y.unidade \nwhere \n\tx.tipo_documento = 'Conta Interna' and y.nome_cliente is null \ngroup by x.unidade, x.nome_cliente, y.nome_cliente",
+        "options": {}
+      },
+      "id": "ce0fea9a-7fc5-497d-9c5d-a5786100d51a",
+      "name": "Postgres",
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 2.3,
+      "position": [
+        -1136,
+        960
+      ],
+      "credentials": {
+        "postgres": {
+          "id": "G50fA6A0L90xaBIe",
+          "name": "Postgres account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "documentId": {
+          "__rl": true,
+          "value": "https://docs.google.com/spreadsheets/d/1J9xHE08UPG2QnDrjFsiy3VU3Z8ziZT9aO9MF7ct5ruA/edit?usp=sharing",
+          "mode": "url"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 564051929,
+          "mode": "list",
+          "cachedResultName": "Token",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1J9xHE08UPG2QnDrjFsiy3VU3Z8ziZT9aO9MF7ct5ruA/edit#gid=564051929"
+        },
+        "options": {}
+      },
+      "id": "598e1221-b4c2-4f87-8e9c-62c588ef88ea",
+      "name": "Token1",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.3,
+      "position": [
+        -1520,
+        832
+      ],
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "HfbTEVMQHA5O66Ya",
+          "name": "Sheets JG e Japa"
+        }
+      }
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Schedule Trigger": {
+      "main": [
+        [
+          {
+            "node": "If1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Cat_python": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Coes": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Contas Internas": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Unidades": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields3",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Mov. Avulsas": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields4",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Categorias": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields5",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Edit Fields": {
+      "main": [
+        [
+          {
+            "node": "Grupo de Mapeamentos",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Edit Fields1": {
+      "main": [
+        [
+          {
+            "node": "Grupo de Mapeamentos",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Edit Fields2": {
+      "main": [
+        [
+          {
+            "node": "Grupo de Mapeamentos",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Edit Fields3": {
+      "main": [
+        [
+          {
+            "node": "Grupo de Mapeamentos",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Edit Fields4": {
+      "main": [
+        [
+          {
+            "node": "Grupo de Mapeamentos",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Edit Fields5": {
+      "main": [
+        [
+          {
+            "node": "Grupo de Mapeamentos",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If1": {
+      "main": [
+        [
+          {
+            "node": "Token",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Convert to File1": {
+      "main": [
+        [
+          {
+            "node": "AWS S31",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Wait": {
+      "main": [
+        [
+          {
+            "node": "AWS S33",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "AWS S31": {
+      "main": [
+        [
+          {
+            "node": "João",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "ARQUIVO": {
+      "main": [
+        [
+          {
+            "node": "Postgres",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "João": {
+      "main": [
+        [
+          {
+            "node": "Wait",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Switch": {
+      "main": [
+        [
+          {
+            "node": "Cat_python",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Coes",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Unidades",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Mov. Avulsas",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Categorias",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Token": {
+      "main": [
+        [
+          {
+            "node": "Switch",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Schedule Trigger1": {
+      "main": [
+        [
+          {
+            "node": "Token1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Postgres": {
+      "main": [
+        [
+          {
+            "node": "Convert to File1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Token1": {
+      "main": [
+        [
+          {
+            "node": "ARQUIVO",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "AWS S3": {
+      "main": [
+        [
+          {
+            "node": "AWS S37",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "1379cbd5-d128-4974-8811-c14ec0fd804b",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "a5e8675e548a032fda81ee9dc775b4fc0a1b2003aee794fb0b37064013276a0f"
+  },
+  "id": "JuBU2igNzLgGCqhF",
+  "tags": [
+    {
+      "updatedAt": "2025-03-21T11:52:03.823Z",
+      "createdAt": "2025-03-21T11:52:03.823Z",
+      "id": "VQmA23kx6h1wy92X",
+      "name": "GUIS"
+    },
+    {
+      "updatedAt": "2025-03-21T11:52:53.040Z",
+      "createdAt": "2025-03-21T11:52:53.040Z",
+      "id": "9sBc8DYqQwfJKaa4",
+      "name": "Setor - Data Science"
+    }
+  ]
+}

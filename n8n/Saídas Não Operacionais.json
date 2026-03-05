@@ -1,0 +1,412 @@
+{
+  "name": "Saídas Não Operacionais",
+  "nodes": [
+    {
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "SELECT *\nFROM movimentacoes_financeiras mf\nWHERE \n    tipo_de_lancamento = 'Saida'\n    AND mf.classificacao ilike '%saida%'\n    AND data_emissao::date BETWEEN \n        CASE \n            WHEN EXTRACT(DOW FROM CURRENT_DATE) = 2  -- terça\n                THEN CURRENT_DATE - INTERVAL '5 days'\n            WHEN EXTRACT(DOW FROM CURRENT_DATE) = 4  -- quinta\n                THEN CURRENT_DATE - INTERVAL '3 days'\n        END\n        AND CURRENT_DATE - INTERVAL '1 day';",
+        "options": {}
+      },
+      "id": "46d2a70c-42af-4824-8489-6d0a9a0a5ffc",
+      "name": "Postgres",
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 2.3,
+      "position": [
+        832,
+        432
+      ],
+      "credentials": {
+        "postgres": {
+          "id": "G50fA6A0L90xaBIe",
+          "name": "Postgres account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "c9777b34-96c3-49cb-9e8f-5171d677c039",
+              "name": "arq",
+              "value": "=gm_montese_vendas",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {
+          "includeBinary": "={{ data }}"
+        }
+      },
+      "id": "d70f601c-910e-4aad-bbb7-1e66ef234e1c",
+      "name": "ARQUIVO",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.3,
+      "position": [
+        656,
+        432
+      ]
+    },
+    {
+      "parameters": {
+        "operation": "xlsx",
+        "options": {}
+      },
+      "id": "50e56d59-a95d-4c07-8aea-0fe45fd57317",
+      "name": "Convert to File",
+      "type": "n8n-nodes-base.convertToFile",
+      "typeVersion": 1.1,
+      "position": [
+        1200,
+        432
+      ]
+    },
+    {
+      "parameters": {
+        "operation": "upload",
+        "bucketName": "marcolanoperacoes",
+        "fileName": "={{ $('ARQUIVO').item.json.arq }}",
+        "additionalFields": {
+          "acl": "publicReadWrite"
+        }
+      },
+      "id": "605ae51a-c47c-43f1-9504-9f79f66c879b",
+      "name": "AWS S31",
+      "type": "n8n-nodes-base.awsS3",
+      "typeVersion": 2,
+      "position": [
+        1376,
+        432
+      ],
+      "credentials": {
+        "aws": {
+          "id": "wojq9Jq4bZgupPjh",
+          "name": "AWS account"
+        }
+      }
+    },
+    {
+      "parameters": {},
+      "id": "46413531-359f-469c-a72c-9ad1aed3de21",
+      "name": "Wait",
+      "type": "n8n-nodes-base.wait",
+      "typeVersion": 1.1,
+      "position": [
+        1744,
+        432
+      ],
+      "webhookId": "7e8fc0b1-1141-45d5-a084-df1fb665b5e1"
+    },
+    {
+      "parameters": {
+        "operation": "delete",
+        "bucketName": "marcolanoperacoes",
+        "fileKey": "={{ $('ARQUIVO').item.json.arq }}",
+        "options": {}
+      },
+      "id": "9052be20-a411-4d7d-9e12-b0cff6fe2535",
+      "name": "AWS S33",
+      "type": "n8n-nodes-base.awsS3",
+      "typeVersion": 2,
+      "position": [
+        1904,
+        432
+      ],
+      "credentials": {
+        "aws": {
+          "id": "wojq9Jq4bZgupPjh",
+          "name": "AWS account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "field": "weeks",
+              "triggerAtDay": [
+                2,
+                4,
+                0
+              ],
+              "triggerAtHour": 7,
+              "triggerAtMinute": 43
+            }
+          ]
+        }
+      },
+      "id": "603e58ef-1b6b-493d-9697-efb6d7d1c900",
+      "name": "Schedule Trigger1",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.1,
+      "position": [
+        112,
+        432
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "const items = $input.all();\n\n// Caractere invisível (Zero Width Space)\nconst ZWS = '\\u200B';\n\nitems.forEach(item => {\n  if (item.json.data_pedido) {\n    item.json.data_pedido = ZWS + item.json.data_pedido;\n  }\n});\n\nreturn items;\n"
+      },
+      "id": "a8bc0ef9-66c9-4395-8ad0-d5d308db5093",
+      "name": "Code",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1024,
+        432
+      ]
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "c9777b34-96c3-49cb-9e8f-5171d677c039",
+              "name": "link",
+              "value": "={{ $json.Link }}",
+              "type": "string"
+            },
+            {
+              "id": "c29c9cfb-b76e-4088-b0ca-7748646d4779",
+              "name": "link1",
+              "value": "={{ $json.Value }}",
+              "type": "string"
+            },
+            {
+              "id": "a2465349-2aee-4dc2-8ce6-9a40bf305fa7",
+              "name": "link2",
+              "value": "={{ $json.Field }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "e9a7e24a-66cc-47bd-81ef-d7068f7ddc53",
+      "name": "AUTH",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.3,
+      "position": [
+        496,
+        432
+      ]
+    },
+    {
+      "parameters": {
+        "documentId": {
+          "__rl": true,
+          "value": "https://docs.google.com/spreadsheets/d/1avLuf5Qpu0lBIFVS-Ny0j-iIFZGkVqqufVGy-sfbqM4/edit?usp=sharing",
+          "mode": "url"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "Página1",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1avLuf5Qpu0lBIFVS-Ny0j-iIFZGkVqqufVGy-sfbqM4/edit#gid=0"
+        },
+        "options": {}
+      },
+      "id": "c225492a-895f-405d-b4a3-077af2787781",
+      "name": "Google Sheets",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.3,
+      "position": [
+        336,
+        432
+      ],
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "8Ytd3zZKAOSyZNqC",
+          "name": "Sheets Andre"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "=https://api.z-api.io/instances/3AD47F49CE9AF04B4D43CA225862B38B/token/6EE2B07CF6D61B0059AD2125/send-document/xlsx",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "={{ $('AUTH').item.json.link2 }}",
+              "value": "={{ $('AUTH').item.json.link1 }}"
+            }
+          ]
+        },
+        "sendBody": true,
+        "contentType": "form-urlencoded",
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "phone",
+              "value": "=5581998328798"
+            },
+            {
+              "name": "fileName",
+              "value": "=Saídas Não Operacionais {{$today.format('DD')}}"
+            },
+            {
+              "name": "document",
+              "value": "=https://marcolanoperacoes.s3.amazonaws.com/{{ $('ARQUIVO').item.json.arq }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "5ff50c7c-0f4d-422d-b584-100a807199ff",
+      "name": "Marcelo",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.1,
+      "position": [
+        1552,
+        432
+      ]
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Postgres": {
+      "main": [
+        [
+          {
+            "node": "Code",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "ARQUIVO": {
+      "main": [
+        [
+          {
+            "node": "Postgres",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Convert to File": {
+      "main": [
+        [
+          {
+            "node": "AWS S31",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "AWS S31": {
+      "main": [
+        [
+          {
+            "node": "Marcelo",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Wait": {
+      "main": [
+        [
+          {
+            "node": "AWS S33",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Schedule Trigger1": {
+      "main": [
+        [
+          {
+            "node": "Google Sheets",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Postgres",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code": {
+      "main": [
+        [
+          {
+            "node": "Convert to File",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "AUTH": {
+      "main": [
+        [
+          {
+            "node": "ARQUIVO",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Google Sheets": {
+      "main": [
+        [
+          {
+            "node": "AUTH",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Marcelo": {
+      "main": [
+        [
+          {
+            "node": "Wait",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": true,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "d3cfd1e6-c4a7-4360-bdbb-1a8945ce6752",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "a5e8675e548a032fda81ee9dc775b4fc0a1b2003aee794fb0b37064013276a0f"
+  },
+  "id": "pcQCbBkNssgwqSgo",
+  "tags": [
+    {
+      "updatedAt": "2025-03-21T11:52:03.821Z",
+      "createdAt": "2025-03-21T11:52:03.821Z",
+      "id": "ro9IiNWQxt6VLDLj",
+      "name": "Setor - Controladoria"
+    },
+    {
+      "updatedAt": "2026-01-14T11:04:00.895Z",
+      "createdAt": "2025-03-21T11:47:30.374Z",
+      "id": "CvCy3KNJKyMxSQ3C",
+      "name": "GDA"
+    }
+  ]
+}

@@ -1,0 +1,1121 @@
+{
+  "name": "PAINEL CAIXA (1)",
+  "nodes": [
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "triggerAtMinute": 13
+            }
+          ]
+        }
+      },
+      "id": "16fe0d74-a743-4c6e-a4a5-13e5f77a26a3",
+      "name": "Schedule Trigger",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.1,
+      "position": [
+        -1600,
+        352
+      ]
+    },
+    {
+      "parameters": {},
+      "id": "ac4ddd33-5cdf-486c-913c-0f92ccc3aa2c",
+      "name": "Execute Workflow Trigger",
+      "type": "n8n-nodes-base.executeWorkflowTrigger",
+      "typeVersion": 1,
+      "position": [
+        -1776,
+        512
+      ]
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": false,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 1
+          },
+          "conditions": [
+            {
+              "id": "b163abb3-009e-4351-a47c-4ccc37da022c",
+              "leftValue": "={{ $json.body.text.message }}",
+              "rightValue": "=ATUALIZA PAINEL WILL",
+              "operator": {
+                "type": "string",
+                "operation": "startsWith"
+              }
+            },
+            {
+              "id": "12838eb5-a6a3-4d57-b4f1-b935176d8895",
+              "leftValue": "={{ $json.body.phone }}",
+              "rightValue": "=558199845029",
+              "operator": {
+                "type": "string",
+                "operation": "equals",
+                "name": "filter.operator.equals"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {
+          "ignoreCase": true
+        }
+      },
+      "id": "2b3c6472-62a6-4d6a-94ef-18f394cf212a",
+      "name": "If1",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2,
+      "position": [
+        -1600,
+        512
+      ]
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "id": "30b6b1df-4db3-4b52-b110-d235400b75b8",
+      "name": "Loop Over Items",
+      "type": "n8n-nodes-base.splitInBatches",
+      "typeVersion": 3,
+      "position": [
+        -656,
+        352
+      ]
+    },
+    {
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "set @unidade = '{{ $json.unidade }}';\n{{ String($('CODIGOS, LINKS e TELEFONES').item.json.SQL) }}",
+        "options": {
+          "connectionTimeoutMillis": 10000
+        }
+      },
+      "id": "ad466109-83bd-4942-984f-3b57c10a9fa4",
+      "name": "SQL",
+      "type": "n8n-nodes-base.mySql",
+      "typeVersion": 2.2,
+      "position": [
+        -448,
+        432
+      ],
+      "alwaysOutputData": false,
+      "credentials": {
+        "mySql": {
+          "id": "TCMIvEsjEY93g6mS",
+          "name": "MySQL WILL"
+        }
+      },
+      "onError": "continueRegularOutput"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{ $('CODIGOS, LINKS e TELEFONES').item.json.link }}send-sticker",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "={{ $('CODIGOS, LINKS e TELEFONES').item.json.link2 }}",
+              "value": "={{ $('CODIGOS, LINKS e TELEFONES').item.json.link1 }}"
+            }
+          ]
+        },
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "phone",
+              "value": "={{ $('CODIGOS, LINKS e TELEFONES').item.json.Solicitante }}"
+            },
+            {
+              "name": "sticker",
+              "value": "={{ $('CODIGOS, LINKS e TELEFONES').item.json.CALCULANDO }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "03bd20c4-5e34-4d52-b07d-ceb67d8778d6",
+      "name": "CALCULANDO1",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.1,
+      "position": [
+        -656,
+        192
+      ],
+      "executeOnce": true,
+      "disabled": true,
+      "onError": "continueRegularOutput"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{ $('CODIGOS, LINKS e TELEFONES').item.json.link }}send-sticker",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "={{ $('CODIGOS, LINKS e TELEFONES').item.json.link2 }}",
+              "value": "={{ $('CODIGOS, LINKS e TELEFONES').item.json.link1 }}"
+            }
+          ]
+        },
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "phone",
+              "value": "={{ $('CODIGOS, LINKS e TELEFONES').item.json.Solicitante }}"
+            },
+            {
+              "name": "sticker",
+              "value": "={{ $('CODIGOS, LINKS e TELEFONES').item.json.ERRO }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "5586711d-e68c-434b-8b1c-66e2b0bb28a7",
+      "name": "ERRO1",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.1,
+      "position": [
+        -256,
+        432
+      ],
+      "executeOnce": true,
+      "disabled": true
+    },
+    {
+      "parameters": {
+        "rules": {
+          "values": [
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 1
+                },
+                "conditions": [
+                  {
+                    "leftValue": "={{ $('CODIGOS, LINKS e TELEFONES').item.json.CODIGO }}",
+                    "rightValue": "PAINEL CAIXA CONTAS",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    },
+                    "id": "e1c58a6c-2a0d-495f-85d6-9c7f089b1193"
+                  }
+                ],
+                "combinator": "and"
+              }
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 1
+                },
+                "conditions": [
+                  {
+                    "id": "10241b5b-6a49-449a-a937-5d7322e69fa7",
+                    "leftValue": "={{ $('CODIGOS, LINKS e TELEFONES').item.json.CODIGO }}",
+                    "rightValue": "=PAINEL CAIXA ENTREGA",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals",
+                      "name": "filter.operator.equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              }
+            }
+          ]
+        },
+        "options": {
+          "allMatchingOutputs": false
+        }
+      },
+      "id": "7c5bfd7e-dabd-46d3-9c1e-df292a9d43fe",
+      "name": "Switch",
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 3,
+      "position": [
+        -256,
+        224
+      ]
+    },
+    {
+      "parameters": {
+        "workflowId": "Mzncl2PY653mQvrF",
+        "options": {}
+      },
+      "id": "54eec704-2ff5-4c8f-b781-d8abba879614",
+      "name": "LINKs SHEETS",
+      "type": "n8n-nodes-base.executeWorkflow",
+      "typeVersion": 1,
+      "position": [
+        -1424,
+        352
+      ]
+    },
+    {
+      "parameters": {
+        "workflowId": "Du7x4YkD8xJLMMZo",
+        "options": {}
+      },
+      "id": "7ff706ee-4538-4320-b28c-bc2441c5d297",
+      "name": "CODIGOS, LINKS e TELEFONES",
+      "type": "n8n-nodes-base.executeWorkflow",
+      "typeVersion": 1,
+      "position": [
+        -848,
+        352
+      ]
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "9cac78a2-6c62-4261-bcfd-9740923cf9aa",
+              "name": "CODIGO",
+              "value": "[\"PAINEL CAIXA CONTAS\",\"PAINEL CAIXA ENTREGA\"]",
+              "type": "array"
+            },
+            {
+              "id": "1c4d9d4d-b475-4df1-8257-6bf3c56df1e9",
+              "name": "TIPO",
+              "value": "AUTO",
+              "type": "string"
+            },
+            {
+              "id": "54e4a748-1d55-4ae3-84a6-1c37d2182e4b",
+              "name": "Solicitante",
+              "value": "=",
+              "type": "string"
+            },
+            {
+              "id": "efc5ac4e-b973-4252-be35-d5109272579d",
+              "name": "sheets",
+              "value": "={{ String($('LINKs SHEETS').item.json.sheets) }}",
+              "type": "string"
+            }
+          ]
+        },
+        "includeOtherFields": true,
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        -1216,
+        352
+      ],
+      "id": "38f454e6-6a65-4e2a-b888-046e747ed330",
+      "name": "CODIGO"
+    },
+    {
+      "parameters": {
+        "fieldToSplitOut": "CODIGO",
+        "include": "allOtherFields",
+        "options": {}
+      },
+      "id": "6044e656-e1ef-43bf-b86a-93889047fbb3",
+      "name": "Split Out1",
+      "type": "n8n-nodes-base.splitOut",
+      "typeVersion": 1,
+      "position": [
+        -1040,
+        352
+      ]
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "040d1303-d83e-441e-b20f-9ad9e46e5277",
+              "leftValue": "={{ $json.DT_REF }}",
+              "rightValue": "",
+              "operator": {
+                "type": "string",
+                "operation": "exists",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        -448,
+        240
+      ],
+      "id": "38637475-c877-4741-bf53-cff8499b8497",
+      "name": "If"
+    },
+    {
+      "parameters": {
+        "operation": "appendOrUpdate",
+        "documentId": {
+          "__rl": true,
+          "value": "={{ $('LINKs SHEETS').first().json.PAINEL_FINANCEIRO }}",
+          "mode": "url"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 1653965454,
+          "mode": "list",
+          "cachedResultName": "CONTAS",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1SCzZJUDolgsR1fBgXQwEc0gEZj5hDd4aJEA2VocGbtQ/edit#gid=1653965454"
+        },
+        "columns": {
+          "mappingMode": "autoMapInputData",
+          "value": {},
+          "matchingColumns": [
+            "unidade"
+          ],
+          "schema": [
+            {
+              "id": "unidade",
+              "displayName": "unidade",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "DT_LANCTO",
+              "displayName": "DT_LANCTO",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "VLR_LANCTO",
+              "displayName": "VLR_LANCTO",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "DS_CON",
+              "displayName": "DS_CON",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "CONSIDERA",
+              "displayName": "CONSIDERA",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "TP_LANCTO",
+              "displayName": "TP_LANCTO",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "SAIDA_INT",
+              "displayName": "SAIDA_INT",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "VLR_LANCTO_CLI",
+              "displayName": "VLR_LANCTO_CLI",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "DT_REF",
+              "displayName": "DT_REF",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "id": "5269c3a5-5321-412f-ac4f-2954711ebf7f",
+      "name": "ATUALIZA DADOS1",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.3,
+      "position": [
+        224,
+        144
+      ],
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "pcOUCMZeQaE24Td8",
+          "name": "SHEETS INDUSTRIAL"
+        }
+      },
+      "onError": "continueRegularOutput"
+    },
+    {
+      "parameters": {
+        "operation": "append",
+        "documentId": {
+          "__rl": true,
+          "value": "={{ $('LINKs SHEETS').first().json.PAINEL_FINANCEIRO }}",
+          "mode": "url"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 1964556587,
+          "mode": "list",
+          "cachedResultName": "ENTREGUE",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1SCzZJUDolgsR1fBgXQwEc0gEZj5hDd4aJEA2VocGbtQ/edit#gid=1964556587"
+        },
+        "columns": {
+          "mappingMode": "autoMapInputData",
+          "value": {},
+          "matchingColumns": [
+            "unidade"
+          ],
+          "schema": [
+            {
+              "id": "unidade",
+              "displayName": "unidade",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "DS_CLI",
+              "displayName": "DS_CLI",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "DataHoraEntregue",
+              "displayName": "DataHoraEntregue",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "DS_OES",
+              "displayName": "DS_OES",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "TotalEntregue",
+              "displayName": "TotalEntregue",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "TotalEntregueCusto",
+              "displayName": "TotalEntregueCusto",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "m2",
+              "displayName": "m2",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "peso",
+              "displayName": "peso",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "DS_CAT",
+              "displayName": "DS_CAT",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "DS_SCP",
+              "displayName": "DS_SCP",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "DS_CLP",
+              "displayName": "DS_CLP",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "DT_REF",
+              "displayName": "DT_REF",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "id": "c008af26-5ff9-443b-8d44-2136480d30fc",
+      "name": "ATUALIZA DADOS2",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.3,
+      "position": [
+        224,
+        304
+      ],
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "pcOUCMZeQaE24Td8",
+          "name": "SHEETS INDUSTRIAL"
+        }
+      },
+      "onError": "continueRegularOutput"
+    },
+    {
+      "parameters": {
+        "operation": "update",
+        "documentId": {
+          "__rl": true,
+          "value": "={{ $('LINKs SHEETS').first().json.PERDAS_TODAS }}",
+          "mode": "url"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 1733753940,
+          "mode": "list",
+          "cachedResultName": "CHECK LIST",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1n_idHmRUq7zjEVdWlIDDsOkjizOp9gk41QqoxnkqJjM/edit#gid=1733753940"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "ROBO": "={{ $('CODIGOS, LINKS e TELEFONES').item.json.CODIGO }}",
+            "ATT": "={{ $now.format('yyyy-MM-dd') }}"
+          },
+          "matchingColumns": [
+            "ROBO"
+          ],
+          "schema": [
+            {
+              "id": "ROBO",
+              "displayName": "ROBO",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "ATT",
+              "displayName": "ATT",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "row_number",
+              "displayName": "row_number",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "readOnly": true,
+              "removed": true
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "id": "5380adda-19ff-425b-b508-bdb6818a1977",
+      "name": "LOG ATT",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.3,
+      "position": [
+        464,
+        224
+      ],
+      "executeOnce": true,
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "pcOUCMZeQaE24Td8",
+          "name": "SHEETS INDUSTRIAL"
+        }
+      },
+      "onError": "continueRegularOutput"
+    },
+    {
+      "parameters": {
+        "operation": "clear",
+        "documentId": {
+          "__rl": true,
+          "value": "={{ $('LINKs SHEETS').first().json.PAINEL_FINANCEIRO }}",
+          "mode": "url"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 1964556587,
+          "mode": "list",
+          "cachedResultName": "ENTREGUE",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1SCzZJUDolgsR1fBgXQwEc0gEZj5hDd4aJEA2VocGbtQ/edit#gid=1964556587"
+        },
+        "clear": "specificRows",
+        "startIndex": 2,
+        "rowsToDelete": 31000
+      },
+      "id": "263fd6d4-8ca1-4a7b-9e0c-9c0ed55ebe32",
+      "name": "APAGA DADOS1",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.3,
+      "position": [
+        -208,
+        -16
+      ],
+      "executeOnce": true,
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "pcOUCMZeQaE24Td8",
+          "name": "SHEETS INDUSTRIAL"
+        }
+      },
+      "onError": "continueRegularOutput"
+    },
+    {
+      "parameters": {
+        "operation": "clear",
+        "documentId": {
+          "__rl": true,
+          "value": "={{ $('LINKs SHEETS').first().json.PAINEL_FINANCEIRO }}",
+          "mode": "url"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 1653965454,
+          "mode": "list",
+          "cachedResultName": "CONTAS",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1SCzZJUDolgsR1fBgXQwEc0gEZj5hDd4aJEA2VocGbtQ/edit#gid=1653965454"
+        },
+        "clear": "specificRows",
+        "startIndex": 2,
+        "rowsToDelete": 100000
+      },
+      "id": "4e85a192-2781-4188-9ef1-65865bdca938",
+      "name": "APAGA DADOS",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.3,
+      "position": [
+        -320,
+        -96
+      ],
+      "executeOnce": true,
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "pcOUCMZeQaE24Td8",
+          "name": "SHEETS INDUSTRIAL"
+        }
+      },
+      "onError": "continueRegularOutput"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "ca4669a3-dd9d-4e56-a913-92ab7ba33d75",
+              "name": "VLR_LANCTO",
+              "value": "={{ $json.VLR_LANCTO.replaceAll('.',',') }}",
+              "type": "string"
+            },
+            {
+              "id": "420bf94a-1201-4e05-aee5-df0a03b29bc5",
+              "name": "SAIDA_INT",
+              "value": "={{ $json.SAIDA_INT.replaceAll('.',',') }}",
+              "type": "string"
+            },
+            {
+              "id": "00f363b1-9b4d-4a37-b9ee-0bf35be11dba",
+              "name": "VLR_LANCTO_CLI",
+              "value": "={{ $json.VLR_LANCTO_CLI.replaceAll('.',',') }}",
+              "type": "string"
+            }
+          ]
+        },
+        "includeOtherFields": true,
+        "options": {}
+      },
+      "id": "85caaedb-7c30-4521-b7df-2e1059596b6d",
+      "name": "CONTAS",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.3,
+      "position": [
+        -80,
+        144
+      ]
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "da415076-c2e9-43d1-bfbb-3016e99b2162",
+              "name": "TotalEntregue",
+              "value": "={{ $json.TotalEntregue.replaceAll('.',',') }}",
+              "type": "string"
+            },
+            {
+              "id": "00d63c12-96f1-4443-932f-eaa7d2739066",
+              "name": "TotalEntregueCusto",
+              "value": "={{ $json.TotalEntregueCusto.replaceAll('.',',') }}",
+              "type": "string"
+            },
+            {
+              "id": "c8b10b55-d715-444c-a17e-034fea65b4a7",
+              "name": "m2",
+              "value": "={{ $json.m2.replaceAll('.',',') }}",
+              "type": "string"
+            },
+            {
+              "id": "5a5cd433-f477-4a71-847c-a50305e393f3",
+              "name": "peso",
+              "value": "={{ $json.peso.replaceAll('.',',') }}",
+              "type": "string"
+            }
+          ]
+        },
+        "includeOtherFields": true,
+        "options": {}
+      },
+      "id": "5d819b0a-2944-488b-a3b2-0b24fdb0bb60",
+      "name": "ENTREGA",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.3,
+      "position": [
+        -80,
+        304
+      ]
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Schedule Trigger": {
+      "main": [
+        [
+          {
+            "node": "LINKs SHEETS",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Execute Workflow Trigger": {
+      "main": [
+        [
+          {
+            "node": "If1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If1": {
+      "main": [
+        [
+          {
+            "node": "LINKs SHEETS",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Loop Over Items": {
+      "main": [
+        [
+          {
+            "node": "If",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "SQL",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "SQL": {
+      "main": [
+        [
+          {
+            "node": "Loop Over Items",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Switch": {
+      "main": [
+        [
+          {
+            "node": "CONTAS",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "ENTREGA",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "LINKs SHEETS": {
+      "main": [
+        [
+          {
+            "node": "CODIGO",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "CODIGOS, LINKS e TELEFONES": {
+      "main": [
+        [
+          {
+            "node": "Loop Over Items",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "CALCULANDO1",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "APAGA DADOS",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "APAGA DADOS1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "CODIGO": {
+      "main": [
+        [
+          {
+            "node": "Split Out1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Split Out1": {
+      "main": [
+        [
+          {
+            "node": "CODIGOS, LINKS e TELEFONES",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If": {
+      "main": [
+        [
+          {
+            "node": "Switch",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "ERRO1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "ATUALIZA DADOS1": {
+      "main": [
+        [
+          {
+            "node": "LOG ATT",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "ATUALIZA DADOS2": {
+      "main": [
+        [
+          {
+            "node": "LOG ATT",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "CONTAS": {
+      "main": [
+        [
+          {
+            "node": "ATUALIZA DADOS1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "ENTREGA": {
+      "main": [
+        [
+          {
+            "node": "ATUALIZA DADOS2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": true,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "a5cc1113-a929-4463-bda1-48aed9b96874",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "a5e8675e548a032fda81ee9dc775b4fc0a1b2003aee794fb0b37064013276a0f"
+  },
+  "id": "wqA62YYJSy4hOOKM",
+  "tags": [
+    {
+      "updatedAt": "2025-03-23T03:52:28.118Z",
+      "createdAt": "2025-03-23T03:52:28.118Z",
+      "id": "ePPKM09heno9AkRg",
+      "name": "Financeiro"
+    },
+    {
+      "updatedAt": "2025-03-21T11:31:29.426Z",
+      "createdAt": "2025-03-21T11:31:29.426Z",
+      "id": "RkprmC0aTVoaMnTe",
+      "name": "E.Ind"
+    },
+    {
+      "updatedAt": "2025-03-21T16:08:01.406Z",
+      "createdAt": "2025-03-21T16:08:01.406Z",
+      "id": "TOQ3ATxyyu1bCn2c",
+      "name": "AUTO"
+    }
+  ]
+}

@@ -1,0 +1,590 @@
+{
+  "name": "ANALISE PRECOS MINIMOS",
+  "nodes": [
+    {
+      "parameters": {
+        "operation": "appendOrUpdate",
+        "documentId": {
+          "__rl": true,
+          "value": "={{ $('LINKs SHEETS').first().json.ACOMPANHAMENTO_COMERCIAL }}",
+          "mode": "url"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 1432836302,
+          "mode": "list",
+          "cachedResultName": "BASE PRECO MINIMO",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1ZYqxCvYwxgrFqsYag5GuSu38bmtRvKNW_GofVfMu6is/edit#gid=1432836302"
+        },
+        "columns": {
+          "mappingMode": "autoMapInputData",
+          "value": {},
+          "matchingColumns": [
+            "MATERIAL"
+          ],
+          "schema": [
+            {
+              "id": "unidade",
+              "displayName": "unidade",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "LAST",
+              "displayName": "LAST",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "MATERIAL",
+              "displayName": "MATERIAL",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "MENOR_VALOR",
+              "displayName": "MENOR_VALOR",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "id": "a715a68f-4177-4369-9c37-9f49b136f10d",
+      "name": "ATUALIZA DADOS",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.3,
+      "position": [
+        160,
+        240
+      ],
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "pcOUCMZeQaE24Td8",
+          "name": "SHEETS INDUSTRIAL"
+        }
+      },
+      "onError": "continueRegularOutput"
+    },
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "triggerAtHour": 2,
+              "triggerAtMinute": 20
+            }
+          ]
+        }
+      },
+      "id": "02161314-3579-48c6-be0c-b1df1cfb79b9",
+      "name": "Schedule Trigger",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.1,
+      "position": [
+        -1184,
+        352
+      ]
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "id": "02beea9b-4069-44db-9d7d-f37dda6992e7",
+      "name": "Loop Over Items",
+      "type": "n8n-nodes-base.splitInBatches",
+      "typeVersion": 3,
+      "position": [
+        -448,
+        352
+      ]
+    },
+    {
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "set @unidade = '{{ $json.unidade }}';\nset @regiao = '{{ $json.REGIAO }}';\n{{ String($('CODIGOS, LINKS e TELEFONES').item.json.SQL) }}",
+        "options": {
+          "connectionTimeoutMillis": 10000
+        }
+      },
+      "id": "622cc63a-0722-44eb-9f21-d5690a9c8d90",
+      "name": "SQL",
+      "type": "n8n-nodes-base.mySql",
+      "typeVersion": 2.2,
+      "position": [
+        -224,
+        432
+      ],
+      "alwaysOutputData": false,
+      "credentials": {
+        "mySql": {
+          "id": "TCMIvEsjEY93g6mS",
+          "name": "MySQL WILL"
+        }
+      },
+      "onError": "continueRegularOutput"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{ $('CODIGOS, LINKS e TELEFONES').item.json.link }}send-sticker",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "={{ $('CODIGOS, LINKS e TELEFONES').item.json.link2 }}",
+              "value": "={{ $('CODIGOS, LINKS e TELEFONES').item.json.link1 }}"
+            }
+          ]
+        },
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "phone",
+              "value": "={{ $('CODIGOS, LINKS e TELEFONES').item.json.Solicitante }}"
+            },
+            {
+              "name": "sticker",
+              "value": "={{ $('CODIGOS, LINKS e TELEFONES').item.json.ERRO }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "d08e73c0-e934-4fed-891d-791dd1126e09",
+      "name": "ERRO1",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.1,
+      "position": [
+        32,
+        448
+      ],
+      "executeOnce": true
+    },
+    {
+      "parameters": {
+        "workflowId": "Mzncl2PY653mQvrF",
+        "options": {}
+      },
+      "id": "4e95d475-1505-401a-9e64-f22ca5bada3c",
+      "name": "LINKs SHEETS",
+      "type": "n8n-nodes-base.executeWorkflow",
+      "typeVersion": 1,
+      "position": [
+        -1008,
+        352
+      ]
+    },
+    {
+      "parameters": {
+        "workflowId": "Du7x4YkD8xJLMMZo",
+        "options": {}
+      },
+      "id": "76059715-8c3e-408e-a2e0-d5f389fb2b00",
+      "name": "CODIGOS, LINKS e TELEFONES",
+      "type": "n8n-nodes-base.executeWorkflow",
+      "typeVersion": 1,
+      "position": [
+        -624,
+        352
+      ]
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "9cac78a2-6c62-4261-bcfd-9740923cf9aa",
+              "name": "CODIGO",
+              "value": "ANALISE PRECOS MINIMOS",
+              "type": "string"
+            },
+            {
+              "id": "1c4d9d4d-b475-4df1-8257-6bf3c56df1e9",
+              "name": "TIPO",
+              "value": "AUTO",
+              "type": "string"
+            },
+            {
+              "id": "54e4a748-1d55-4ae3-84a6-1c37d2182e4b",
+              "name": "Solicitante",
+              "value": "=",
+              "type": "string"
+            },
+            {
+              "id": "efc5ac4e-b973-4252-be35-d5109272579d",
+              "name": "sheets",
+              "value": "={{ String($('LINKs SHEETS').item.json.sheets) }}",
+              "type": "string"
+            },
+            {
+              "id": "9d036697-e5a5-4645-9187-1873e67998ff",
+              "name": "arq",
+              "value": "",
+              "type": "string"
+            }
+          ]
+        },
+        "includeOtherFields": true,
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        -816,
+        352
+      ],
+      "id": "59276394-7ec5-4d4a-ab37-fb0673a758f2",
+      "name": "CODIGO"
+    },
+    {
+      "parameters": {
+        "operation": "update",
+        "documentId": {
+          "__rl": true,
+          "value": "={{ $('LINKs SHEETS').first().json.PERDAS_TODAS }}",
+          "mode": "url"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 1733753940,
+          "mode": "list",
+          "cachedResultName": "CHECK LIST",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1n_idHmRUq7zjEVdWlIDDsOkjizOp9gk41QqoxnkqJjM/edit#gid=1733753940"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "ROBO": "={{ $('CODIGOS, LINKS e TELEFONES').item.json.CODIGO }}",
+            "ATT": "={{ $now.format('yyyy-MM-dd') }}"
+          },
+          "matchingColumns": [
+            "ROBO"
+          ],
+          "schema": [
+            {
+              "id": "ROBO",
+              "displayName": "ROBO",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "ATT",
+              "displayName": "ATT",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "row_number",
+              "displayName": "row_number",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "readOnly": true,
+              "removed": true
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "id": "80fd272c-573d-49a5-a2d0-a94ee16ca0be",
+      "name": "LOG ATT",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.3,
+      "position": [
+        368,
+        240
+      ],
+      "executeOnce": true,
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "pcOUCMZeQaE24Td8",
+          "name": "SHEETS INDUSTRIAL"
+        }
+      },
+      "onError": "continueRegularOutput"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "040d1303-d83e-441e-b20f-9ad9e46e5277",
+              "leftValue": "={{ $json.MATERIAL }}",
+              "rightValue": "",
+              "operator": {
+                "type": "string",
+                "operation": "notEmpty",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        -224,
+        240
+      ],
+      "id": "4632ec77-4027-46f2-8b77-eb025bfec6e8",
+      "name": "If"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "0d362526-bf4c-4cbf-ba60-f446f462dcee",
+              "name": "VLR_TOTAL",
+              "value": "={{ $json.VLR_TOTAL.replace(\".\",\",\") }}",
+              "type": "string"
+            },
+            {
+              "id": "fcf3e2fc-e1d1-45f1-ac2a-068ac5bd4d86",
+              "name": "m2",
+              "value": "={{ $json.m2.replace(\".\",\",\") }}",
+              "type": "string"
+            },
+            {
+              "id": "acb33da5-2be1-477a-be03-cdfab775cee8",
+              "name": "RSm2",
+              "value": "={{ $json.RSm2.replace(\".\",\",\") }}",
+              "type": "string"
+            }
+          ]
+        },
+        "includeOtherFields": true,
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        -16,
+        240
+      ],
+      "id": "92f2c4f1-0cfa-42d2-ae42-986664f5f33a",
+      "name": "Edit Fields"
+    },
+    {
+      "parameters": {
+        "operation": "clear",
+        "documentId": {
+          "__rl": true,
+          "value": "={{ $('LINKs SHEETS').first().json.ACOMPANHAMENTO_COMERCIAL }}",
+          "mode": "url"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 1432836302,
+          "mode": "list",
+          "cachedResultName": "BASE PRECO MINIMO",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1ZYqxCvYwxgrFqsYag5GuSu38bmtRvKNW_GofVfMu6is/edit#gid=1432836302"
+        },
+        "clear": "specificRows",
+        "startIndex": 2,
+        "rowsToDelete": 50000
+      },
+      "id": "712a2bd0-7b5d-44db-9168-cd1e66fd7dcd",
+      "name": "APAGA DADOS",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.3,
+      "position": [
+        160,
+        64
+      ],
+      "executeOnce": true,
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "pcOUCMZeQaE24Td8",
+          "name": "SHEETS INDUSTRIAL"
+        }
+      },
+      "onError": "continueRegularOutput"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "ATUALIZA DADOS": {
+      "main": [
+        [
+          {
+            "node": "LOG ATT",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Schedule Trigger": {
+      "main": [
+        [
+          {
+            "node": "LINKs SHEETS",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Loop Over Items": {
+      "main": [
+        [
+          {
+            "node": "If",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "SQL",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "SQL": {
+      "main": [
+        [
+          {
+            "node": "Loop Over Items",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "LINKs SHEETS": {
+      "main": [
+        [
+          {
+            "node": "CODIGO",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "CODIGOS, LINKS e TELEFONES": {
+      "main": [
+        [
+          {
+            "node": "Loop Over Items",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "CODIGO": {
+      "main": [
+        [
+          {
+            "node": "CODIGOS, LINKS e TELEFONES",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        []
+      ]
+    },
+    "Edit Fields": {
+      "main": [
+        [
+          {
+            "node": "ATUALIZA DADOS",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "APAGA DADOS",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": true,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "a2f94fe2-8f99-4a8b-8c38-4005eaf5eef9",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "a5e8675e548a032fda81ee9dc775b4fc0a1b2003aee794fb0b37064013276a0f"
+  },
+  "id": "2AxhWJXRFITIDS00",
+  "tags": [
+    {
+      "updatedAt": "2025-03-21T17:32:15.943Z",
+      "createdAt": "2025-03-21T17:32:15.943Z",
+      "id": "vDLABaj1cUhPpO61",
+      "name": "Comercial"
+    },
+    {
+      "updatedAt": "2025-03-21T16:08:01.406Z",
+      "createdAt": "2025-03-21T16:08:01.406Z",
+      "id": "TOQ3ATxyyu1bCn2c",
+      "name": "AUTO"
+    },
+    {
+      "updatedAt": "2025-03-21T11:31:29.426Z",
+      "createdAt": "2025-03-21T11:31:29.426Z",
+      "id": "RkprmC0aTVoaMnTe",
+      "name": "E.Ind"
+    }
+  ]
+}

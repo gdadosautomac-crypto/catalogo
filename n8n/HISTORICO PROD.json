@@ -1,0 +1,646 @@
+{
+  "name": "HISTORICO PROD",
+  "nodes": [
+    {
+      "parameters": {
+        "operation": "appendOrUpdate",
+        "documentId": {
+          "__rl": true,
+          "value": "={{ $('LINKs SHEETS').first().json.PERDAS_TODAS }}",
+          "mode": "url"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 1943915756,
+          "mode": "list",
+          "cachedResultName": "HISTORICO PROD",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1n_idHmRUq7zjEVdWlIDDsOkjizOp9gk41QqoxnkqJjM/edit#gid=1943915756"
+        },
+        "columns": {
+          "mappingMode": "autoMapInputData",
+          "value": {},
+          "matchingColumns": [
+            "key"
+          ],
+          "schema": [
+            {
+              "id": "key",
+              "displayName": "key",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "unidade",
+              "displayName": "unidade",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "ANO",
+              "displayName": "ANO",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "MES",
+              "displayName": "MES",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "DS_CLP",
+              "displayName": "DS_CLP",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "DS_SCP",
+              "displayName": "DS_SCP",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "m2_ENG",
+              "displayName": "m2_ENG",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "m2_BOX",
+              "displayName": "m2_BOX",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "m2_OUTRO",
+              "displayName": "m2_OUTRO",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "m2",
+              "displayName": "m2",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "id": "4df617ee-e681-4351-8934-c3c45feb4347",
+      "name": "ATUALIZA DADOS",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.3,
+      "position": [
+        64,
+        160
+      ],
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "pcOUCMZeQaE24Td8",
+          "name": "SHEETS INDUSTRIAL"
+        }
+      },
+      "onError": "continueRegularOutput"
+    },
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "field": "weeks",
+              "triggerAtDay": [
+                6
+              ],
+              "triggerAtHour": 17,
+              "triggerAtMinute": 45
+            }
+          ]
+        }
+      },
+      "id": "9c6b44d6-b894-47a6-a7bd-3b0660848779",
+      "name": "Schedule Trigger",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.1,
+      "position": [
+        -1376,
+        352
+      ]
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "id": "a911d8ca-d37c-416c-8770-909b4c87e6cb",
+      "name": "Loop Over Items",
+      "type": "n8n-nodes-base.splitInBatches",
+      "typeVersion": 3,
+      "position": [
+        -656,
+        352
+      ]
+    },
+    {
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "set @unidade = '{{ $json.unidade }}';\n{{ String($('CODIGOS, LINKS e TELEFONES').item.json.SQL) }}",
+        "options": {
+          "connectionTimeoutMillis": 10000
+        }
+      },
+      "id": "51b6c47c-31d2-4f40-aa1c-8d2a60b4cf63",
+      "name": "SQL",
+      "type": "n8n-nodes-base.mySql",
+      "typeVersion": 2.2,
+      "position": [
+        -448,
+        432
+      ],
+      "alwaysOutputData": false,
+      "credentials": {
+        "mySql": {
+          "id": "TCMIvEsjEY93g6mS",
+          "name": "MySQL WILL"
+        }
+      },
+      "onError": "continueRegularOutput"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{ $('CODIGOS, LINKS e TELEFONES').item.json.link }}send-sticker",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "={{ $('CODIGOS, LINKS e TELEFONES').item.json.link2 }}",
+              "value": "={{ $('CODIGOS, LINKS e TELEFONES').item.json.link1 }}"
+            }
+          ]
+        },
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "phone",
+              "value": "={{ $('CODIGOS, LINKS e TELEFONES').item.json.Solicitante }}"
+            },
+            {
+              "name": "sticker",
+              "value": "={{ $('CODIGOS, LINKS e TELEFONES').item.json.ERRO }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "a836aa8f-6405-47ef-9c0c-3e4f81e5e9e3",
+      "name": "ERRO1",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.1,
+      "position": [
+        -240,
+        352
+      ],
+      "executeOnce": true,
+      "disabled": true
+    },
+    {
+      "parameters": {
+        "workflowId": "Mzncl2PY653mQvrF",
+        "options": {}
+      },
+      "id": "ac203367-36d8-4bbc-ab8d-d65e60c718ac",
+      "name": "LINKs SHEETS",
+      "type": "n8n-nodes-base.executeWorkflow",
+      "typeVersion": 1,
+      "position": [
+        -1200,
+        352
+      ]
+    },
+    {
+      "parameters": {
+        "workflowId": "Du7x4YkD8xJLMMZo",
+        "options": {}
+      },
+      "id": "8905310d-7d7f-457c-87f7-2426d9043736",
+      "name": "CODIGOS, LINKS e TELEFONES",
+      "type": "n8n-nodes-base.executeWorkflow",
+      "typeVersion": 1,
+      "position": [
+        -848,
+        352
+      ]
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "9cac78a2-6c62-4261-bcfd-9740923cf9aa",
+              "name": "CODIGO",
+              "value": "HISTORICO PROD",
+              "type": "string"
+            },
+            {
+              "id": "1c4d9d4d-b475-4df1-8257-6bf3c56df1e9",
+              "name": "TIPO",
+              "value": "AUTO",
+              "type": "string"
+            },
+            {
+              "id": "54e4a748-1d55-4ae3-84a6-1c37d2182e4b",
+              "name": "Solicitante",
+              "value": "=",
+              "type": "string"
+            },
+            {
+              "id": "efc5ac4e-b973-4252-be35-d5109272579d",
+              "name": "sheets",
+              "value": "={{ String($('LINKs SHEETS').item.json.sheets) }}",
+              "type": "string"
+            }
+          ]
+        },
+        "includeOtherFields": true,
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        -1024,
+        352
+      ],
+      "id": "74db31e8-3d75-4dac-b9c7-f9ad26ab0584",
+      "name": "CODIGO"
+    },
+    {
+      "parameters": {
+        "operation": "update",
+        "documentId": {
+          "__rl": true,
+          "value": "={{ $('LINKs SHEETS').first().json.PERDAS_TODAS }}",
+          "mode": "url"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 1733753940,
+          "mode": "list",
+          "cachedResultName": "CHECK LIST",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1n_idHmRUq7zjEVdWlIDDsOkjizOp9gk41QqoxnkqJjM/edit#gid=1733753940"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "ROBO": "={{ $('CODIGOS, LINKS e TELEFONES').item.json.CODIGO }}",
+            "ATT": "={{ $now.format('yyyy-MM-dd') }}"
+          },
+          "matchingColumns": [
+            "ROBO"
+          ],
+          "schema": [
+            {
+              "id": "ROBO",
+              "displayName": "ROBO",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "ATT",
+              "displayName": "ATT",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "row_number",
+              "displayName": "row_number",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "readOnly": true,
+              "removed": true
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "id": "1f2ffc7b-f68f-4e74-9402-6853f31c441d",
+      "name": "LOG ATT",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.3,
+      "position": [
+        272,
+        160
+      ],
+      "executeOnce": true,
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "pcOUCMZeQaE24Td8",
+          "name": "SHEETS INDUSTRIAL"
+        }
+      },
+      "onError": "continueRegularOutput"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "040d1303-d83e-441e-b20f-9ad9e46e5277",
+              "leftValue": "={{ $json.key }}",
+              "rightValue": "",
+              "operator": {
+                "type": "string",
+                "operation": "exists",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        -448,
+        240
+      ],
+      "id": "f24ce0cc-3f36-4887-a16a-33d829f0af19",
+      "name": "If"
+    },
+    {
+      "parameters": {
+        "operation": "clear",
+        "documentId": {
+          "__rl": true,
+          "value": "={{ $('LINKs SHEETS').first().json.PERDAS_TODAS }}",
+          "mode": "url"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 1943915756,
+          "mode": "list",
+          "cachedResultName": "HISTORICO PROD",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1n_idHmRUq7zjEVdWlIDDsOkjizOp9gk41QqoxnkqJjM/edit#gid=1943915756"
+        },
+        "clear": "specificRows",
+        "startIndex": 2,
+        "rowsToDelete": 15000
+      },
+      "id": "8131a53c-5aba-4314-9ccb-342f1f7d1420",
+      "name": "APAGA DADOS",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.3,
+      "position": [
+        -80,
+        80
+      ],
+      "executeOnce": true,
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "pcOUCMZeQaE24Td8",
+          "name": "SHEETS INDUSTRIAL"
+        }
+      },
+      "onError": "continueRegularOutput"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "00d63c12-96f1-4443-932f-eaa7d2739066",
+              "name": "m2_ENG",
+              "value": "={{ $json.m2_ENG.replaceAll('.',',') }}",
+              "type": "string"
+            },
+            {
+              "id": "e1be7ca2-5068-4f72-a571-880659f369d6",
+              "name": "m2_BOX",
+              "value": "={{ $json.m2_BOX.replaceAll('.',',') }}",
+              "type": "string"
+            },
+            {
+              "id": "3ebef789-e733-40f8-a4e0-bd57647b7025",
+              "name": "m2_OUTRO",
+              "value": "={{ $json.m2_OUTRO.replaceAll('.',',') }}",
+              "type": "string"
+            },
+            {
+              "id": "695abc1f-b65e-42a9-9e0a-78dd82006b7c",
+              "name": "m2",
+              "value": "={{ $json.m2.replaceAll('.',',') }}",
+              "type": "string"
+            }
+          ]
+        },
+        "includeOtherFields": true,
+        "options": {}
+      },
+      "id": "11c7a33c-0c16-40ff-b191-192cde7d29f7",
+      "name": "CONVERTE",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.3,
+      "position": [
+        -240,
+        160
+      ]
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "ATUALIZA DADOS": {
+      "main": [
+        [
+          {
+            "node": "LOG ATT",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Schedule Trigger": {
+      "main": [
+        [
+          {
+            "node": "LINKs SHEETS",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Loop Over Items": {
+      "main": [
+        [
+          {
+            "node": "If",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "SQL",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "SQL": {
+      "main": [
+        [
+          {
+            "node": "Loop Over Items",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "LINKs SHEETS": {
+      "main": [
+        [
+          {
+            "node": "CODIGO",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "CODIGOS, LINKS e TELEFONES": {
+      "main": [
+        [
+          {
+            "node": "Loop Over Items",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "CODIGO": {
+      "main": [
+        [
+          {
+            "node": "CODIGOS, LINKS e TELEFONES",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If": {
+      "main": [
+        [
+          {
+            "node": "CONVERTE",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "ERRO1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "CONVERTE": {
+      "main": [
+        [
+          {
+            "node": "APAGA DADOS",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "ATUALIZA DADOS",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": true,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "aa24668b-93d3-4b54-bf2a-0aeae8ddc758",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "a5e8675e548a032fda81ee9dc775b4fc0a1b2003aee794fb0b37064013276a0f"
+  },
+  "id": "rUu3qMu56YnBQ5zf",
+  "tags": [
+    {
+      "updatedAt": "2025-03-21T16:08:01.406Z",
+      "createdAt": "2025-03-21T16:08:01.406Z",
+      "id": "TOQ3ATxyyu1bCn2c",
+      "name": "AUTO"
+    },
+    {
+      "updatedAt": "2025-03-21T11:31:29.426Z",
+      "createdAt": "2025-03-21T11:31:29.426Z",
+      "id": "RkprmC0aTVoaMnTe",
+      "name": "E.Ind"
+    }
+  ]
+}

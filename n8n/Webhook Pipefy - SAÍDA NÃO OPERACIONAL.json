@@ -1,0 +1,263 @@
+{
+  "name": "Webhook Pipefy - SAÍDA NÃO OPERACIONAL",
+  "nodes": [
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "897a9a1a-3870-4374-b539-3863e8d9a32d",
+              "name": "Alerta",
+              "value": "={{ $json.body.alerta }}",
+              "type": "string"
+            },
+            {
+              "id": "57d2fff4-f86a-44b9-a31d-d8fe6293feaa",
+              "name": "unidade",
+              "value": "={{ $json.body.Unidade }}",
+              "type": "string"
+            },
+            {
+              "id": "77c16ead-013f-4d7e-add0-7a0dbbdf0189",
+              "name": "solicitante",
+              "value": "={{ $json.body.Solicitante }}",
+              "type": "string"
+            },
+            {
+              "id": "6f82a10d-47e1-41ef-b301-e35f648991f8",
+              "name": "valor",
+              "value": "={{ $json.body.Valor }}",
+              "type": "string"
+            },
+            {
+              "id": "61bd6a55-fbc6-4ff5-869e-270a2075401a",
+              "name": "contato",
+              "value": "={{ $json.body.Contato }}",
+              "type": "string"
+            },
+            {
+              "id": "7cd4cdf0-cff3-4a98-90ae-847c690a2fed",
+              "name": "tipo_unidade",
+              "value": "={{ $json.body['Tipo Unidade'] }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "683b54f0-ed9e-4e0d-8810-71acb03cf418",
+      "name": "Edit Fields",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.3,
+      "position": [
+        -928,
+        640
+      ]
+    },
+    {
+      "parameters": {
+        "rules": {
+          "values": [
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 1
+                },
+                "conditions": [
+                  {
+                    "leftValue": "={{ $('Webhook1').item.json.body.alerta }}",
+                    "rightValue": "New_Card_criado",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    },
+                    "id": "14f22e56-41d0-4489-9457-f76d23021901"
+                  }
+                ],
+                "combinator": "and"
+              }
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 1
+                },
+                "conditions": [
+                  {
+                    "id": "ab9e58f8-e011-4c5d-be87-8fffa3233f85",
+                    "leftValue": "={{ $('Webhook1').item.json.body.alerta }}",
+                    "rightValue": "Move_Card_autorizado",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals",
+                      "name": "filter.operator.equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              }
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "ea34009e-0d38-441e-95f8-d40683a8c863",
+      "name": "Switch",
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 3,
+      "position": [
+        -736,
+        640
+      ]
+    },
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "78f9e14a-4b9c-45d6-97d3-8fad4beea86c",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "position": [
+        -1104,
+        640
+      ],
+      "id": "5dc4f8f3-6a87-4f0f-a2bb-8bb6fa77f363",
+      "name": "Webhook1",
+      "webhookId": "78f9e14a-4b9c-45d6-97d3-8fad4beea86c"
+    },
+    {
+      "parameters": {
+        "phone": "5581986945032",
+        "text": "=------- *SOLICITAÇÃO DE SAÍDA NÃO OPERACIONAL* -------\nTipo Unidade: {{ $json.tipo_unidade }}\nUnidade: {{ $json.unidade }}\nSolicitante: {{ $json.solicitante }}\nValor: {{ $json.valor }}",
+        "additionalFields": {}
+      },
+      "type": "n8n-nodes-zapi.zapi",
+      "typeVersion": 1,
+      "position": [
+        -544,
+        528
+      ],
+      "id": "3993180c-bd2a-4804-a809-1dd30146a969",
+      "name": "Z-API",
+      "credentials": {
+        "zapiApi": {
+          "id": "cGI15AvSkFAV8Qrr",
+          "name": "Z-API account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "phone": "={{ $json.telefoneFormatado }}",
+        "text": "=------- *SAÍDA NÃO OPERACIONAL AUTORIZADA* -------\nOlá *{{ $json.solicitante }}*. Sua solicitação no valor de R$*{{ $json.valor }}* foi analisada e Aprovada.",
+        "additionalFields": {}
+      },
+      "type": "n8n-nodes-zapi.zapi",
+      "typeVersion": 1,
+      "position": [
+        -288,
+        752
+      ],
+      "id": "91110f75-b502-4dd7-a885-7dc986e78de3",
+      "name": "Z-API1",
+      "credentials": {
+        "zapiApi": {
+          "id": "cGI15AvSkFAV8Qrr",
+          "name": "Z-API account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "return items.map(item => {\n  const numeroOriginal = item.json.contato || \"\"; // ou o nome correto do campo do Pipefy\n  const numeroLimpo = numeroOriginal.replace(/[^0-9]/g, \"\"); // remove tudo que não for número\n\n  return {\n    json: {\n      ...item.json,\n      telefoneFormatado: numeroLimpo\n    }\n  };\n});\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -528,
+        752
+      ],
+      "id": "ab59a8f8-db46-4b73-bb37-ed7385db1328",
+      "name": "Code"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Edit Fields": {
+      "main": [
+        [
+          {
+            "node": "Switch",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Switch": {
+      "main": [
+        [
+          {
+            "node": "Z-API",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Code",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Webhook1": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code": {
+      "main": [
+        [
+          {
+            "node": "Z-API1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "6e45e792-346a-4cae-aa10-76b864b938df",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "a5e8675e548a032fda81ee9dc775b4fc0a1b2003aee794fb0b37064013276a0f"
+  },
+  "id": "3ZAt4rb91W7lxmOf",
+  "tags": [
+    {
+      "updatedAt": "2026-01-14T11:04:00.895Z",
+      "createdAt": "2025-03-21T11:47:30.374Z",
+      "id": "CvCy3KNJKyMxSQ3C",
+      "name": "GDA"
+    }
+  ]
+}

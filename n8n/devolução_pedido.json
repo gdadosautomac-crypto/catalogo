@@ -1,0 +1,914 @@
+{
+  "name": "devolução_pedido",
+  "nodes": [
+    {
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "-- devolução de pedidos\nSELECT \n\ttipo_unidade ,\n\tunidade,\n\tnome_cliente ,\n\tcod_pedido ,\n\tcoes ,\n\tdata_pedido ,\n\tdata_devolucao ,\n\tclasse_produto ,\n\tsub_classe_produto ,\n\tcategoria_produto ,\n\tclasse_produto ,\n\tDATE(dd.data_devolucao ::timestamp) AS data_devolucao,\n\tcusto_devolvido ,\n\tlucrodevolvido ,\n\tfaturamento_devolvido ,\n\tqtd_devolvida \nFROM \n    dre_devolucoes dd \nWHERE\n    DATE(data_devolucao ::timestamp) BETWEEN CURRENT_DATE - INTERVAL '1 day' AND CURRENT_DATE",
+        "options": {}
+      },
+      "id": "ab0e8f73-0c1c-4701-89e6-2a806b0a5271",
+      "name": "Postgres",
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 2.3,
+      "position": [
+        1408,
+        288
+      ],
+      "alwaysOutputData": false,
+      "credentials": {
+        "postgres": {
+          "id": "G50fA6A0L90xaBIe",
+          "name": "Postgres account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "xlsx",
+        "options": {
+          "fileName": "=$json[\"nome_do_arquivo\"] = 'dinheiro_bds_' + new Date().toISOString().slice(0, 10)"
+        }
+      },
+      "id": "bb1f8ea6-7204-4607-bc84-127f74bad7bc",
+      "name": "Convert to File",
+      "type": "n8n-nodes-base.convertToFile",
+      "typeVersion": 1.1,
+      "position": [
+        1760,
+        288
+      ]
+    },
+    {
+      "parameters": {
+        "operation": "upload",
+        "bucketName": "marcolanoperacoes",
+        "fileName": "={{ $('ARQUIVO').item.json.arq }}",
+        "additionalFields": {
+          "acl": "publicReadWrite"
+        }
+      },
+      "id": "d6801a36-97fa-4e50-917c-b388896fbd4f",
+      "name": "AWS S31",
+      "type": "n8n-nodes-base.awsS3",
+      "typeVersion": 2,
+      "position": [
+        1968,
+        288
+      ],
+      "credentials": {
+        "aws": {
+          "id": "wojq9Jq4bZgupPjh",
+          "name": "AWS account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "documentId": {
+          "__rl": true,
+          "value": "https://docs.google.com/spreadsheets/d/1avLuf5Qpu0lBIFVS-Ny0j-iIFZGkVqqufVGy-sfbqM4/edit?usp=sharing",
+          "mode": "url"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "Página1",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1avLuf5Qpu0lBIFVS-Ny0j-iIFZGkVqqufVGy-sfbqM4/edit#gid=0"
+        },
+        "options": {}
+      },
+      "id": "b3eed091-7e72-42da-af9e-a39cc1056b29",
+      "name": "Google Sheets",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.3,
+      "position": [
+        912,
+        288
+      ],
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "8Ytd3zZKAOSyZNqC",
+          "name": "Sheets Andre"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "c9777b34-96c3-49cb-9e8f-5171d677c039",
+              "name": "link",
+              "value": "={{ $json.Link }}",
+              "type": "string"
+            },
+            {
+              "id": "c29c9cfb-b76e-4088-b0ca-7748646d4779",
+              "name": "link1",
+              "value": "={{ $json.Value }}",
+              "type": "string"
+            },
+            {
+              "id": "a2465349-2aee-4dc2-8ce6-9a40bf305fa7",
+              "name": "link2",
+              "value": "={{ $json.Field }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "abe0f2de-69ea-4654-820f-ab7a709526ff",
+      "name": "AUTH",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.3,
+      "position": [
+        1088,
+        288
+      ]
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "c9777b34-96c3-49cb-9e8f-5171d677c039",
+              "name": "arq",
+              "value": "=devolucao_pedidos - d{{ $now.day }}-{{ $now.hour }}h{{ $now.minute }}m{{ $now.second }}s",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {
+          "includeBinary": "={{ data }}"
+        }
+      },
+      "id": "8e2ec05e-7970-4ba7-9275-ea0c1aabdf2c",
+      "name": "ARQUIVO",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.3,
+      "position": [
+        1248,
+        288
+      ]
+    },
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "field": "weeks",
+              "triggerAtDay": [
+                1,
+                2,
+                3,
+                4,
+                5,
+                6
+              ],
+              "triggerAtHour": 8,
+              "triggerAtMinute": 30
+            }
+          ]
+        }
+      },
+      "id": "7a37298a-1352-49b3-a6bd-4b965ff38089",
+      "name": "Schedule Trigger",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.1,
+      "position": [
+        720,
+        288
+      ]
+    },
+    {
+      "parameters": {
+        "operation": "delete",
+        "bucketName": "marcolanoperacoes",
+        "fileKey": "=Documentos Devolvidos - d23-6h0m2s",
+        "options": {}
+      },
+      "id": "96e4f573-6be1-4bda-88da-0b33c688c1b0",
+      "name": "AWS S37",
+      "type": "n8n-nodes-base.awsS3",
+      "typeVersion": 2,
+      "position": [
+        1472,
+        640
+      ],
+      "credentials": {
+        "aws": {
+          "id": "wojq9Jq4bZgupPjh",
+          "name": "AWS account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "getAll",
+        "bucketName": "marcolanoperacoes",
+        "returnAll": true,
+        "options": {}
+      },
+      "id": "e461ea7f-f7bd-48cb-aa3a-71efcd8fb754",
+      "name": "AWS S3",
+      "type": "n8n-nodes-base.awsS3",
+      "typeVersion": 2,
+      "position": [
+        1344,
+        640
+      ],
+      "credentials": {
+        "aws": {
+          "id": "wojq9Jq4bZgupPjh",
+          "name": "AWS account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "delete",
+        "bucketName": "marcolanoperacoes",
+        "fileKey": "={{ $('ARQUIVO').item.json.arq }}",
+        "options": {}
+      },
+      "id": "cb2459f1-a964-475e-92f2-6ecb742fb80e",
+      "name": "AWS S33",
+      "type": "n8n-nodes-base.awsS3",
+      "typeVersion": 2,
+      "position": [
+        2512,
+        288
+      ],
+      "credentials": {
+        "aws": {
+          "id": "wojq9Jq4bZgupPjh",
+          "name": "AWS account"
+        }
+      }
+    },
+    {
+      "parameters": {},
+      "id": "662fed73-c89e-4f6d-9a09-564619b713c7",
+      "name": "Wait",
+      "type": "n8n-nodes-base.wait",
+      "typeVersion": 1.1,
+      "position": [
+        2320,
+        288
+      ],
+      "webhookId": "7e8fc0b1-1141-45d5-a084-df1fb665b5e1"
+    },
+    {
+      "parameters": {
+        "jsCode": "const items = $input.all();\n\n// Loop para formatar a data de cada item\nitems.forEach(item => {\n  if (item.json.data_pedido) {\n    item.json.data_pedido = new Date(item.json.data_pedido).toISOString().split('T')[0];\n  }\n  \n  if (item.json.data_devolucao) {\n    item.json.data_devolucao = new Date(item.json.data_devolucao).toISOString().split('T')[0];\n  }\n});\n\nreturn items;\n"
+      },
+      "id": "ff682767-152a-4eb2-87f5-12939d3560c5",
+      "name": "Code",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1584,
+        288
+      ]
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "ede53e75-55ad-405c-803e-e572936d81d2",
+              "name": "unidade",
+              "value": "={{ $json.unidade }}",
+              "type": "string"
+            },
+            {
+              "id": "ba55b8e0-ba3f-47a1-a545-cd7f7ca0e84c",
+              "name": "cod_pedido",
+              "value": "={{ $json.cod_pedido }}",
+              "type": "string"
+            },
+            {
+              "id": "e2210d6b-2759-410d-b8f3-580953fe2fc9",
+              "name": "categoria",
+              "value": "={{ $json.categoria_produto }}",
+              "type": "string"
+            },
+            {
+              "id": "eeef12f2-e0a8-44f1-8d66-0d49dff60962",
+              "name": "faturamento_devolvido",
+              "value": "={{ $json.faturamento_devolvido }}",
+              "type": "number"
+            },
+            {
+              "id": "1e6e0692-878b-4e10-b16f-be9e0045cb99",
+              "name": "data_devolucao",
+              "value": "={{ $json.data_devolucao }}",
+              "type": "string"
+            },
+            {
+              "id": "6cd1e0ad-0ea8-4ce8-8b18-1973c56755e7",
+              "name": "nome_cliente",
+              "value": "={{ $json.nome_cliente }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "9d962e5f-d9a3-45fb-b8eb-60bee98fd770",
+      "name": "Edit Fields",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.3,
+      "position": [
+        1760,
+        480
+      ]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.pipefy.com/graphql",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Authorization",
+              "value": "Bearer eyJhbGciOiJIUzUxMiJ9.eyJpc3MiOiJQaXBlZnkiLCJpYXQiOjE3MzY0NDc3OTMsImp0aSI6IjgyMWZhZjBkLWMyMDUtNDRjOC05YTU2LWFmYmIxMzI3OTdkYSIsInN1YiI6ODAyNzIsInVzZXIiOnsiaWQiOjgwMjcyLCJlbWFpbCI6Im1hcmNvbGFuZGllZ29AZ21haWwuY29tIn19.czyBeR45RrwDXqnq-TjN7CgM6zmMgR8KB6oeBujazuO1assBjhTFZVyqLw3LB-yT1xDTnJaQS4aIS7_iRhWz4Q"
+            },
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"query\": \"mutation { createCard(input: {pipe_id: 305619354, phase_id: 333525857, title: \\\"DEVOLUCAO TEMPERADO\\\", fields_attributes: [{field_id: \\\"descricao\\\", field_value: \\\"{{ $json.categoria }}\\\"}, {field_id: \\\"unidade\\\", field_value: \\\"{{ $json.unidade }}\\\"}, {field_id: \\\"chave\\\", field_value: \\\"{{ $json.cod_pedido }}\\\"}, {field_id: \\\"valor\\\", field_value: \\\"{{ $json.faturamento_devolvido.toString() }}\\\"}, {field_id: \\\"nome_cliente\\\", field_value: \\\"{{ $json.nome_cliente }}\\\"}, {field_id: \\\"data_pagamento\\\", field_value: \\\"{{ $json.data_devolucao }}\\\"}]}) { card { id } } }\"\n}",
+        "options": {}
+      },
+      "id": "ce179923-9546-4432-924c-ce3d0b273132",
+      "name": "PIPEFY",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.1,
+      "position": [
+        2320,
+        480
+      ]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.pipefy.com/graphql",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Authorization",
+              "value": "Bearer eyJhbGciOiJIUzUxMiJ9.eyJpc3MiOiJQaXBlZnkiLCJpYXQiOjE3MzY0NDc3OTMsImp0aSI6IjgyMWZhZjBkLWMyMDUtNDRjOC05YTU2LWFmYmIxMzI3OTdkYSIsInN1YiI6ODAyNzIsInVzZXIiOnsiaWQiOjgwMjcyLCJlbWFpbCI6Im1hcmNvbGFuZGllZ29AZ21haWwuY29tIn19.czyBeR45RrwDXqnq-TjN7CgM6zmMgR8KB6oeBujazuO1assBjhTFZVyqLw3LB-yT1xDTnJaQS4aIS7_iRhWz4Q"
+            },
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"query\": \"mutation { updateCard(input: {id: \\\"{{ $json.data.createCard.card.id }}\\\", label_ids: [\\\"314483773\\\"]}) { card { id } } }\"\n}",
+        "options": {}
+      },
+      "id": "1daba53c-3457-47aa-ba79-892c423b6d5d",
+      "name": "PIPEFY - etiqueta",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.1,
+      "position": [
+        2512,
+        480
+      ]
+    },
+    {
+      "parameters": {
+        "rules": {
+          "values": [
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "leftValue": "={{ $json.categoria }}",
+                    "rightValue": "TEMPERADO",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    },
+                    "id": "3844a9e3-e89a-4fb5-9a1f-73e4bed2cdf5"
+                  }
+                ],
+                "combinator": "and"
+              }
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "id": "4bf0129e-0bfa-42fc-af6c-cf69d853956d",
+                    "leftValue": "={{ $json.faturamento_devolvido }}",
+                    "rightValue": 10000,
+                    "operator": {
+                      "type": "number",
+                      "operation": "gt"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              }
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 3.2,
+      "position": [
+        1968,
+        480
+      ],
+      "id": "4f2e6ca4-9f1e-4dbb-8d14-50f13db57009",
+      "name": "Switch"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.pipefy.com/graphql",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Authorization",
+              "value": "Bearer eyJhbGciOiJIUzUxMiJ9.eyJpc3MiOiJQaXBlZnkiLCJpYXQiOjE3MzY0NDc3OTMsImp0aSI6IjgyMWZhZjBkLWMyMDUtNDRjOC05YTU2LWFmYmIxMzI3OTdkYSIsInN1YiI6ODAyNzIsInVzZXIiOnsiaWQiOjgwMjcyLCJlbWFpbCI6Im1hcmNvbGFuZGllZ29AZ21haWwuY29tIn19.czyBeR45RrwDXqnq-TjN7CgM6zmMgR8KB6oeBujazuO1assBjhTFZVyqLw3LB-yT1xDTnJaQS4aIS7_iRhWz4Q"
+            },
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"query\": \"mutation { createCard(input: {pipe_id: 305619354, phase_id: 333525857, title: \\\"DEVOLUCAO\\\", fields_attributes: [{field_id: \\\"descricao\\\", field_value: \\\"{{ $json.categoria }}\\\"}, {field_id: \\\"unidade\\\", field_value: \\\"{{ $json.unidade }}\\\"}, {field_id: \\\"chave\\\", field_value: \\\"{{ $json.cod_pedido }}\\\"}, {field_id: \\\"valor\\\", field_value: \\\"{{ $json.faturamento_devolvido }}\\\"}, {field_id: \\\"nome_cliente\\\", field_value: \\\"{{ $json.nome_cliente }}\\\"}, {field_id: \\\"data_pagamento\\\", field_value: \\\"{{ $json.data_devolucao }}\\\"}]}) { card { id } } }\"\n}\n",
+        "options": {}
+      },
+      "id": "709c463e-2a05-4cb7-b789-a9922cc6f551",
+      "name": "PIPEFY1",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.1,
+      "position": [
+        2320,
+        672
+      ]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.pipefy.com/graphql",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Authorization",
+              "value": "Bearer eyJhbGciOiJIUzUxMiJ9.eyJpc3MiOiJQaXBlZnkiLCJpYXQiOjE3MzY0NDc3OTMsImp0aSI6IjgyMWZhZjBkLWMyMDUtNDRjOC05YTU2LWFmYmIxMzI3OTdkYSIsInN1YiI6ODAyNzIsInVzZXIiOnsiaWQiOjgwMjcyLCJlbWFpbCI6Im1hcmNvbGFuZGllZ29AZ21haWwuY29tIn19.czyBeR45RrwDXqnq-TjN7CgM6zmMgR8KB6oeBujazuO1assBjhTFZVyqLw3LB-yT1xDTnJaQS4aIS7_iRhWz4Q"
+            },
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"query\": \"mutation { updateCard(input: {id: \\\"{{ $json.data.createCard.card.id }}\\\", label_ids: [\\\"314906512\\\"]}) { card { id } } }\"\n}",
+        "options": {}
+      },
+      "id": "c123ac21-93f8-4e0f-afd6-5a30fa70b6db",
+      "name": "PIPEFY - etiqueta1",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.1,
+      "position": [
+        2512,
+        672
+      ]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.pipefy.com/graphql",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Authorization",
+              "value": "Bearer eyJhbGciOiJIUzUxMiJ9.eyJpc3MiOiJQaXBlZnkiLCJpYXQiOjE3MzY0NDc3OTMsImp0aSI6IjgyMWZhZjBkLWMyMDUtNDRjOC05YTU2LWFmYmIxMzI3OTdkYSIsInN1YiI6ODAyNzIsInVzZXIiOnsiaWQiOjgwMjcyLCJlbWFpbCI6Im1hcmNvbGFuZGllZ29AZ21haWwuY29tIn19.czyBeR45RrwDXqnq-TjN7CgM6zmMgR8KB6oeBujazuO1assBjhTFZVyqLw3LB-yT1xDTnJaQS4aIS7_iRhWz4Q"
+            },
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"query\": \"query { pipe(id: 305619354) { labels { id name } } }\"\n}",
+        "options": {}
+      },
+      "id": "eb0fbbc9-4f90-4d15-a9db-63da6727e008",
+      "name": "PIPEFY2",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.1,
+      "position": [
+        1152,
+        624
+      ]
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "ede53e75-55ad-405c-803e-e572936d81d2",
+              "name": "unidade",
+              "value": "={{ $json.unidade }}",
+              "type": "string"
+            },
+            {
+              "id": "ba55b8e0-ba3f-47a1-a545-cd7f7ca0e84c",
+              "name": "cod_pedido",
+              "value": "={{ $json.cod_pedido }}",
+              "type": "string"
+            },
+            {
+              "id": "e2210d6b-2759-410d-b8f3-580953fe2fc9",
+              "name": "categoria",
+              "value": "={{ $json.categoria }}",
+              "type": "string"
+            },
+            {
+              "id": "eeef12f2-e0a8-44f1-8d66-0d49dff60962",
+              "name": "faturamento_devolvido",
+              "value": "={{ $json.faturamento_devolvido }}",
+              "type": "string"
+            },
+            {
+              "id": "1e6e0692-878b-4e10-b16f-be9e0045cb99",
+              "name": "data_devolucao",
+              "value": "={{ $json.data_devolucao }}",
+              "type": "string"
+            },
+            {
+              "id": "6cd1e0ad-0ea8-4ce8-8b18-1973c56755e7",
+              "name": "nome_cliente",
+              "value": "={{ $json.nome_cliente }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "4370dafa-f5b8-413a-9e98-7561aba60b99",
+      "name": "Edit Fields1",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.3,
+      "position": [
+        2160,
+        672
+      ]
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "ede53e75-55ad-405c-803e-e572936d81d2",
+              "name": "unidade",
+              "value": "={{ $json.unidade }}",
+              "type": "string"
+            },
+            {
+              "id": "ba55b8e0-ba3f-47a1-a545-cd7f7ca0e84c",
+              "name": "cod_pedido",
+              "value": "={{ $json.cod_pedido }}",
+              "type": "string"
+            },
+            {
+              "id": "e2210d6b-2759-410d-b8f3-580953fe2fc9",
+              "name": "categoria",
+              "value": "={{ $json.categoria }}",
+              "type": "string"
+            },
+            {
+              "id": "eeef12f2-e0a8-44f1-8d66-0d49dff60962",
+              "name": "faturamento_devolvido",
+              "value": "={{ $json.faturamento_devolvido }}",
+              "type": "string"
+            },
+            {
+              "id": "1e6e0692-878b-4e10-b16f-be9e0045cb99",
+              "name": "data_devolucao",
+              "value": "={{ $json.data_devolucao }}",
+              "type": "string"
+            },
+            {
+              "id": "6cd1e0ad-0ea8-4ce8-8b18-1973c56755e7",
+              "name": "nome_cliente",
+              "value": "={{ $json.nome_cliente }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "0011d3d3-f619-41f8-85a3-ca909ff34923",
+      "name": "Edit Fields2",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.3,
+      "position": [
+        2144,
+        480
+      ]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "=https://api.z-api.io/instances/3AD47F49CE9AF04B4D43CA225862B38B/token/6EE2B07CF6D61B0059AD2125/send-document/xlsx",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "={{ $('AUTH').item.json.link2 }}",
+              "value": "={{ $('AUTH').item.json.link1 }}"
+            }
+          ]
+        },
+        "sendBody": true,
+        "contentType": "form-urlencoded",
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "phone",
+              "value": "=5581986945032"
+            },
+            {
+              "name": "fileName",
+              "value": "=devolucao_pedido_{{$today.format('MM-DD')}}"
+            },
+            {
+              "name": "document",
+              "value": "=https://marcolanoperacoes.s3.amazonaws.com/{{ $('ARQUIVO').item.json.arq }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "b98d3001-477b-48b6-8732-612ddf43d83a",
+      "name": "Controladoria",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.1,
+      "position": [
+        2144,
+        288
+      ]
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "AUTH": {
+      "main": [
+        [
+          {
+            "node": "ARQUIVO",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "ARQUIVO": {
+      "main": [
+        [
+          {
+            "node": "Postgres",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Postgres": {
+      "main": [
+        [
+          {
+            "node": "Code",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Convert to File": {
+      "main": [
+        [
+          {
+            "node": "AWS S31",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "AWS S31": {
+      "main": [
+        [
+          {
+            "node": "Controladoria",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Wait": {
+      "main": [
+        [
+          {
+            "node": "AWS S33",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Schedule Trigger": {
+      "main": [
+        [
+          {
+            "node": "Google Sheets",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Google Sheets": {
+      "main": [
+        [
+          {
+            "node": "AUTH",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "AWS S3": {
+      "main": [
+        [
+          {
+            "node": "AWS S37",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Convert to File",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Edit Fields": {
+      "main": [
+        [
+          {
+            "node": "Switch",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "PIPEFY": {
+      "main": [
+        [
+          {
+            "node": "PIPEFY - etiqueta",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Switch": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields2",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Edit Fields1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "PIPEFY1": {
+      "main": [
+        [
+          {
+            "node": "PIPEFY - etiqueta1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Edit Fields1": {
+      "main": [
+        [
+          {
+            "node": "PIPEFY1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Edit Fields2": {
+      "main": [
+        [
+          {
+            "node": "PIPEFY",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Controladoria": {
+      "main": [
+        [
+          {
+            "node": "Wait",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "64685a46-7548-4fe7-9b60-d570dd722f0e",
+  "meta": {
+    "instanceId": "a5e8675e548a032fda81ee9dc775b4fc0a1b2003aee794fb0b37064013276a0f"
+  },
+  "id": "b18gHTu0XrXsF8DA",
+  "tags": [
+    {
+      "updatedAt": "2026-01-14T11:04:00.895Z",
+      "createdAt": "2025-03-21T11:47:30.374Z",
+      "id": "CvCy3KNJKyMxSQ3C",
+      "name": "GDA"
+    }
+  ]
+}

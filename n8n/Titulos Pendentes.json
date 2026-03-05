@@ -1,0 +1,670 @@
+{
+  "name": "Titulos Pendentes",
+  "nodes": [
+    {
+      "parameters": {
+        "documentId": {
+          "__rl": true,
+          "value": "https://docs.google.com/spreadsheets/d/1avLuf5Qpu0lBIFVS-Ny0j-iIFZGkVqqufVGy-sfbqM4/edit?usp=sharing",
+          "mode": "url"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "Página1",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1avLuf5Qpu0lBIFVS-Ny0j-iIFZGkVqqufVGy-sfbqM4/edit#gid=0"
+        },
+        "options": {}
+      },
+      "id": "e36f2575-eaf2-4b34-86b0-58750f8b5c97",
+      "name": "Google Sheets",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.3,
+      "position": [
+        -3232,
+        160
+      ],
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "8Ytd3zZKAOSyZNqC",
+          "name": "Sheets Andre"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "c9777b34-96c3-49cb-9e8f-5171d677c039",
+              "name": "link",
+              "value": "={{ $json.Link }}",
+              "type": "string"
+            },
+            {
+              "id": "c29c9cfb-b76e-4088-b0ca-7748646d4779",
+              "name": "link1",
+              "value": "={{ $json.Value }}",
+              "type": "string"
+            },
+            {
+              "id": "a2465349-2aee-4dc2-8ce6-9a40bf305fa7",
+              "name": "link2",
+              "value": "={{ $json.Field }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "9eb17704-9623-478c-bb6e-81a42b4682b4",
+      "name": "AUTH",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.3,
+      "position": [
+        -3056,
+        160
+      ]
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "c9777b34-96c3-49cb-9e8f-5171d677c039",
+              "name": "arq",
+              "value": "=titulos_pendentes - d{{ $now.day }}-{{ $now.hour }}h{{ $now.minute }}m{{ $now.second }}s",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {
+          "includeBinary": "={{ data }}"
+        }
+      },
+      "id": "1214f2d7-f677-4b18-916e-207c455821b1",
+      "name": "ARQUIVO",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.3,
+      "position": [
+        -2880,
+        160
+      ]
+    },
+    {
+      "parameters": {
+        "documentId": {
+          "__rl": true,
+          "value": "https://docs.google.com/spreadsheets/d/1-POicyrzt3pF737lETypFKUwZu1wf9iQwqYqQnse5bk/edit?hl=pt-br&gid=0#gid=0",
+          "mode": "url"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "Página1",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1-POicyrzt3pF737lETypFKUwZu1wf9iQwqYqQnse5bk/edit#gid=0"
+        },
+        "options": {}
+      },
+      "id": "bde2793c-82cf-4406-8161-b07a2786377b",
+      "name": "Google Sheets1",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.3,
+      "position": [
+        -2704,
+        160
+      ],
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "8Ytd3zZKAOSyZNqC",
+          "name": "Sheets Andre"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "2bae94fc-16e6-422b-a70d-b488666e0510",
+              "name": "tipo_unidade",
+              "value": "={{ $json.tipo_unidade }}",
+              "type": "string"
+            },
+            {
+              "id": "674a349e-fc00-4c9b-ada6-0d216d0a80db",
+              "name": "unidade",
+              "value": "={{ $json.unidade }}",
+              "type": "string"
+            },
+            {
+              "id": "67ac34de-fd36-4b6c-b797-f6837ea7d981",
+              "name": "host",
+              "value": "={{ $json.host }}",
+              "type": "string"
+            },
+            {
+              "id": "f022d193-0473-4fbc-9a48-3f29487dd5fa",
+              "name": "name",
+              "value": "={{ $json.name }}",
+              "type": "string"
+            },
+            {
+              "id": "4146a9c6-c7a0-4231-adea-914085fef4f6",
+              "name": "port",
+              "value": "={{ $json.port }}",
+              "type": "number"
+            },
+            {
+              "id": "e9f4fa0c-455b-4366-9988-b45c6a53615d",
+              "name": "user",
+              "value": "={{ $json.user }}",
+              "type": "string"
+            },
+            {
+              "id": "e973f1f7-c07d-4409-8617-4d8e9735a819",
+              "name": "senha",
+              "value": "={{ $json.senha }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "0aa08352-dcb6-4431-82a3-3749e951535f",
+      "name": "Edit Fields",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.3,
+      "position": [
+        -2544,
+        160
+      ]
+    },
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "field": "weeks",
+              "triggerAtDay": [
+                1,
+                2,
+                3,
+                4,
+                5
+              ],
+              "triggerAtHour": 7,
+              "triggerAtMinute": 20
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.2,
+      "position": [
+        -3424,
+        160
+      ],
+      "id": "5f113953-6279-433b-a6ce-02782bca89cc",
+      "name": "Schedule Trigger"
+    },
+    {
+      "parameters": {
+        "batchSize": "=1",
+        "options": {}
+      },
+      "id": "5a307f28-5299-4231-9870-30448f657d01",
+      "name": "Loop Over Items2",
+      "type": "n8n-nodes-base.splitInBatches",
+      "typeVersion": 3,
+      "position": [
+        -2320,
+        160
+      ]
+    },
+    {
+      "parameters": {
+        "operation": "xlsx",
+        "options": {
+          "fileName": "=doc_devolvido"
+        }
+      },
+      "id": "e5df304e-0901-41ab-a8f6-729cb5901add",
+      "name": "Convert to File",
+      "type": "n8n-nodes-base.convertToFile",
+      "typeVersion": 1.1,
+      "position": [
+        -1872,
+        160
+      ]
+    },
+    {
+      "parameters": {
+        "operation": "upload",
+        "bucketName": "marcolanoperacoes",
+        "fileName": "={{ $('ARQUIVO').item.json.arq }}",
+        "additionalFields": {
+          "acl": "publicReadWrite"
+        }
+      },
+      "id": "6e1f6593-738f-4a7f-b46d-e4fd36911aae",
+      "name": "AWS S31",
+      "type": "n8n-nodes-base.awsS3",
+      "typeVersion": 2,
+      "position": [
+        -1680,
+        160
+      ],
+      "credentials": {
+        "aws": {
+          "id": "wojq9Jq4bZgupPjh",
+          "name": "AWS account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "delete",
+        "bucketName": "marcolanoperacoes",
+        "fileKey": "={{ $('ARQUIVO').item.json.arq }}",
+        "options": {}
+      },
+      "id": "1f68c266-a7f2-45c9-b675-b48baa8024b4",
+      "name": "AWS S33",
+      "type": "n8n-nodes-base.awsS3",
+      "typeVersion": 2,
+      "position": [
+        -992,
+        160
+      ],
+      "credentials": {
+        "aws": {
+          "id": "wojq9Jq4bZgupPjh",
+          "name": "AWS account"
+        }
+      }
+    },
+    {
+      "parameters": {},
+      "id": "558d46ee-2a23-4079-96ce-e7efe4dd2202",
+      "name": "Wait",
+      "type": "n8n-nodes-base.wait",
+      "typeVersion": 1.1,
+      "position": [
+        -1184,
+        160
+      ],
+      "webhookId": "7e8fc0b1-1141-45d5-a084-df1fb665b5e1"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "=https://api.z-api.io/instances/3AD47F49CE9AF04B4D43CA225862B38B/token/6EE2B07CF6D61B0059AD2125/send-document/xlsx",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "={{ $('AUTH').item.json.link2 }}",
+              "value": "={{ $('AUTH').item.json.link1 }}"
+            }
+          ]
+        },
+        "sendBody": true,
+        "contentType": "form-urlencoded",
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "phone",
+              "value": "=5581994541473"
+            },
+            {
+              "name": "fileName",
+              "value": "=titulos_pendentes_{{$today.format('MM-DD')}}"
+            },
+            {
+              "name": "document",
+              "value": "=https://marcolanoperacoes.s3.amazonaws.com/{{ $('ARQUIVO').item.json.arq }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "9a7db744-dc80-4b29-9727-c8287a577fb0",
+      "name": "Grupo Financeiro",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.1,
+      "position": [
+        -1408,
+        160
+      ]
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "12d4f787-e3f2-4ebb-8103-b4551a8b42e9",
+              "name": "tipo_unidade",
+              "value": "={{ $json.tipo_unidade }}",
+              "type": "string"
+            },
+            {
+              "id": "d1ae7e95-5611-476d-8ba5-0ba403245da0",
+              "name": "unidade",
+              "value": "={{ $json.unidade }}",
+              "type": "string"
+            },
+            {
+              "id": "3a42e792-30c9-4f70-8499-711d49e98722",
+              "name": "cod_pedido",
+              "value": "={{ $json.cod_pedido }}",
+              "type": "string"
+            },
+            {
+              "id": "b816d76d-7360-4ac3-99db-9fc66ff70dc8",
+              "name": "cod_cliente",
+              "value": "={{ $json.cod_cliente }}",
+              "type": "string"
+            },
+            {
+              "id": "a32d28d5-f2e2-4fcf-8002-6df07993c2ea",
+              "name": "nome_cliente",
+              "value": "={{ $json.nome_cliente }}",
+              "type": "string"
+            },
+            {
+              "id": "a801bdab-08af-4dd4-af2b-1df15670ce0d",
+              "name": "DS_RAM",
+              "value": "={{ $json.DS_RAM }}",
+              "type": "string"
+            },
+            {
+              "id": "a4e52c75-59ff-45ac-b8ef-69bceecdc589",
+              "name": "ID_STATUS",
+              "value": "={{ $json.ID_STATUS }}",
+              "type": "string"
+            },
+            {
+              "id": "d71e81b7-0198-402c-9475-954099bf089d",
+              "name": "StatusPedido",
+              "value": "={{ $json.StatusPedido }}",
+              "type": "string"
+            },
+            {
+              "id": "89f05c2a-85f0-4a00-a74c-4a47e42e7485",
+              "name": "condicao_pagamento",
+              "value": "={{ $json.condicao_pagamento }}",
+              "type": "string"
+            },
+            {
+              "id": "21409658-f774-4647-803c-e4d5863f7839",
+              "name": "DT_PVE",
+              "value": "={{ $json.DT_PVE }}",
+              "type": "string"
+            },
+            {
+              "id": "7c955884-44b1-4d28-836a-f3cf139a04f5",
+              "name": "nu_cta",
+              "value": "={{ $json.nu_cta }}",
+              "type": "string"
+            },
+            {
+              "id": "e9eea4ba-e5ec-410d-bc2e-4f1740a28b4d",
+              "name": "valor_pendente",
+              "value": "={{ $json.valor_pendente }}",
+              "type": "string"
+            },
+            {
+              "id": "dced42d7-0685-485d-af32-680bfa8361b5",
+              "name": "VLR_TOT_PVE",
+              "value": "={{ $json.VLR_TOT_PVE }}",
+              "type": "string"
+            },
+            {
+              "id": "ba0cea34-f59c-42e0-a298-f35af9ec9e5c",
+              "name": "tempo_pendente",
+              "value": "={{ $json.tempo_pendente }}",
+              "type": "number"
+            },
+            {
+              "id": "69638dcc-62ca-4ec9-b566-047312d42ab8",
+              "name": "valor_entregue",
+              "value": "={{ $json.valor_entregue }}",
+              "type": "string"
+            },
+            {
+              "id": "898c2838-5f67-401a-833a-037c2c118db7",
+              "name": "saldo_cliente",
+              "value": "={{ $json.saldo_cliente }}",
+              "type": "string"
+            },
+            {
+              "id": "33a34210-f476-43d7-81e6-5abfc83b32c7",
+              "name": "data_romaneio",
+              "value": "={{ $json.DT_ROM }}",
+              "type": "string"
+            },
+            {
+              "id": "4746d867-f037-455d-a61f-53e9a7b168a5",
+              "name": "tipo_pedido",
+              "value": "={{ $json.tipo_pedido }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        -2112,
+        160
+      ],
+      "id": "fef3c286-143f-45c9-9ce1-b34308b8c5ec",
+      "name": "format_text3"
+    },
+    {
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "SELECT \n    '{{ $json[\"tipo_unidade\"] }}' as tipo_unidade,\n    '{{ $json[\"unidade\"] }}' as unidade,\n    pedidos.NU_PVE AS cod_pedido,\n    pedidos.NU_CLI AS cod_cliente,\n    cli.DS_CLI AS nome_cliente,\n    ramo.DS_RAM,\n    pedidos.ID_STATUS,\n    CASE pedidos.ID_STATUS\n        WHEN 1 THEN 'Aberto' \n        WHEN 2 THEN 'Em Separacao' \n        WHEN 4 THEN 'Finalizado' \n        WHEN 6 THEN 'Cancelado' \n        WHEN 8 THEN 'Em Producao'\n        WHEN 9 THEN 'Pend. Liberacao Financeira'\n        ELSE 'Orcamento' \n    END AS StatusPedido,\n    cond.DS_CPG AS condicao_pagamento,\n    pedidos.DT_PVE,\n    pedxtit.nu_cta,\n    tit.VLR_TIT_ORIG AS valor_pendente,\n    pedidos.VLR_TOT_PVE,\n    DATEDIFF(CURDATE(), pedidos.DT_PVE) AS tempo_pendente,\n    rom.valor_entregue ,\n    saldo_cli.VLR_SALDO AS saldo_cliente,\n    dtrom.DT_ROM,\n    pedidos.ID_TP_PED ,\n    case pedidos.ID_TP_PED \n        when 1 then 'Serie'\n        when 2 then 'Engenharia'\n        when 3 then 'Serviço'\n        when 5 then 'Laminado'\n        else 'Desconhecido'\n   end as tipo_pedido\nFROM mgpve01010 pedidos\nLEFT JOIN mgcpg01010 cond \n    ON pedidos.NU_CPG = cond.NU_CPG\nLEFT JOIN mgcli01010 cli \n    ON pedidos.NU_CLI = cli.NU_CLI\nLEFT JOIN mgpxt01010 pedxtit \n    ON pedidos.NU_PVE = pedxtit.NU_PVE\nLEFT JOIN mgcta01014 tit \n    ON pedxtit.nu_cta = tit.nu_cta\nLEFT JOIN mgram01010 ramo \n    ON cli.NU_RAM = ramo.NU_RAM\n-- 🔹 Soma do valor entregue por pedido\nLEFT JOIN (\n    SELECT \n        NU_ROM ,\n        NU_PVE,\n        SUM(VLR_FINAL_PROD) AS valor_entregue\n    FROM mgrom01011\n    GROUP BY NU_PVE\n) rom\n    ON pedidos.NU_PVE = rom.NU_PVE\nleft join mgrom01010 dtrom on rom.NU_ROM = dtrom.NU_ROM\nLEFT JOIN (\n    SELECT \n        t1.NU_CLI,\n        t1.VLR_SALDO\n    FROM mgcli01011 t1\n    INNER JOIN (\n        SELECT \n            NU_CLI,\n            MAX(DT_LANCTO) AS dt_mais_recente\n        FROM mgcli01011\n        GROUP BY NU_CLI\n    ) t2\n    ON  t1.NU_CLI = t2.NU_CLI\n    AND t1.DT_LANCTO = t2.dt_mais_recente\n) saldo_cli\n    ON pedidos.NU_CLI = saldo_cli.NU_CLI\nWHERE \n    pedidos.DT_PVE > '2024-01-01'\n    AND tit.ID_STAT_LANCTO = '1';",
+        "options": {}
+      },
+      "id": "e9fcdb38-0c7a-4d93-84bd-95c850ae5cb6",
+      "name": "MySQL - Titulos",
+      "type": "n8n-nodes-base.mySql",
+      "typeVersion": 2.2,
+      "position": [
+        -2192,
+        320
+      ],
+      "executeOnce": false,
+      "retryOnFail": false,
+      "alwaysOutputData": true,
+      "credentials": {
+        "mySql": {
+          "id": "INDKBtYNaYfBC3it",
+          "name": "MySQL Connection"
+        }
+      },
+      "onError": "continueRegularOutput"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Google Sheets": {
+      "main": [
+        [
+          {
+            "node": "AUTH",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "AUTH": {
+      "main": [
+        [
+          {
+            "node": "ARQUIVO",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "ARQUIVO": {
+      "main": [
+        [
+          {
+            "node": "Google Sheets1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Google Sheets1": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Edit Fields": {
+      "main": [
+        [
+          {
+            "node": "Loop Over Items2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Schedule Trigger": {
+      "main": [
+        [
+          {
+            "node": "Google Sheets",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Loop Over Items2": {
+      "main": [
+        [
+          {
+            "node": "format_text3",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "MySQL - Titulos",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Convert to File": {
+      "main": [
+        [
+          {
+            "node": "AWS S31",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "AWS S31": {
+      "main": [
+        [
+          {
+            "node": "Grupo Financeiro",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Wait": {
+      "main": [
+        [
+          {
+            "node": "AWS S33",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Grupo Financeiro": {
+      "main": [
+        [
+          {
+            "node": "Wait",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "format_text3": {
+      "main": [
+        [
+          {
+            "node": "Convert to File",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "MySQL - Titulos": {
+      "main": [
+        [
+          {
+            "node": "Loop Over Items2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "bb7334c5-2fdc-4233-b45f-84e4b40cb4d2",
+  "meta": {
+    "instanceId": "a5e8675e548a032fda81ee9dc775b4fc0a1b2003aee794fb0b37064013276a0f"
+  },
+  "id": "QBMfP1Rlpq9ds8KJ",
+  "tags": [
+    {
+      "updatedAt": "2025-03-21T11:52:03.821Z",
+      "createdAt": "2025-03-21T11:52:03.821Z",
+      "id": "ro9IiNWQxt6VLDLj",
+      "name": "Setor - Controladoria"
+    },
+    {
+      "updatedAt": "2026-01-14T11:04:00.895Z",
+      "createdAt": "2025-03-21T11:47:30.374Z",
+      "id": "CvCy3KNJKyMxSQ3C",
+      "name": "GDA"
+    }
+  ]
+}

@@ -1,0 +1,535 @@
+{
+  "name": "WebHook Painéis",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "b80e2238-0d03-4408-a0cc-384ecea0c437",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2.1,
+      "position": [
+        -480,
+        -16
+      ],
+      "id": "b05e5448-ded0-4ac8-9878-c2b131b9ecd7",
+      "name": "Webhook",
+      "webhookId": "b80e2238-0d03-4408-a0cc-384ecea0c437"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "5650e35c-251c-4dac-ab78-793e3f6ba7eb",
+              "name": "body.alerta",
+              "value": "={{ $json.body.Alerta }}",
+              "type": "string"
+            },
+            {
+              "id": "34466ae9-22a5-462b-9840-59798b4f5c10",
+              "name": "body.Contato",
+              "value": "={{ $json.body.Contato }}",
+              "type": "string"
+            },
+            {
+              "id": "3e92579f-4230-4ea2-ad16-2f6124489711",
+              "name": "body.Responsável",
+              "value": "={{ $json.body['Responsável'] }}",
+              "type": "string"
+            },
+            {
+              "id": "f2fe0bc3-e75b-4317-884d-30be9be0a86c",
+              "name": "body.Data",
+              "value": "={{ $json.body.Data }}",
+              "type": "string"
+            },
+            {
+              "id": "9bc027cb-ed14-4a5a-a0c3-c7f470705ee0",
+              "name": "body.Comentário",
+              "value": "={{ $json.body['Comentário'] }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        -272,
+        -16
+      ],
+      "id": "f00c4ce5-21ed-46e5-8e33-37a0c8fb89aa",
+      "name": "Edit Fields"
+    },
+    {
+      "parameters": {
+        "rules": {
+          "values": [
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 3
+                },
+                "conditions": [
+                  {
+                    "leftValue": "={{ $json.body.alerta }}",
+                    "rightValue": "Enviado",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    },
+                    "id": "79db853c-a003-4850-83e3-d647f49a4b70"
+                  }
+                ],
+                "combinator": "and"
+              }
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 3
+                },
+                "conditions": [
+                  {
+                    "id": "d41062f7-75a4-4576-b38a-ed8520c4add1",
+                    "leftValue": "={{ $json.body.alerta }}",
+                    "rightValue": "Reprovado",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              }
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 3
+                },
+                "conditions": [
+                  {
+                    "id": "0601a387-5411-42b4-a715-9b95dade6d47",
+                    "leftValue": "={{ $json.body.alerta }}",
+                    "rightValue": "Aprovado",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals",
+                      "name": "filter.operator.equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              }
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 3.4,
+      "position": [
+        -64,
+        -16
+      ],
+      "id": "75a098e4-655d-471c-85fc-dc6e1f0f9e29",
+      "name": "Switch"
+    },
+    {
+      "parameters": {
+        "jsCode": "return items.map(item => {\n  const body = item.json.body || {};\n\n  const numeroOriginal = body.contato || \"\";\n  const numeroLimpo = numeroOriginal.replace(/[^0-9]/g, \"\");\n\n  const dataOriginal = body.Data || \"\"; // YYYY-MM-DD\n  let dataFormatada = \"\";\n\n  if (dataOriginal) {\n    const [ano, mes, dia] = dataOriginal.split(\"-\");\n    dataFormatada = `${dia}-${mes}-${ano}`;\n  }\n\n  return {\n    json: {\n      ...item.json,\n      body: {\n        ...body,\n        telefoneFormatado: numeroLimpo,\n        Data: dataFormatada\n      }\n    }\n  };\n});\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        624,
+        -256
+      ],
+      "id": "c89178b8-581b-4081-8568-9781020218cd",
+      "name": "limpa)numero"
+    },
+    {
+      "parameters": {
+        "jsCode": "return items.map(item => {\n  const body = item.json.body || {};\n\n  const numeroOriginal = body.contato || \"\";\n  const numeroLimpo = numeroOriginal.replace(/[^0-9]/g, \"\");\n\n  const dataOriginal = body.Data || \"\"; // YYYY-MM-DD\n  let dataFormatada = \"\";\n\n  if (dataOriginal) {\n    const [ano, mes, dia] = dataOriginal.split(\"-\");\n    dataFormatada = `${dia}-${mes}-${ano}`;\n  }\n\n  return {\n    json: {\n      ...item.json,\n      body: {\n        ...body,\n        telefoneFormatado: numeroLimpo,\n        Data: dataFormatada\n      }\n    }\n  };\n});\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        624,
+        -48
+      ],
+      "id": "b342d7cd-c81f-42da-8df3-8ca9db7138df",
+      "name": "limpa)numero1"
+    },
+    {
+      "parameters": {
+        "jsCode": "return items.map(item => {\n  const body = item.json.body || {};\n\n  const numeroOriginal = body.contato || \"\";\n  const numeroLimpo = numeroOriginal.replace(/[^0-9]/g, \"\");\n\n  const dataOriginal = body.Data || \"\"; // YYYY-MM-DD\n  let dataFormatada = \"\";\n\n  if (dataOriginal) {\n    const [ano, mes, dia] = dataOriginal.split(\"-\");\n    dataFormatada = `${dia}-${mes}-${ano}`;\n  }\n\n  return {\n    json: {\n      ...item.json,\n      body: {\n        ...body,\n        telefoneFormatado: numeroLimpo,\n        Data: dataFormatada\n      }\n    }\n  };\n});\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        576,
+        176
+      ],
+      "id": "c2f26c25-993c-4eef-9157-5b71915a97c3",
+      "name": "limpa)numero2"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "eeae5c07-0073-49c8-b264-4e7159d725be",
+              "leftValue": "={{ $json.body['Comentário'] }}",
+              "rightValue": "",
+              "operator": {
+                "type": "string",
+                "operation": "empty",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        144,
+        144
+      ],
+      "id": "c2362597-1d5c-442f-b2ca-47e857c68b4d",
+      "name": "If"
+    },
+    {
+      "parameters": {
+        "phone": "={{ $json.body.Contato }}",
+        "text": "={{ $json.body['Responsável'] }},\n\nO painel referente a data *{{ $json.body.Data }}* foi *{{ $json.body.alerta }}* com sucesso.",
+        "additionalFields": {}
+      },
+      "type": "n8n-nodes-zapi.zapi",
+      "typeVersion": 1,
+      "position": [
+        912,
+        -336
+      ],
+      "id": "e8204018-c16c-44a9-986f-10307cb19513",
+      "name": "Enviado",
+      "credentials": {
+        "zapiApi": {
+          "id": "cGI15AvSkFAV8Qrr",
+          "name": "Z-API account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "phone": "={{ $json.body.Contato }}",
+        "text": "={{ $json.body['Responsável'] }},\n\nO painel referente a data *{{ $json.body.Data }}* foi *{{ $json.body.alerta }}*, pois não cumpriu os requisitos necessários do processo.\n\n{{ $json.body['Comentário'] }}",
+        "additionalFields": {}
+      },
+      "type": "n8n-nodes-zapi.zapi",
+      "typeVersion": 1,
+      "position": [
+        864,
+        32
+      ],
+      "id": "7f65f3c6-9869-4199-a0ab-1eae04593bb1",
+      "name": "Rejeitado",
+      "credentials": {
+        "zapiApi": {
+          "id": "cGI15AvSkFAV8Qrr",
+          "name": "Z-API account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "phone": "={{ $json.body.Contato }}",
+        "text": "={{ $json.body['Responsável'] }},\n\nO painel referente a data *{{ $json.body.Data }}* foi analizado e *{{ $json.body.alerta }}* com sucesso. Muito obrigado pelo envio dos anexos e o preenchimento correto dos campos.\n\nObs.: {{ $json.body['Comentário'] }}",
+        "additionalFields": {}
+      },
+      "type": "n8n-nodes-zapi.zapi",
+      "typeVersion": 1,
+      "position": [
+        816,
+        256
+      ],
+      "id": "ba0d3083-713f-46eb-871d-48b225631a30",
+      "name": "Aprovado",
+      "credentials": {
+        "zapiApi": {
+          "id": "cGI15AvSkFAV8Qrr",
+          "name": "Z-API account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "5650e35c-251c-4dac-ab78-793e3f6ba7eb",
+              "name": "body.alerta",
+              "value": "={{ $json.body.alerta }}",
+              "type": "string"
+            },
+            {
+              "id": "34466ae9-22a5-462b-9840-59798b4f5c10",
+              "name": "body.Contato",
+              "value": "={{ $json.body.Contato }}",
+              "type": "string"
+            },
+            {
+              "id": "3e92579f-4230-4ea2-ad16-2f6124489711",
+              "name": "body.Responsável",
+              "value": "={{ $json.body['Responsável'] }}",
+              "type": "string"
+            },
+            {
+              "id": "f2fe0bc3-e75b-4317-884d-30be9be0a86c",
+              "name": "body.Data",
+              "value": "={{ $json.body.Data }}",
+              "type": "string"
+            },
+            {
+              "id": "9bc027cb-ed14-4a5a-a0c3-c7f470705ee0",
+              "name": "body.Comentário",
+              "value": "=Nenhuma",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        352,
+        80
+      ],
+      "id": "1908bd00-bd49-4ca9-9af0-9f0d55d4a849",
+      "name": "Nenhuma"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "5650e35c-251c-4dac-ab78-793e3f6ba7eb",
+              "name": "body.alerta",
+              "value": "={{ $json.body.alerta }}",
+              "type": "string"
+            },
+            {
+              "id": "34466ae9-22a5-462b-9840-59798b4f5c10",
+              "name": "body.Contato",
+              "value": "={{ $json.body.Contato }}",
+              "type": "string"
+            },
+            {
+              "id": "3e92579f-4230-4ea2-ad16-2f6124489711",
+              "name": "body.Responsável",
+              "value": "={{ $json.body['Responsável'] }}",
+              "type": "string"
+            },
+            {
+              "id": "f2fe0bc3-e75b-4317-884d-30be9be0a86c",
+              "name": "body.Data",
+              "value": "={{ $json.body.Data }}",
+              "type": "string"
+            },
+            {
+              "id": "9bc027cb-ed14-4a5a-a0c3-c7f470705ee0",
+              "name": "body.Comentário",
+              "value": "={{ $json.body['Comentário'] }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        352,
+        256
+      ],
+      "id": "4fef8e65-fe12-4f28-aad4-35bc8ffb4c9d",
+      "name": "Comentário"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Webhook": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Edit Fields": {
+      "main": [
+        [
+          {
+            "node": "Switch",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Switch": {
+      "main": [
+        [
+          {
+            "node": "limpa)numero",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "limpa)numero1",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "If",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "limpa)numero": {
+      "main": [
+        [
+          {
+            "node": "Enviado",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "limpa)numero1": {
+      "main": [
+        [
+          {
+            "node": "Rejeitado",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "limpa)numero2": {
+      "main": [
+        [
+          {
+            "node": "Aprovado",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If": {
+      "main": [
+        [
+          {
+            "node": "Nenhuma",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Comentário",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Nenhuma": {
+      "main": [
+        [
+          {
+            "node": "limpa)numero2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Comentário": {
+      "main": [
+        [
+          {
+            "node": "limpa)numero2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": true,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "7fc5a695-4b1c-4ca6-8579-39126e549c0b",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "a5e8675e548a032fda81ee9dc775b4fc0a1b2003aee794fb0b37064013276a0f"
+  },
+  "id": "s8RnF9NLdVlaL9nN",
+  "tags": [
+    {
+      "updatedAt": "2026-01-14T11:04:00.895Z",
+      "createdAt": "2025-03-21T11:47:30.374Z",
+      "id": "CvCy3KNJKyMxSQ3C",
+      "name": "GDA"
+    },
+    {
+      "updatedAt": "2025-03-21T11:52:03.821Z",
+      "createdAt": "2025-03-21T11:52:03.821Z",
+      "id": "ro9IiNWQxt6VLDLj",
+      "name": "Setor - Controladoria"
+    },
+    {
+      "updatedAt": "2025-03-21T11:52:03.823Z",
+      "createdAt": "2025-03-21T11:52:03.823Z",
+      "id": "VQmA23kx6h1wy92X",
+      "name": "GUIS"
+    }
+  ]
+}

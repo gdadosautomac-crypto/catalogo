@@ -1,0 +1,281 @@
+{
+  "name": "Webhook - DESPESAS NÃO PROGRAMADAS",
+  "nodes": [
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "897a9a1a-3870-4374-b539-3863e8d9a32d",
+              "name": "Alerta",
+              "value": "={{ $json.body.alerta }}",
+              "type": "string"
+            },
+            {
+              "id": "57d2fff4-f86a-44b9-a31d-d8fe6293feaa",
+              "name": "unidade",
+              "value": "={{ $json.body.Unidade }}",
+              "type": "string"
+            },
+            {
+              "id": "77c16ead-013f-4d7e-add0-7a0dbbdf0189",
+              "name": "solicitante",
+              "value": "={{ $json.body.Solicitante }}",
+              "type": "string"
+            },
+            {
+              "id": "6f82a10d-47e1-41ef-b301-e35f648991f8",
+              "name": "valor",
+              "value": "={{ $json.body.Valor }}",
+              "type": "string"
+            },
+            {
+              "id": "61bd6a55-fbc6-4ff5-869e-270a2075401a",
+              "name": "contato",
+              "value": "={{ $json.body.Contato }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "1536a94a-b094-46a0-af3b-4c684aa0f58f",
+      "name": "Edit Fields",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.3,
+      "position": [
+        -688,
+        -48
+      ]
+    },
+    {
+      "parameters": {
+        "rules": {
+          "values": [
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 1
+                },
+                "conditions": [
+                  {
+                    "id": "bcb3f761-0392-41ae-b2a7-dac7e3b008f2",
+                    "leftValue": "={{ $json.Alerta }}",
+                    "rightValue": "=card_aprovado",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals",
+                      "name": "filter.operator.equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              }
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 1
+                },
+                "conditions": [
+                  {
+                    "id": "7103ce71-c06a-4dd4-b9d5-23c2041152c9",
+                    "leftValue": "={{ $json.Alerta }}",
+                    "rightValue": "=card_reprovado",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals",
+                      "name": "filter.operator.equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              }
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "dbb17b60-c0a7-4035-aadf-bce26a9fa399",
+      "name": "Switch",
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 3,
+      "position": [
+        -496,
+        -48
+      ]
+    },
+    {
+      "parameters": {
+        "phone": "={{ $json.telefoneFormatado }}",
+        "text": "=------- *SOLICITAÇÃO DE DESPESA NÃO PROGRAMADA* -------\n\nOlá, *{{ $json.solicitante }}*.\nSua solicitação de despesa no valor de, *R$ {{ $json.valor }}*,  foi analisada e *APROVADA* por este financeiro.\n",
+        "additionalFields": {}
+      },
+      "type": "n8n-nodes-zapi.zapi",
+      "typeVersion": 1,
+      "position": [
+        -128,
+        -176
+      ],
+      "id": "97343cee-f44a-4d3c-a43f-792fac4b0229",
+      "name": "Z-API",
+      "credentials": {
+        "zapiApi": {
+          "id": "cGI15AvSkFAV8Qrr",
+          "name": "Z-API account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "return items.map(item => {\n  const numeroOriginal = item.json.contato || \"\"; // ou o nome correto do campo do Pipefy\n  const numeroLimpo = numeroOriginal.replace(/[^0-9]/g, \"\"); // remove tudo que não for número\n\n  return {\n    json: {\n      ...item.json,\n      telefoneFormatado: numeroLimpo\n    }\n  };\n});\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -304,
+        -176
+      ],
+      "id": "5a7a748a-6bb8-4fe1-80be-ec2e769607c5",
+      "name": "Code"
+    },
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "980da079-31fb-49a4-8404-71709c76e50f",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2.1,
+      "position": [
+        -912,
+        -48
+      ],
+      "id": "a8aae042-822c-4559-9d8f-5ef0403c7d34",
+      "name": "Webhook",
+      "webhookId": "980da079-31fb-49a4-8404-71709c76e50f"
+    },
+    {
+      "parameters": {
+        "phone": "={{ $json.telefoneFormatado }}",
+        "text": "=------- *SOLICITAÇÃO DE DESPESA NÃO PROGRAMADA* -------\n\nOlá, *{{ $json.solicitante }}*.\nSua solicitação de despesa no valor de, *R$ {{ $json.valor }}*,  foi analisada e *NÃO AUTORIZADA* por este financeiro.\n",
+        "additionalFields": {}
+      },
+      "type": "n8n-nodes-zapi.zapi",
+      "typeVersion": 1,
+      "position": [
+        -128,
+        48
+      ],
+      "id": "90c498e8-8a19-40c3-a768-865ce9a20a79",
+      "name": "Z-API1",
+      "credentials": {
+        "zapiApi": {
+          "id": "cGI15AvSkFAV8Qrr",
+          "name": "Z-API account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "return items.map(item => {\n  const numeroOriginal = item.json.contato || \"\"; // ou o nome correto do campo do Pipefy\n  const numeroLimpo = numeroOriginal.replace(/[^0-9]/g, \"\"); // remove tudo que não for número\n\n  return {\n    json: {\n      ...item.json,\n      telefoneFormatado: numeroLimpo\n    }\n  };\n});\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -304,
+        48
+      ],
+      "id": "35c9146f-811f-4dc1-a4cb-4ec128fbc860",
+      "name": "Code1"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Edit Fields": {
+      "main": [
+        [
+          {
+            "node": "Switch",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Switch": {
+      "main": [
+        [
+          {
+            "node": "Code",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Code1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code": {
+      "main": [
+        [
+          {
+            "node": "Z-API",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Webhook": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code1": {
+      "main": [
+        [
+          {
+            "node": "Z-API1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "cd15dfd1-7302-4ab1-8ebc-9b9d232f6680",
+  "meta": {
+    "instanceId": "a5e8675e548a032fda81ee9dc775b4fc0a1b2003aee794fb0b37064013276a0f"
+  },
+  "id": "KyJFpKsbCAIqMXLz",
+  "tags": [
+    {
+      "updatedAt": "2026-01-14T11:04:00.895Z",
+      "createdAt": "2025-03-21T11:47:30.374Z",
+      "id": "CvCy3KNJKyMxSQ3C",
+      "name": "GDA"
+    }
+  ]
+}

@@ -1,0 +1,282 @@
+{
+  "name": "Pedidos com Custos Alterado - Alumiaco Recife",
+  "nodes": [
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "triggerAtHour": 6
+            },
+            {
+              "field": "hours",
+              "hoursInterval": 3
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.2,
+      "position": [
+        -224,
+        0
+      ],
+      "id": "dd5f95d9-dc50-498d-b1af-e1ee16e4c3bc",
+      "name": "Schedule Trigger"
+    },
+    {
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "select \n'{{ $json.unidade }}' as Unidade,\nped.NU_PVE as Pedido,\nusu.NOM_USU as Usuario,\nh.DATA_REAJUSTE as DataReajuste,\npro.DS_PRO as Produto,\nh.CUSTO_ANTERIOR as CustoAnterior,\nh.NOVO_CUSTO as CustoNovo\nfrom historicoreajustecustopedidovenda h \nleft join mgpve01011 itens on itens.NU_PVE = h.NU_PVE and h.NU_DPV = itens.NU_DPV  \nleft join mgpve01010 ped on ped.NU_PVE = itens.NU_PVE \nleft join mgcli01010 cli on cli.NU_CLI = ped.NU_CLI \nleft join mgpro01010 pro on pro.NU_PRO = itens.NU_PRO\nleft join mgcat01010 cat on cat.NU_CAT = pro.NU_CAT\nleft join mgclp01010 cla on cla.NU_CLP = pro.NU_CLP \nleft join mgscp01010 sub on sub.NU_SCP = pro.NU_SCP \nleft join mgoes01010 coes on coes.NU_OES = ped.NU_OES  \nleft join mgusu01010 usu on usu.NU_USU = h.NU_USU \n  where h.DATA_REAJUSTE >= CURRENT_TIMESTAMP() - INTERVAL 3 HOUR  \ngroup by \nped.NU_PVE, h.DATA_REAJUSTE, usu.NOM_USU, pro.DS_PRO, h.CUSTO_ANTERIOR, h.NOVO_CUSTO\norder by h.data_reajuste desc ",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.mySql",
+      "typeVersion": 2.5,
+      "position": [
+        272,
+        0
+      ],
+      "id": "9544e934-b87a-4af3-84bb-9137be0afc26",
+      "name": "Execute a SQL query",
+      "credentials": {
+        "mySql": {
+          "id": "j37y4C8GLxegCMtt",
+          "name": "Conexões"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "documentId": {
+          "__rl": true,
+          "value": "https://docs.google.com/spreadsheets/d/1JiCDcWeV9iP63SPUR3gciYb1svq3iJ3z4-lUQYHCplY/edit?pli=1&gid=0#gid=0",
+          "mode": "url"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "ConexoesVictor",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1JiCDcWeV9iP63SPUR3gciYb1svq3iJ3z4-lUQYHCplY/edit#gid=0"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        32,
+        0
+      ],
+      "id": "50473ad4-97e0-44ae-bf70-d9c7c4509fd1",
+      "name": "Get row(s) in sheet",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "HfbTEVMQHA5O66Ya",
+          "name": "Sheets JG e Japa"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "fieldsToSummarize": {
+          "values": [
+            {
+              "aggregation": "concatenate",
+              "field": "mensagem",
+              "separateBy": "\n"
+            }
+          ]
+        },
+        "fieldsToSplitBy": "pedido,unidade,usuario",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.summarize",
+      "typeVersion": 1.1,
+      "position": [
+        784,
+        0
+      ],
+      "id": "6b26e62f-a4fd-4928-bdf2-7d064e1be588",
+      "name": "Summarize"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "7d3f00a7-9a04-4598-b3bf-185a451d324b",
+              "name": "mensagem",
+              "value": "=Produto: {{ $json.Produto }}\nCusto Anterior: {{ $json.CustoAnterior }}\nCusto Novo: {{ $json.CustoNovo }}\n________________________________",
+              "type": "string"
+            },
+            {
+              "id": "fb71191d-77a2-4a4e-822b-f193b20d1695",
+              "name": "pedido",
+              "value": "={{ $json.Pedido }}",
+              "type": "string"
+            },
+            {
+              "id": "97f61597-eef4-40ab-b82b-3ba3dfe82453",
+              "name": "unidade",
+              "value": "={{ $json.Unidade }}",
+              "type": "string"
+            },
+            {
+              "id": "45e18895-bc0c-40a8-bcf3-20612fa0d955",
+              "name": "usuario",
+              "value": "={{ $json.Usuario }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        528,
+        0
+      ],
+      "id": "763c7329-3047-499a-9d5a-019a75b65c09",
+      "name": "Variaveis"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.z-api.io/instances/3AD47F49CE9AF04B4D43CA225862B38B/token/6EE2B07CF6D61B0059AD2125/send-text",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Client-Token",
+              "value": "Fb834c77bdcad40999dcb28212a96a9a0S"
+            }
+          ]
+        },
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "phone",
+              "value": "5581991389136"
+            },
+            {
+              "name": "message",
+              "value": "=*Alteração no Custo do Pedido de Venda*\n\nUnidade: {{ $json.unidade }}\nPedido: {{ $json.pedido }}\nUsuário: {{ $json.usuario }}\n\n{{ $json.concatenated_mensagem }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "b385dae5-2cc6-470b-a4e4-2bcf02fb65c0",
+      "name": "Detalhamento",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.1,
+      "position": [
+        832,
+        240
+      ]
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Schedule Trigger": {
+      "main": [
+        [
+          {
+            "node": "Get row(s) in sheet",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get row(s) in sheet": {
+      "main": [
+        [
+          {
+            "node": "Execute a SQL query",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Execute a SQL query": {
+      "main": [
+        [
+          {
+            "node": "Variaveis",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Summarize": {
+      "main": [
+        [
+          {
+            "node": "Detalhamento",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Variaveis": {
+      "main": [
+        [
+          {
+            "node": "Summarize",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1",
+    "callerPolicy": "workflowsFromSameOwner"
+  },
+  "versionId": "c7db5c6e-3bcf-4a15-9a07-bc973ba469e3",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "a5e8675e548a032fda81ee9dc775b4fc0a1b2003aee794fb0b37064013276a0f"
+  },
+  "id": "N6gcEXzX8iZiqEq6",
+  "tags": [
+    {
+      "updatedAt": "2025-03-21T11:52:03.823Z",
+      "createdAt": "2025-03-21T11:52:03.823Z",
+      "id": "VQmA23kx6h1wy92X",
+      "name": "GUIS"
+    },
+    {
+      "updatedAt": "2025-08-27T19:03:17.619Z",
+      "createdAt": "2025-08-27T19:03:17.619Z",
+      "id": "rXMRhKZGkPPuA7Hs",
+      "name": "GM Olinda"
+    },
+    {
+      "updatedAt": "2025-05-22T20:07:12.064Z",
+      "createdAt": "2025-05-22T20:07:12.064Z",
+      "id": "oiU1aryB9368JHxf",
+      "name": "Alumiaço Recife"
+    },
+    {
+      "updatedAt": "2025-03-21T11:52:53.040Z",
+      "createdAt": "2025-03-21T11:52:53.040Z",
+      "id": "9sBc8DYqQwfJKaa4",
+      "name": "Setor - Data Science"
+    },
+    {
+      "updatedAt": "2025-03-24T14:37:59.670Z",
+      "createdAt": "2025-03-24T14:37:59.670Z",
+      "id": "43bGFMtQluMwVPv1",
+      "name": "GM Recife"
+    }
+  ]
+}

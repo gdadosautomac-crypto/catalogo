@@ -1,0 +1,1311 @@
+{
+  "name": "Relatórios GM Olinda",
+  "nodes": [
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "field": "weeks",
+              "triggerAtDay": [
+                1,
+                2,
+                3,
+                4
+              ],
+              "triggerAtHour": 18
+            },
+            {
+              "field": "weeks",
+              "triggerAtDay": [
+                5
+              ],
+              "triggerAtHour": 17
+            }
+          ]
+        }
+      },
+      "id": "e974ccc6-3f07-47d6-b656-fde4ad4388f8",
+      "name": "Schedule Trigger",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.1,
+      "position": [
+        368,
+        512
+      ]
+    },
+    {
+      "parameters": {
+        "operation": "xlsx",
+        "options": {
+          "fileName": "={{ $('ARQUIVO').item.json.arq }}"
+        }
+      },
+      "id": "6057fa4a-7701-496d-80b6-b381f6abcab3",
+      "name": "Convert to File",
+      "type": "n8n-nodes-base.convertToFile",
+      "typeVersion": 1.1,
+      "position": [
+        1232,
+        1008
+      ]
+    },
+    {
+      "parameters": {},
+      "id": "175a6012-e046-4d54-b5b6-20b4c100a539",
+      "name": "Wait",
+      "type": "n8n-nodes-base.wait",
+      "typeVersion": 1.1,
+      "position": [
+        1824,
+        1008
+      ],
+      "webhookId": "81fc5e63-d5d1-4c4d-872c-a26b99c1ba86"
+    },
+    {
+      "parameters": {
+        "operation": "upload",
+        "bucketName": "marcolanoperacoes",
+        "fileName": "={{ $('ARQUIVO').item.json.arq }}",
+        "additionalFields": {
+          "acl": "publicReadWrite"
+        }
+      },
+      "id": "93b9a915-cf9d-4b81-8d05-f84d7c11b487",
+      "name": "AWS S31",
+      "type": "n8n-nodes-base.awsS3",
+      "typeVersion": 2,
+      "position": [
+        1424,
+        1008
+      ],
+      "credentials": {
+        "aws": {
+          "id": "wojq9Jq4bZgupPjh",
+          "name": "AWS account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "delete",
+        "bucketName": "marcolanoperacoes",
+        "fileKey": "={{ $('ARQUIVO').item.json.arq }}",
+        "options": {}
+      },
+      "id": "5949b419-6a17-4ab0-8cfa-2e5b45bede22",
+      "name": "AWS S33",
+      "type": "n8n-nodes-base.awsS3",
+      "typeVersion": 2,
+      "position": [
+        2032,
+        1008
+      ],
+      "credentials": {
+        "aws": {
+          "id": "wojq9Jq4bZgupPjh",
+          "name": "AWS account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "c9777b34-96c3-49cb-9e8f-5171d677c039",
+              "name": "arq",
+              "value": "=Olinda - Vendido do dia Cat e Vend - d{{ $now.day }}-{{ $now.hour }}h{{ $now.minute }}m{{ $now.second }}s",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "ddae9a3c-0a0e-4414-bb68-a275725fc7ee",
+      "name": "ARQUIVO",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.3,
+      "position": [
+        832,
+        1008
+      ]
+    },
+    {
+      "parameters": {
+        "operation": "getAll",
+        "bucketName": "marcolanoperacoes",
+        "returnAll": true,
+        "options": {}
+      },
+      "id": "ebe16609-3ccf-49e3-912d-200ed9bee0ce",
+      "name": "AWS S3",
+      "type": "n8n-nodes-base.awsS3",
+      "typeVersion": 2,
+      "position": [
+        208,
+        960
+      ],
+      "credentials": {
+        "aws": {
+          "id": "wojq9Jq4bZgupPjh",
+          "name": "AWS account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "delete",
+        "bucketName": "marcolanoperacoes",
+        "fileKey": "=LançamentosErrados2024-08-20T10:26:14.901-03:00\t",
+        "options": {}
+      },
+      "id": "8569b2f0-3e02-4513-9369-550ec24e50b6",
+      "name": "AWS S37",
+      "type": "n8n-nodes-base.awsS3",
+      "typeVersion": 2,
+      "position": [
+        384,
+        960
+      ],
+      "credentials": {
+        "aws": {
+          "id": "wojq9Jq4bZgupPjh",
+          "name": "AWS account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{ $('Token').item.json.Link }}send-document/xlsx",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "={{ $('Token').item.json.Name }}",
+              "value": "={{ $('Token').item.json.Value }}"
+            }
+          ]
+        },
+        "sendBody": true,
+        "contentType": "form-urlencoded",
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "phone",
+              "value": "=5581994392978"
+            },
+            {
+              "name": "fileName",
+              "value": "=Vendido no dia por Vendedor e Categoria"
+            },
+            {
+              "name": "document",
+              "value": "=https://marcolanoperacoes.s3.amazonaws.com/{{ $('ARQUIVO').item.json.arq }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "abea38e5-bb47-4038-8b1f-0352da7b99cd",
+      "name": "Vinícius",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.1,
+      "position": [
+        1632,
+        1008
+      ]
+    },
+    {
+      "parameters": {
+        "documentId": {
+          "__rl": true,
+          "value": "https://docs.google.com/spreadsheets/d/1J9xHE08UPG2QnDrjFsiy3VU3Z8ziZT9aO9MF7ct5ruA/edit?usp=sharing",
+          "mode": "url"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 564051929,
+          "mode": "list",
+          "cachedResultName": "Token",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1J9xHE08UPG2QnDrjFsiy3VU3Z8ziZT9aO9MF7ct5ruA/edit#gid=564051929"
+        },
+        "options": {}
+      },
+      "id": "aa481a8c-8405-4d7d-a4c0-b9a7cbc7c60a",
+      "name": "Token",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.3,
+      "position": [
+        560,
+        512
+      ],
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "HfbTEVMQHA5O66Ya",
+          "name": "Sheets JG e Japa"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "xlsx",
+        "options": {
+          "fileName": "={{ $('ARQUIVO1').item.json.arq }}"
+        }
+      },
+      "id": "21507398-2bd0-49bc-8db2-212ee98cdcfe",
+      "name": "Convert to File1",
+      "type": "n8n-nodes-base.convertToFile",
+      "typeVersion": 1.1,
+      "position": [
+        1232,
+        608
+      ]
+    },
+    {
+      "parameters": {},
+      "id": "66f540ba-c4bd-43b6-8755-2e3978e40338",
+      "name": "Wait1",
+      "type": "n8n-nodes-base.wait",
+      "typeVersion": 1.1,
+      "position": [
+        1824,
+        608
+      ],
+      "webhookId": "81fc5e63-d5d1-4c4d-872c-a26b99c1ba86"
+    },
+    {
+      "parameters": {
+        "operation": "upload",
+        "bucketName": "marcolanoperacoes",
+        "fileName": "={{ $('ARQUIVO1').item.json.arq }}",
+        "additionalFields": {
+          "acl": "publicReadWrite"
+        }
+      },
+      "id": "f449073e-70e8-4a4a-b2d3-3286072d1871",
+      "name": "AWS S32",
+      "type": "n8n-nodes-base.awsS3",
+      "typeVersion": 2,
+      "position": [
+        1424,
+        608
+      ],
+      "credentials": {
+        "aws": {
+          "id": "wojq9Jq4bZgupPjh",
+          "name": "AWS account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "delete",
+        "bucketName": "marcolanoperacoes",
+        "fileKey": "={{ $('ARQUIVO1').item.json.arq }}",
+        "options": {}
+      },
+      "id": "ce617df7-5879-45b5-ab1c-be33b3f9d5c0",
+      "name": "AWS S34",
+      "type": "n8n-nodes-base.awsS3",
+      "typeVersion": 2,
+      "position": [
+        2032,
+        608
+      ],
+      "credentials": {
+        "aws": {
+          "id": "wojq9Jq4bZgupPjh",
+          "name": "AWS account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "c9777b34-96c3-49cb-9e8f-5171d677c039",
+              "name": "arq",
+              "value": "=Olinda - Vendido do dia Cat e Vend - d{{ $now.day }}-{{ $now.hour }}h{{ $now.minute }}m{{ $now.second }}s",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "644ef415-9a77-46e3-933a-fc0e697e3e87",
+      "name": "ARQUIVO1",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.3,
+      "position": [
+        832,
+        608
+      ]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{ $('Token').item.json.Link }}send-document/xlsx",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "={{ $('Token').item.json.Name }}",
+              "value": "={{ $('Token').item.json.Value }}"
+            }
+          ]
+        },
+        "sendBody": true,
+        "contentType": "form-urlencoded",
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "phone",
+              "value": "=5581994392978"
+            },
+            {
+              "name": "fileName",
+              "value": "=Expedido no dia por Vendedor e Categoria"
+            },
+            {
+              "name": "document",
+              "value": "=https://marcolanoperacoes.s3.amazonaws.com/{{ $('ARQUIVO1').item.json.arq }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "297ba66f-c452-4d28-b4d9-ef58c41bea2d",
+      "name": "Vinícius1",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.1,
+      "position": [
+        1632,
+        608
+      ]
+    },
+    {
+      "parameters": {},
+      "id": "f55746d3-31ea-4ed5-a75c-4713d24eb001",
+      "name": "Wait2",
+      "type": "n8n-nodes-base.wait",
+      "typeVersion": 1.1,
+      "position": [
+        1824,
+        432
+      ],
+      "webhookId": "1dd759c8-608b-45af-8bf1-bc5029eb8c00"
+    },
+    {
+      "parameters": {
+        "operation": "upload",
+        "bucketName": "marcolanoperacoes",
+        "fileName": "={{ $('ARQUIVO2').item.json.arq }}",
+        "additionalFields": {
+          "acl": "publicReadWrite"
+        }
+      },
+      "id": "14ce7e5c-4e50-4097-b854-f2be7ffeec12",
+      "name": "AWS S35",
+      "type": "n8n-nodes-base.awsS3",
+      "typeVersion": 2,
+      "position": [
+        1424,
+        432
+      ],
+      "credentials": {
+        "aws": {
+          "id": "wojq9Jq4bZgupPjh",
+          "name": "AWS account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "delete",
+        "bucketName": "marcolanoperacoes",
+        "fileKey": "={{ $('ARQUIVO2').item.json.arq }}",
+        "options": {}
+      },
+      "id": "27be05a7-d965-406b-a693-13acf5c5f645",
+      "name": "AWS S36",
+      "type": "n8n-nodes-base.awsS3",
+      "typeVersion": 2,
+      "position": [
+        2032,
+        432
+      ],
+      "credentials": {
+        "aws": {
+          "id": "wojq9Jq4bZgupPjh",
+          "name": "AWS account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "c9777b34-96c3-49cb-9e8f-5171d677c039",
+              "name": "arq",
+              "value": "=Olinda - Expedido do mes Cat e Vend - d{{ $now.day }}-{{ $now.hour }}h{{ $now.minute }}m{{ $now.second }}s",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "45c535f5-a256-4f1c-bc5b-66fcf8fd313d",
+      "name": "ARQUIVO2",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.3,
+      "position": [
+        832,
+        432
+      ]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{ $('Token').item.json.Link }}send-document/xlsx",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "={{ $('Token').item.json.Name }}",
+              "value": "={{ $('Token').item.json.Value }}"
+            }
+          ]
+        },
+        "sendBody": true,
+        "contentType": "form-urlencoded",
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "phone",
+              "value": "=5581994392978"
+            },
+            {
+              "name": "fileName",
+              "value": "=Expedido do mês - Vendedor por categoria"
+            },
+            {
+              "name": "document",
+              "value": "=https://marcolanoperacoes.s3.amazonaws.com/{{ $('ARQUIVO2').item.json.arq }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "635b14bd-5bf1-426a-921c-c93cb175eb4a",
+      "name": "Vinícius2",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.1,
+      "position": [
+        1632,
+        432
+      ]
+    },
+    {
+      "parameters": {
+        "operation": "xlsx",
+        "options": {
+          "fileName": "={{ $('ARQUIVO3').item.json.arq }}"
+        }
+      },
+      "id": "bf8801a4-0528-4716-b245-b649a49318c2",
+      "name": "Convert to File2",
+      "type": "n8n-nodes-base.convertToFile",
+      "typeVersion": 1.1,
+      "position": [
+        1232,
+        832
+      ]
+    },
+    {
+      "parameters": {},
+      "id": "29a34317-200b-4932-8fb0-476b88416b4f",
+      "name": "Wait3",
+      "type": "n8n-nodes-base.wait",
+      "typeVersion": 1.1,
+      "position": [
+        1824,
+        832
+      ],
+      "webhookId": "6adedeb6-dab2-46fa-8838-c474982bb143"
+    },
+    {
+      "parameters": {
+        "operation": "upload",
+        "bucketName": "marcolanoperacoes",
+        "fileName": "={{ $('ARQUIVO3').item.json.arq }}",
+        "additionalFields": {
+          "acl": "publicReadWrite"
+        }
+      },
+      "id": "35146e73-dbd7-41ff-8152-c368938c0f4e",
+      "name": "AWS S38",
+      "type": "n8n-nodes-base.awsS3",
+      "typeVersion": 2,
+      "position": [
+        1424,
+        832
+      ],
+      "credentials": {
+        "aws": {
+          "id": "wojq9Jq4bZgupPjh",
+          "name": "AWS account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "delete",
+        "bucketName": "marcolanoperacoes",
+        "fileKey": "={{ $('ARQUIVO3').item.json.arq }}",
+        "options": {}
+      },
+      "id": "3756d52e-e7de-4118-a9af-419474349674",
+      "name": "AWS S39",
+      "type": "n8n-nodes-base.awsS3",
+      "typeVersion": 2,
+      "position": [
+        2032,
+        832
+      ],
+      "credentials": {
+        "aws": {
+          "id": "wojq9Jq4bZgupPjh",
+          "name": "AWS account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "c9777b34-96c3-49cb-9e8f-5171d677c039",
+              "name": "arq",
+              "value": "=Olinda - Vendido do mes Cat e Vend - d{{ $now.day }}-{{ $now.hour }}h{{ $now.minute }}m{{ $now.second }}s",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "686d6fa2-c0e7-4738-8bd6-cca0d6e1518c",
+      "name": "ARQUIVO3",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.3,
+      "position": [
+        832,
+        832
+      ]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{ $('Token').item.json.Link }}send-document/xlsx",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "={{ $('Token').item.json.Name }}",
+              "value": "={{ $('Token').item.json.Value }}"
+            }
+          ]
+        },
+        "sendBody": true,
+        "contentType": "form-urlencoded",
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "phone",
+              "value": "=5581994392978"
+            },
+            {
+              "name": "fileName",
+              "value": "=Vendido no mês por Vendedor e Categoria"
+            },
+            {
+              "name": "document",
+              "value": "=https://marcolanoperacoes.s3.amazonaws.com/{{ $('ARQUIVO3').item.json.arq }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "b0c25442-e63d-4bb3-9450-f532c6f1dc81",
+      "name": "Vinícius3",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.1,
+      "position": [
+        1632,
+        832
+      ]
+    },
+    {
+      "parameters": {
+        "operation": "xlsx",
+        "options": {
+          "fileName": "={{ $('ARQUIVO2').item.json.arq }}"
+        }
+      },
+      "id": "925c1a7e-74b4-4d2e-b886-42c21e9e6287",
+      "name": "Convert to File3",
+      "type": "n8n-nodes-base.convertToFile",
+      "typeVersion": 1.1,
+      "position": [
+        1232,
+        432
+      ]
+    },
+    {
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "select \n\tvendedor, \n\tcategoria_produto, \n\texpedido, \n\tround(abs(custo/expedido - 1),2) as margem, \n\tqtd_cliente, \n\tround(expedido/qtd_cliente,2) as ticket_medio \nfrom (\n\tselect \n\t\tvendedor, \n\t\tcategoria_produto, \n\t\tround(sum(valor_entregue + coalesce(acrescimo, 0) ), 2) as expedido, \n\t\tROUND(sum(custo_entregue), 2) as custo, \n\t\tCOUNT(distinct cod_cliente) as qtd_cliente \n\tfrom entregas_geral eg \n\twhere \n\t\tdata_hora_entregue::Date = NOW()::DATE and unidade = 'OLINDA' \n\tgroup by categoria_produto, vendedor \n) x ",
+        "options": {}
+      },
+      "id": "76fac2e6-cdcb-4887-b9ff-d3618088b38e",
+      "name": "Expedido Dia",
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 2.3,
+      "position": [
+        1024,
+        608
+      ],
+      "credentials": {
+        "postgres": {
+          "id": "G50fA6A0L90xaBIe",
+          "name": "Postgres account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "select \n\tvendedor, \n\tcategoria_produto, \n\tvendido, \n\tround(abs(custo/vendido - 1),2) as margem, \n\tqtd_cliente, \n\tround(vendido/qtd_cliente,2) as ticket_medio \nfrom (\n\tselect \n\t\tvendedor, \n\t\tcategoria_produto, \n\t\tROUND(SUM(replace(p.valor_unitario_total_com_Desconto,',','.')::numeric),2) as vendido, \n\t\tROUND(SUM(replace(p.custo_unitario_total_produto,',','.')::numeric),2) as custo, \n\t\tCOUNT(distinct cod_cliente) as qtd_cliente \n\tfrom pedidos p \n\t\tleft join coes c on p.coes = c.nome \n\twhere \n\t\tdata_pedido::Date = NOW()::dATE and unidade = 'OLINDA' and c.gerafaturamento = 'SIM' \n\tgroup by categoria_produto, vendedor \n) x ",
+        "options": {}
+      },
+      "id": "67231902-adab-40af-b0db-b6c58fcc40a5",
+      "name": "Vendido Dia",
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 2.3,
+      "position": [
+        1024,
+        1008
+      ],
+      "credentials": {
+        "postgres": {
+          "id": "G50fA6A0L90xaBIe",
+          "name": "Postgres account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "select \n\tvendedor, \n\tcategoria_produto, \n\tround(sum(valor_entregue + coalesce(acrescimo, 0) ), 2) as expedido, \n\tROUND(sum(custo_entregue), 2) as custo_expedido, \n\tround(abs(sum(custo_entregue) / nullif((sum(valor_entregue) - 1), 0)), 4) as Margem, \n\tROUND(sum(replace(metragem_entregue, ',','.')::numeric), 2) as m2, \n\tROUND(sum(qtd_entregue), 2) as qtd_entregue \nfrom entregas_geral eg \nwhere \n\tunidade = 'OLINDA' and data_hora_entregue::date between to_char(now()::date, 'yyyy-mm-01')::date and current_date \ngroup by vendedor, categoria_produto ",
+        "options": {}
+      },
+      "id": "5d1838bb-f0ed-4e3c-8a2e-e0e8e0d3a238",
+      "name": "Expedido Mês",
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 2.3,
+      "position": [
+        1024,
+        432
+      ],
+      "credentials": {
+        "postgres": {
+          "id": "G50fA6A0L90xaBIe",
+          "name": "Postgres account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "select \n\tvendedor, \n\tcategoria_produto, \n\tvendido, \n\tround(abs(custo/vendido - 1),2) as margem, \n\tqtd_cliente, \n\tround(vendido/qtd_cliente,2) as ticket_medio \nfrom (\n\tselect \n\t\tvendedor, \n\t\tcategoria_produto, \n\t\tROUND(SUM(replace(p.valor_unitario_total_com_Desconto,',','.')::numeric),2) as vendido,\n\t\tROUND(SUM(replace(p.custo_unitario_total_produto,',','.')::numeric),2) as custo,\n\t\tCOUNT(distinct cod_cliente) as qtd_cliente\n\tfrom pedidos p\n\t\tleft join coes c on p.coes = c.nome \n\twhere \n\t\tdata_pedido::Date >= to_char(NOW()::dATE, 'yyyy-mm-01')::date and unidade = 'OLINDA' and c.gerafaturamento = 'SIM'\n\tgroup by categoria_produto, vendedor\n) x ",
+        "options": {}
+      },
+      "id": "cab64bcc-db98-4ccd-b60c-bea7e0b91a3f",
+      "name": "Vendido Mês",
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 2.3,
+      "position": [
+        1024,
+        832
+      ],
+      "credentials": {
+        "postgres": {
+          "id": "G50fA6A0L90xaBIe",
+          "name": "Postgres account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "xlsx",
+        "options": {
+          "fileName": "={{ $('ARQUIVO4').item.json.arq }}"
+        }
+      },
+      "id": "a0bfcf27-6a7b-483b-b098-874cbdf01e9b",
+      "name": "Convert to File4",
+      "type": "n8n-nodes-base.convertToFile",
+      "typeVersion": 1.1,
+      "position": [
+        1232,
+        144
+      ]
+    },
+    {
+      "parameters": {},
+      "id": "a60bf2dd-6015-4173-9a90-7fd7ee74d2a6",
+      "name": "Wait4",
+      "type": "n8n-nodes-base.wait",
+      "typeVersion": 1.1,
+      "position": [
+        1824,
+        144
+      ],
+      "webhookId": "5561a743-e956-4314-a096-1f89352e69e1"
+    },
+    {
+      "parameters": {
+        "operation": "upload",
+        "bucketName": "marcolanoperacoes",
+        "fileName": "={{ $('ARQUIVO4').item.json.arq }}",
+        "additionalFields": {
+          "acl": "publicReadWrite"
+        }
+      },
+      "id": "82d90796-757c-4287-8e75-3b1eb80f065d",
+      "name": "AWS S310",
+      "type": "n8n-nodes-base.awsS3",
+      "typeVersion": 2,
+      "position": [
+        1424,
+        144
+      ],
+      "credentials": {
+        "aws": {
+          "id": "wojq9Jq4bZgupPjh",
+          "name": "AWS account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "delete",
+        "bucketName": "marcolanoperacoes",
+        "fileKey": "={{ $('ARQUIVO4').item.json.arq }}",
+        "options": {}
+      },
+      "id": "d52f55f6-82de-4d3b-b028-7203297acadb",
+      "name": "AWS S311",
+      "type": "n8n-nodes-base.awsS3",
+      "typeVersion": 2,
+      "position": [
+        2032,
+        144
+      ],
+      "credentials": {
+        "aws": {
+          "id": "wojq9Jq4bZgupPjh",
+          "name": "AWS account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "c9777b34-96c3-49cb-9e8f-5171d677c039",
+              "name": "arq",
+              "value": "=Olinda - Relatório de Despesas - d{{ $now.day }}-{{ $now.hour }}h{{ $now.minute }}m{{ $now.second }}s",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "c117d072-3c10-4df1-b6e1-ff52b9170817",
+      "name": "ARQUIVO4",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.3,
+      "position": [
+        832,
+        144
+      ]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{ $('Token').item.json.Link }}send-document/xlsx",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "={{ $('Token').item.json.Name }}",
+              "value": "={{ $('Token').item.json.Value }}"
+            }
+          ]
+        },
+        "sendBody": true,
+        "contentType": "form-urlencoded",
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "phone",
+              "value": "=5581994392978"
+            },
+            {
+              "name": "fileName",
+              "value": "=Relatório de Despesas"
+            },
+            {
+              "name": "document",
+              "value": "=https://marcolanoperacoes.s3.amazonaws.com/{{ $('ARQUIVO4').item.json.arq }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "4b02cd89-7432-48ae-9e2f-dc5ac5de64d6",
+      "name": "Vinícius4",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.1,
+      "position": [
+        1632,
+        144
+      ]
+    },
+    {
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "SELECT \n\tmf.tipo_unidade, \n\tmf.unidade, \n\tmf.data_pagamento::date::text AS data_pagamento, \n\tmf.centro_custo, \n\tmf.classificacao, \n\tmf.plano_conta, \n\tmf.chave, \n\tmf.descricao, \n\tmf.fornecedor_cliente, \n\tmf.colaborador, \n\tround(replace(mf.vlr_pago, ','::text, '.'::text)::numeric, 2) AS valor \nFROM movimentacoes_financeiras mf \nWHERE \n\tmf.data_pagamento::date >= to_char(now()::date::timestamp with time zone, 'yyyy-mm-01'::text)::date \n\tAND mf.data_pagamento::date <= CURRENT_DATE AND mf.tipo_de_lancamento = 'Saida'::text and unidade in ('OLINDA') \norder by unidade, centro_custo desc, classificacao asc, plano_conta ",
+        "options": {}
+      },
+      "id": "eef5cd25-dbcb-46ba-bbd4-08f523952379",
+      "name": "Despesas",
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 2.3,
+      "position": [
+        1024,
+        144
+      ],
+      "credentials": {
+        "postgres": {
+          "id": "G50fA6A0L90xaBIe",
+          "name": "Postgres account"
+        }
+      }
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Schedule Trigger": {
+      "main": [
+        [
+          {
+            "node": "Token",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Convert to File": {
+      "main": [
+        [
+          {
+            "node": "AWS S31",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Wait": {
+      "main": [
+        [
+          {
+            "node": "AWS S33",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "ARQUIVO": {
+      "main": [
+        [
+          {
+            "node": "Vendido Dia",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "AWS S31": {
+      "main": [
+        [
+          {
+            "node": "Vinícius",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Vinícius": {
+      "main": [
+        [
+          {
+            "node": "Wait",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Token": {
+      "main": [
+        [
+          {
+            "node": "ARQUIVO",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "ARQUIVO1",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "ARQUIVO2",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "ARQUIVO3",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "ARQUIVO4",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Convert to File1": {
+      "main": [
+        [
+          {
+            "node": "AWS S32",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Wait1": {
+      "main": [
+        [
+          {
+            "node": "AWS S34",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "AWS S32": {
+      "main": [
+        [
+          {
+            "node": "Vinícius1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "ARQUIVO1": {
+      "main": [
+        [
+          {
+            "node": "Expedido Dia",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Vinícius1": {
+      "main": [
+        [
+          {
+            "node": "Wait1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Wait2": {
+      "main": [
+        [
+          {
+            "node": "AWS S36",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "AWS S35": {
+      "main": [
+        [
+          {
+            "node": "Vinícius2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "ARQUIVO2": {
+      "main": [
+        [
+          {
+            "node": "Expedido Mês",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Vinícius2": {
+      "main": [
+        [
+          {
+            "node": "Wait2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Convert to File2": {
+      "main": [
+        [
+          {
+            "node": "AWS S38",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Wait3": {
+      "main": [
+        [
+          {
+            "node": "AWS S39",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "AWS S38": {
+      "main": [
+        [
+          {
+            "node": "Vinícius3",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "ARQUIVO3": {
+      "main": [
+        [
+          {
+            "node": "Vendido Mês",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Vinícius3": {
+      "main": [
+        [
+          {
+            "node": "Wait3",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Convert to File3": {
+      "main": [
+        [
+          {
+            "node": "AWS S35",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Expedido Dia": {
+      "main": [
+        [
+          {
+            "node": "Convert to File1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Vendido Dia": {
+      "main": [
+        [
+          {
+            "node": "Convert to File",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Expedido Mês": {
+      "main": [
+        [
+          {
+            "node": "Convert to File3",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Vendido Mês": {
+      "main": [
+        [
+          {
+            "node": "Convert to File2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Convert to File4": {
+      "main": [
+        [
+          {
+            "node": "AWS S310",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Wait4": {
+      "main": [
+        [
+          {
+            "node": "AWS S311",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "AWS S310": {
+      "main": [
+        [
+          {
+            "node": "Vinícius4",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "ARQUIVO4": {
+      "main": [
+        [
+          {
+            "node": "Despesas",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Vinícius4": {
+      "main": [
+        [
+          {
+            "node": "Wait4",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Despesas": {
+      "main": [
+        [
+          {
+            "node": "Convert to File4",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "bb0126bc-1160-416a-a285-b8e9c4af5bf4",
+  "meta": {
+    "instanceId": "a5e8675e548a032fda81ee9dc775b4fc0a1b2003aee794fb0b37064013276a0f"
+  },
+  "id": "TC0Nudth7WYa6fBn",
+  "tags": [
+    {
+      "updatedAt": "2025-03-21T11:52:03.823Z",
+      "createdAt": "2025-03-21T11:52:03.823Z",
+      "id": "VQmA23kx6h1wy92X",
+      "name": "GUIS"
+    },
+    {
+      "updatedAt": "2025-03-24T14:24:48.667Z",
+      "createdAt": "2025-03-24T14:24:48.667Z",
+      "id": "DRs3JJesnD7xa1AS",
+      "name": "Setor - Comercial"
+    }
+  ]
+}

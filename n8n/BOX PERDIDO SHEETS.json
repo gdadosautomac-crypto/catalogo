@@ -1,0 +1,943 @@
+{
+  "name": "BOX PERDIDO SHEETS",
+  "nodes": [
+    {
+      "parameters": {
+        "operation": "appendOrUpdate",
+        "documentId": {
+          "__rl": true,
+          "value": "={{ $('LINKs SHEETS').first().json.PERDAS_TODAS }}",
+          "mode": "url"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 1686715922,
+          "mode": "list",
+          "cachedResultName": "BOX NAO TEMPERADO",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1n_idHmRUq7zjEVdWlIDDsOkjizOp9gk41QqoxnkqJjM/edit#gid=1686715922"
+        },
+        "columns": {
+          "mappingMode": "autoMapInputData",
+          "value": {},
+          "matchingColumns": [
+            "key"
+          ],
+          "schema": [
+            {
+              "id": "key",
+              "displayName": "key",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "unidade",
+              "displayName": "unidade",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "ano",
+              "displayName": "ano",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "mes",
+              "displayName": "mes",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "qt_metrag",
+              "displayName": "qt_metrag",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "LAST",
+              "displayName": "LAST",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "row_number",
+              "displayName": "row_number",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "readOnly": true,
+              "removed": true
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "id": "be8366d9-6955-4c34-ab1d-b380fc2b984f",
+      "name": "ATUALIZA DADOS",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.3,
+      "position": [
+        528,
+        144
+      ],
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "pcOUCMZeQaE24Td8",
+          "name": "SHEETS INDUSTRIAL"
+        }
+      },
+      "onError": "continueRegularOutput"
+    },
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "triggerAtMinute": 10
+            }
+          ]
+        }
+      },
+      "id": "d9b1cbca-3887-454a-87af-969453b8dafd",
+      "name": "Schedule Trigger",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.1,
+      "position": [
+        -1584,
+        352
+      ]
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "id": "3846594a-319a-4b49-bfb6-e71ffd12aed2",
+      "name": "Loop Over Items",
+      "type": "n8n-nodes-base.splitInBatches",
+      "typeVersion": 3,
+      "position": [
+        -448,
+        352
+      ]
+    },
+    {
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "set @unidade = '{{ $json.unidade }}';\n{{ String($('CODIGOS, LINKS e TELEFONES').item.json.SQL) }}",
+        "options": {
+          "connectionTimeoutMillis": 10000
+        }
+      },
+      "id": "91a1a3ae-46b8-4394-b776-c384ad23c434",
+      "name": "SQL",
+      "type": "n8n-nodes-base.mySql",
+      "typeVersion": 2.2,
+      "position": [
+        -224,
+        432
+      ],
+      "alwaysOutputData": false,
+      "credentials": {
+        "mySql": {
+          "id": "TCMIvEsjEY93g6mS",
+          "name": "MySQL WILL"
+        }
+      },
+      "onError": "continueRegularOutput"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{ $('CODIGOS, LINKS e TELEFONES').item.json.link }}send-sticker",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "={{ $('CODIGOS, LINKS e TELEFONES').item.json.link2 }}",
+              "value": "={{ $('CODIGOS, LINKS e TELEFONES').item.json.link1 }}"
+            }
+          ]
+        },
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "phone",
+              "value": "={{ $('CODIGOS, LINKS e TELEFONES').item.json.Solicitante }}"
+            },
+            {
+              "name": "sticker",
+              "value": "={{ $('CODIGOS, LINKS e TELEFONES').item.json.CALCULANDO }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "ce74aa9b-b216-466b-805f-f2fba1d8796c",
+      "name": "CALCULANDO1",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.1,
+      "position": [
+        -448,
+        192
+      ],
+      "executeOnce": true,
+      "disabled": true,
+      "onError": "continueRegularOutput"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{ $('CODIGOS, LINKS e TELEFONES').item.json.link }}send-sticker",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "={{ $('CODIGOS, LINKS e TELEFONES').item.json.link2 }}",
+              "value": "={{ $('CODIGOS, LINKS e TELEFONES').item.json.link1 }}"
+            }
+          ]
+        },
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "phone",
+              "value": "={{ $('CODIGOS, LINKS e TELEFONES').item.json.Solicitante }}"
+            },
+            {
+              "name": "sticker",
+              "value": "={{ $('CODIGOS, LINKS e TELEFONES').item.json.ERRO }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "82a8d691-df3d-41ee-8c05-0616cf34e679",
+      "name": "ERRO1",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.1,
+      "position": [
+        32,
+        448
+      ],
+      "executeOnce": true,
+      "disabled": true
+    },
+    {
+      "parameters": {
+        "rules": {
+          "values": [
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 1
+                },
+                "conditions": [
+                  {
+                    "leftValue": "={{ $('CODIGOS, LINKS e TELEFONES').item.json.CODIGO }}",
+                    "rightValue": "BOX PERDIDO",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    },
+                    "id": "e1c58a6c-2a0d-495f-85d6-9c7f089b1193"
+                  }
+                ],
+                "combinator": "and"
+              }
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 1
+                },
+                "conditions": [
+                  {
+                    "id": "10241b5b-6a49-449a-a937-5d7322e69fa7",
+                    "leftValue": "={{ $('CODIGOS, LINKS e TELEFONES').item.json.CODIGO }}",
+                    "rightValue": "=BOX PERDIDO EXCEL",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals",
+                      "name": "filter.operator.equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              }
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "59370fe8-2acb-4bd3-83f5-b39c21a04d92",
+      "name": "Switch",
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 3,
+      "position": [
+        32,
+        224
+      ]
+    },
+    {
+      "parameters": {
+        "workflowId": "Mzncl2PY653mQvrF",
+        "options": {}
+      },
+      "id": "9812fa20-ec37-4872-be61-4562afd3b103",
+      "name": "LINKs SHEETS",
+      "type": "n8n-nodes-base.executeWorkflow",
+      "typeVersion": 1,
+      "position": [
+        -1408,
+        352
+      ]
+    },
+    {
+      "parameters": {
+        "workflowId": "Du7x4YkD8xJLMMZo",
+        "options": {}
+      },
+      "id": "d4aa92e0-f6ef-43ff-b0e6-6c54433f0768",
+      "name": "CODIGOS, LINKS e TELEFONES",
+      "type": "n8n-nodes-base.executeWorkflow",
+      "typeVersion": 1,
+      "position": [
+        -816,
+        352
+      ]
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "9cac78a2-6c62-4261-bcfd-9740923cf9aa",
+              "name": "CODIGO",
+              "value": "[\"BOX PERDIDO\"]",
+              "type": "array"
+            },
+            {
+              "id": "1c4d9d4d-b475-4df1-8257-6bf3c56df1e9",
+              "name": "TIPO",
+              "value": "AUTO",
+              "type": "string"
+            },
+            {
+              "id": "54e4a748-1d55-4ae3-84a6-1c37d2182e4b",
+              "name": "Solicitante",
+              "value": "=",
+              "type": "string"
+            },
+            {
+              "id": "efc5ac4e-b973-4252-be35-d5109272579d",
+              "name": "sheets",
+              "value": "={{ String($('LINKs SHEETS').item.json.sheets) }}",
+              "type": "string"
+            },
+            {
+              "id": "40e6424b-0768-4853-adaa-302211ccd111",
+              "name": "arq",
+              "value": "=BOX PENDENTE - {{ $now.format('yyyy-MM-dd hh:mm:ss') }}",
+              "type": "string"
+            }
+          ]
+        },
+        "includeOtherFields": true,
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        -1200,
+        352
+      ],
+      "id": "b179aaae-220d-475f-b8ea-456a6fbfa463",
+      "name": "CODIGO"
+    },
+    {
+      "parameters": {
+        "fieldToSplitOut": "CODIGO",
+        "include": "allOtherFields",
+        "options": {}
+      },
+      "id": "54102c8f-5d55-44ff-aa27-c027774f1016",
+      "name": "Split Out1",
+      "type": "n8n-nodes-base.splitOut",
+      "typeVersion": 1,
+      "position": [
+        -1024,
+        352
+      ]
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "00d63c12-96f1-4443-932f-eaa7d2739066",
+              "name": "qt_metrag",
+              "value": "={{ $json.qt_metrag.replaceAll('.',',') }}",
+              "type": "string"
+            }
+          ]
+        },
+        "includeOtherFields": true,
+        "options": {}
+      },
+      "id": "482c11dc-1b13-4a93-bb2f-bff1beb3fbc6",
+      "name": "BASE DADOS",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.3,
+      "position": [
+        224,
+        144
+      ]
+    },
+    {
+      "parameters": {
+        "operation": "update",
+        "documentId": {
+          "__rl": true,
+          "value": "={{ $('LINKs SHEETS').item.json.PERDAS_TODAS }}",
+          "mode": "url"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 1733753940,
+          "mode": "list",
+          "cachedResultName": "CHECK LIST",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1n_idHmRUq7zjEVdWlIDDsOkjizOp9gk41QqoxnkqJjM/edit#gid=1733753940"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "ROBO": "={{ $('CODIGOS, LINKS e TELEFONES').item.json.CODIGO }}",
+            "ATT": "={{ $now.format('yyyy-MM-dd') }}"
+          },
+          "matchingColumns": [
+            "ROBO"
+          ],
+          "schema": [
+            {
+              "id": "ROBO",
+              "displayName": "ROBO",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "ATT",
+              "displayName": "ATT",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "row_number",
+              "displayName": "row_number",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "readOnly": true,
+              "removed": true
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "id": "940f5080-47b0-4d8c-8911-c9190bf9688a",
+      "name": "LOG ATT",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.3,
+      "position": [
+        720,
+        144
+      ],
+      "executeOnce": true,
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "pcOUCMZeQaE24Td8",
+          "name": "SHEETS INDUSTRIAL"
+        }
+      },
+      "onError": "continueRegularOutput"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "040d1303-d83e-441e-b20f-9ad9e46e5277",
+              "leftValue": "={{ $json.unidade }}",
+              "rightValue": "",
+              "operator": {
+                "type": "string",
+                "operation": "exists",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        -224,
+        240
+      ],
+      "id": "d86cddbc-26bc-4c4b-a726-4f6d6d1c71c7",
+      "name": "If"
+    },
+    {
+      "parameters": {
+        "operation": "clear",
+        "documentId": {
+          "__rl": true,
+          "value": "={{ $('LINKs SHEETS').first().json.PERDAS_TODAS }}",
+          "mode": "url"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 1686715922,
+          "mode": "list",
+          "cachedResultName": "BOX NAO TEMPERADO",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1n_idHmRUq7zjEVdWlIDDsOkjizOp9gk41QqoxnkqJjM/edit#gid=1686715922"
+        },
+        "clear": "specificRows",
+        "startIndex": 2,
+        "rowsToDelete": 11000
+      },
+      "id": "fdcb637e-1def-46fd-9aa6-20ff54e19972",
+      "name": "APAGA DADOS",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.3,
+      "position": [
+        384,
+        64
+      ],
+      "executeOnce": true,
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "pcOUCMZeQaE24Td8",
+          "name": "SHEETS INDUSTRIAL"
+        }
+      },
+      "onError": "continueRegularOutput"
+    },
+    {
+      "parameters": {
+        "operation": "xlsx",
+        "options": {
+          "fileName": "={{ $('CODIGOS, LINKS e TELEFONES').item.json.arq }}"
+        }
+      },
+      "id": "dda40cbe-e127-4ba6-a8fe-5daf93291546",
+      "name": "Convert to File1",
+      "type": "n8n-nodes-base.convertToFile",
+      "typeVersion": 1.1,
+      "position": [
+        224,
+        304
+      ]
+    },
+    {
+      "parameters": {
+        "operation": "upload",
+        "bucketName": "marcolanoperacoes",
+        "fileName": "={{ $('CODIGOS, LINKS e TELEFONES').first().json.arq }}",
+        "additionalFields": {
+          "acl": "publicReadWrite"
+        }
+      },
+      "id": "7de9ea3b-4096-4efe-af5d-4c0a6e3396aa",
+      "name": "AWS S3",
+      "type": "n8n-nodes-base.awsS3",
+      "typeVersion": 2,
+      "position": [
+        400,
+        304
+      ],
+      "credentials": {
+        "aws": {
+          "id": "wojq9Jq4bZgupPjh",
+          "name": "AWS account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "delete",
+        "bucketName": "marcolanoperacoes",
+        "fileKey": "={{ $('CODIGOS, LINKS e TELEFONES').first().json.arq }}",
+        "options": {}
+      },
+      "id": "aa4dbcbb-a6fd-4d25-8111-65acab4a9c4e",
+      "name": "AWS S32",
+      "type": "n8n-nodes-base.awsS3",
+      "typeVersion": 2,
+      "position": [
+        960,
+        304
+      ],
+      "credentials": {
+        "aws": {
+          "id": "wojq9Jq4bZgupPjh",
+          "name": "AWS account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{ $('CODIGOS, LINKS e TELEFONES').first().json.link}}send-document/xlsx",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "={{ $('CODIGOS, LINKS e TELEFONES').first().json.link2 }}",
+              "value": "={{ $('CODIGOS, LINKS e TELEFONES').first().json.link1 }}"
+            }
+          ]
+        },
+        "sendBody": true,
+        "contentType": "form-urlencoded",
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "phone",
+              "value": "={{ $('Solicitante').first().json.Solicitante }}"
+            },
+            {
+              "name": "fileName",
+              "value": "={{ $('CODIGOS, LINKS e TELEFONES').first().json.arq }}"
+            },
+            {
+              "name": "document",
+              "value": "=https://marcolanoperacoes.s3.amazonaws.com/{{ $('CODIGOS, LINKS e TELEFONES').first().json.arq }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "1d5aef3c-5751-4515-b2e1-c16fe6790002",
+      "name": "MSG Grupo Produção6",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.1,
+      "position": [
+        608,
+        304
+      ]
+    },
+    {
+      "parameters": {
+        "amount": 10
+      },
+      "id": "075984ef-f282-4ea2-815f-69a86d2635f6",
+      "name": "Wait",
+      "type": "n8n-nodes-base.wait",
+      "typeVersion": 1.1,
+      "position": [
+        784,
+        304
+      ],
+      "webhookId": "afec00dc-0c5e-4143-9bfe-c556889b2512"
+    },
+    {
+      "parameters": {
+        "compare": "selectedFields",
+        "fieldsToCompare": "unidade",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.removeDuplicates",
+      "typeVersion": 2,
+      "position": [
+        -624,
+        352
+      ],
+      "id": "9ef1d08a-026d-4d15-be3a-c393fac2e238",
+      "name": "Remove Duplicates"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "ATUALIZA DADOS": {
+      "main": [
+        [
+          {
+            "node": "LOG ATT",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Schedule Trigger": {
+      "main": [
+        [
+          {
+            "node": "LINKs SHEETS",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Loop Over Items": {
+      "main": [
+        [
+          {
+            "node": "If",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "SQL",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "SQL": {
+      "main": [
+        [
+          {
+            "node": "Loop Over Items",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Switch": {
+      "main": [
+        [
+          {
+            "node": "BASE DADOS",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Convert to File1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "LINKs SHEETS": {
+      "main": [
+        [
+          {
+            "node": "CODIGO",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "CODIGOS, LINKS e TELEFONES": {
+      "main": [
+        [
+          {
+            "node": "CALCULANDO1",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Remove Duplicates",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "CODIGO": {
+      "main": [
+        [
+          {
+            "node": "Split Out1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Split Out1": {
+      "main": [
+        [
+          {
+            "node": "CODIGOS, LINKS e TELEFONES",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "BASE DADOS": {
+      "main": [
+        [
+          {
+            "node": "APAGA DADOS",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "ATUALIZA DADOS",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If": {
+      "main": [
+        [
+          {
+            "node": "Switch",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "ERRO1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Convert to File1": {
+      "main": [
+        [
+          {
+            "node": "AWS S3",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "AWS S3": {
+      "main": [
+        [
+          {
+            "node": "MSG Grupo Produção6",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "MSG Grupo Produção6": {
+      "main": [
+        [
+          {
+            "node": "Wait",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Wait": {
+      "main": [
+        [
+          {
+            "node": "AWS S32",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Remove Duplicates": {
+      "main": [
+        [
+          {
+            "node": "Loop Over Items",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": true,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "49def6d7-5590-4d79-9979-d9ad17c27e39",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "a5e8675e548a032fda81ee9dc775b4fc0a1b2003aee794fb0b37064013276a0f"
+  },
+  "id": "xMWfZheanIfi2LpX",
+  "tags": [
+    {
+      "updatedAt": "2025-03-21T16:08:01.406Z",
+      "createdAt": "2025-03-21T16:08:01.406Z",
+      "id": "TOQ3ATxyyu1bCn2c",
+      "name": "AUTO"
+    },
+    {
+      "updatedAt": "2025-03-21T11:31:29.426Z",
+      "createdAt": "2025-03-21T11:31:29.426Z",
+      "id": "RkprmC0aTVoaMnTe",
+      "name": "E.Ind"
+    }
+  ]
+}

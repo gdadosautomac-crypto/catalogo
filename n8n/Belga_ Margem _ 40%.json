@@ -1,0 +1,416 @@
+{
+  "name": "Belga: Margem < 40%",
+  "nodes": [
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "field": "hours"
+            }
+          ]
+        }
+      },
+      "id": "ed7df164-f30e-4cc3-9d93-eb74c358b761",
+      "name": "Schedule Trigger",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.1,
+      "position": [
+        -2288,
+        800
+      ]
+    },
+    {
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "select \n\tunidade, \n    cod_pedido, \n    cod_cliente, \n    nome_cliente, \n    cod_produto, \n    nome_produto, \n\tround(valor/qtd, 2) as vlr_uni, \n    round(custo/qtd, 2) as cst_uni, \n\tCONCAT(ROUND(abs(custo/valor - 1) * 100,2),' ','%') as margem, \n\tvendedor\nfrom ( \n\tselect \n\t\tunidade, \n\t\tcod_pedido, \n        cod_cliente, \n        nome_cliente, \n\t\tcod_produto, \n\t\tnome_produto, \n\t\tround(sum(replace(valor_unitario_total_com_desconto, ',','.')::numeric), 2) as valor, \n\t\tround(sum(replace(custo_unitario_total_produto, ',','.')::numeric), 2) as custo, \n\t\tround(sum(replace(qtd_produto, ',','.')::numeric), 2) as qtd,\n\t\tvendedor\n\tfrom pedidos p \n\twhere \n\t\tunidade = 'BELGA POLIMEROS' \n        and data_hora_pedido::TIMESTAMP >= NOW()::TIMESTAMP - '1 HOUR'::interval\n\t\t--and data_hora_pedido::date >= '2026-01-01' \n\tgroup by unidade, cod_pedido, cod_produto, nome_produto, vendedor, nome_cliente, cod_cliente\n) x where CONCAT(ROUND(abs(custo/valor - 1) * 100,2),' ','%') < '40.00'",
+        "options": {}
+      },
+      "id": "d389ad9c-7a8b-47a5-adb4-c311a847cd94",
+      "name": "Postgres",
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 2.3,
+      "position": [
+        -1904,
+        800
+      ],
+      "credentials": {
+        "postgres": {
+          "id": "G50fA6A0L90xaBIe",
+          "name": "Postgres account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "documentId": {
+          "__rl": true,
+          "value": "https://docs.google.com/spreadsheets/d/1J9xHE08UPG2QnDrjFsiy3VU3Z8ziZT9aO9MF7ct5ruA/edit?usp=sharing",
+          "mode": "url"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 564051929,
+          "mode": "list",
+          "cachedResultName": "Token",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1J9xHE08UPG2QnDrjFsiy3VU3Z8ziZT9aO9MF7ct5ruA/edit#gid=564051929"
+        },
+        "options": {}
+      },
+      "id": "6ad266fb-4d35-4f80-9f24-7c776b1d9a9d",
+      "name": "Token",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.3,
+      "position": [
+        -2112,
+        800
+      ],
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "HfbTEVMQHA5O66Ya",
+          "name": "Sheets JG e Japa"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 1
+          },
+          "conditions": [
+            {
+              "id": "3d7853d1-bcf0-4bd7-9bb0-b3b2b1ac0292",
+              "leftValue": "=Monday,Tuesday,Wednsday,Thursday,Friday",
+              "rightValue": "={{ $('Schedule Trigger').item.json['Day of week'] }}",
+              "operator": {
+                "type": "string",
+                "operation": "contains"
+              }
+            }
+          ],
+          "combinator": "or"
+        },
+        "options": {}
+      },
+      "id": "67fd5712-3ace-477e-b349-9f46ccf87fbc",
+      "name": "If",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2,
+      "position": [
+        -2048,
+        480
+      ]
+    },
+    {
+      "parameters": {
+        "operation": "upload",
+        "bucketName": "marcolanoperacoes",
+        "fileName": "={{ $('ARQUIVO').item.json.arq }}",
+        "additionalFields": {
+          "acl": "publicReadWrite"
+        }
+      },
+      "id": "36e6c8c9-2963-4e47-b894-02e9fe8cb71c",
+      "name": "AWS S31",
+      "type": "n8n-nodes-base.awsS3",
+      "typeVersion": 2,
+      "position": [
+        -1152,
+        496
+      ],
+      "credentials": {
+        "aws": {
+          "id": "wojq9Jq4bZgupPjh",
+          "name": "AWS account"
+        }
+      }
+    },
+    {
+      "parameters": {},
+      "id": "14fa4098-a6f0-45e4-8354-216b94721546",
+      "name": "Wait",
+      "type": "n8n-nodes-base.wait",
+      "typeVersion": 1.1,
+      "position": [
+        -752,
+        496
+      ],
+      "webhookId": "21941212-27a3-4f3f-ac35-1ae3a454507b"
+    },
+    {
+      "parameters": {
+        "operation": "delete",
+        "bucketName": "marcolanoperacoes",
+        "fileKey": "=RelFinFELIPE.xlsx",
+        "options": {}
+      },
+      "id": "1911385e-532e-4b55-b7bc-432ede367c44",
+      "name": "AWS S33",
+      "type": "n8n-nodes-base.awsS3",
+      "typeVersion": 2,
+      "position": [
+        -576,
+        496
+      ],
+      "credentials": {
+        "aws": {
+          "id": "wojq9Jq4bZgupPjh",
+          "name": "AWS account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "xlsx",
+        "options": {}
+      },
+      "id": "df8c3cad-27ab-4992-98bc-3e407d14b0db",
+      "name": "Convert to File",
+      "type": "n8n-nodes-base.convertToFile",
+      "typeVersion": 1.1,
+      "position": [
+        -1344,
+        496
+      ]
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "c9777b34-96c3-49cb-9e8f-5171d677c039",
+              "name": "arq",
+              "value": "=Belga - Margem < 40 - d{{ $now.day }}-{{ $now.hour }}h{{ $now.minute }}m{{ $now.second }}s",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "0d254a21-7fdf-4026-aa80-77db88d5985a",
+      "name": "ARQUIVO",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.3,
+      "position": [
+        -1696,
+        496
+      ]
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "b97c3336-9bd3-4a94-ba16-3cb561614035",
+              "name": "name",
+              "value": "=Pedido *{{ $json[\"cod_pedido\"] }}*\n\nCliente: *{{ $json.cod_cliente }} | {{ $json.nome_cliente }}*\nProduto: *{{ $json.cod_produto }} | {{ $json[\"nome_produto\"] }}*\n\nValor Unitário: *R$ {{ $json.vlr_uni }}*\nCusto Unitário: *R$ {{ $json.cst_uni }}*\nMargem: *{{ $json[\"margem\"] }}*\n\nVendedor: *{{ $json[\"vendedor\"] }}*",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "3763c2d3-a066-4c58-95e5-db8e49a7729f",
+      "name": "Edit Fields1",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.3,
+      "position": [
+        -1680,
+        800
+      ]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "=https://api.z-api.io/instances/3E4BB1786A2EE0025FEF5E8072250E75/token/909D8480BB81D64D02A6ED60/send-text",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "={{ $('Token').item.json.Name }}",
+              "value": "={{ $('Token').item.json.Value }}"
+            }
+          ]
+        },
+        "sendBody": true,
+        "contentType": "form-urlencoded",
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "phone",
+              "value": "=5581981308564"
+            },
+            {
+              "name": "message",
+              "value": "={{ $json.name }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "80138d57-68f0-48a8-879a-7500c8fe6a28",
+      "name": "Diego Marcolan",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.1,
+      "position": [
+        -1408,
+        800
+      ]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{ $('Token').item.json.Link }}send-text",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "={{ $('Token').item.json.Name }}",
+              "value": "={{ $('Token').item.json.Value }}"
+            }
+          ]
+        },
+        "sendBody": true,
+        "contentType": "form-urlencoded",
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "phone",
+              "value": "=5581981598765"
+            },
+            {
+              "name": "message",
+              "value": "={{ $json.name }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "46cd748f-851a-4e42-98de-cf43b82c4f1f",
+      "name": "TESTE1",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.1,
+      "position": [
+        -1392,
+        1008
+      ]
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Schedule Trigger": {
+      "main": [
+        [
+          {
+            "node": "Token",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Postgres": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Token": {
+      "main": [
+        [
+          {
+            "node": "Postgres",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If": {
+      "main": [
+        []
+      ]
+    },
+    "AWS S31": {
+      "main": [
+        []
+      ]
+    },
+    "Wait": {
+      "main": [
+        [
+          {
+            "node": "AWS S33",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Convert to File": {
+      "main": [
+        [
+          {
+            "node": "AWS S31",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "ARQUIVO": {
+      "main": [
+        []
+      ]
+    },
+    "Edit Fields1": {
+      "main": [
+        [
+          {
+            "node": "Diego Marcolan",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": true,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "1853347b-25f0-4bbf-9e78-b17b8a614aa6",
+  "meta": {
+    "instanceId": "a5e8675e548a032fda81ee9dc775b4fc0a1b2003aee794fb0b37064013276a0f"
+  },
+  "id": "4XZjITXYbjX0t7zl",
+  "tags": [
+    {
+      "updatedAt": "2026-01-14T11:04:00.895Z",
+      "createdAt": "2025-03-21T11:47:30.374Z",
+      "id": "CvCy3KNJKyMxSQ3C",
+      "name": "GDA"
+    },
+    {
+      "updatedAt": "2025-03-24T14:35:52.840Z",
+      "createdAt": "2025-03-24T14:35:52.840Z",
+      "id": "sPkE8K1cDKi4JAee",
+      "name": "Diretoria"
+    },
+    {
+      "updatedAt": "2025-03-24T14:40:59.830Z",
+      "createdAt": "2025-03-24T14:40:59.830Z",
+      "id": "vK8d40ObLmVSMtwq",
+      "name": "Belga Polímeros"
+    }
+  ]
+}

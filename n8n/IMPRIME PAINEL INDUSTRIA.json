@@ -1,0 +1,1098 @@
+{
+  "name": "IMPRIME PAINEL INDUSTRIA",
+  "nodes": [
+    {
+      "parameters": {
+        "workflowId": "Mzncl2PY653mQvrF",
+        "options": {}
+      },
+      "id": "221a8c54-4682-4600-b16c-3700b1e34065",
+      "name": "LINKs SHEETS",
+      "type": "n8n-nodes-base.executeWorkflow",
+      "typeVersion": 1,
+      "position": [
+        -1120,
+        160
+      ]
+    },
+    {
+      "parameters": {
+        "workflowId": "Du7x4YkD8xJLMMZo",
+        "options": {}
+      },
+      "id": "2ab6c5b3-c755-4138-8e30-12a302a27820",
+      "name": "CODIGOS, LINKS e TELEFONES",
+      "type": "n8n-nodes-base.executeWorkflow",
+      "typeVersion": 1,
+      "position": [
+        -768,
+        160
+      ]
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "9cac78a2-6c62-4261-bcfd-9740923cf9aa",
+              "name": "CODIGO",
+              "value": "IMPRIME PAINEL INDUSTRIA",
+              "type": "string"
+            },
+            {
+              "id": "1c4d9d4d-b475-4df1-8257-6bf3c56df1e9",
+              "name": "TIPO",
+              "value": "AUTO",
+              "type": "string"
+            },
+            {
+              "id": "54e4a748-1d55-4ae3-84a6-1c37d2182e4b",
+              "name": "Solicitante",
+              "value": "=",
+              "type": "string"
+            },
+            {
+              "id": "efc5ac4e-b973-4252-be35-d5109272579d",
+              "name": "sheets",
+              "value": "={{ String($('LINKs SHEETS').item.json.sheets) }}",
+              "type": "string"
+            },
+            {
+              "id": "4d1844dd-2b1c-432a-a2e3-7cca02588f7f",
+              "name": "arq",
+              "value": "=Painel - {{ $now.format('yyyy-MM-dd HH:mm:ss') }}",
+              "type": "string"
+            }
+          ]
+        },
+        "includeOtherFields": true,
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        -944,
+        160
+      ],
+      "id": "0d5abc2f-4b04-44cd-926a-12193941bcca",
+      "name": "CODIGO"
+    },
+    {
+      "parameters": {
+        "operation": "delete",
+        "bucketName": "marcolanoperacoes",
+        "fileKey": "={{ $('ARQPAINEL').first().json.arq }}",
+        "options": {}
+      },
+      "id": "4cfdc72b-eb0b-49ea-8b16-e04b8039f3f0",
+      "name": "AWS S32",
+      "type": "n8n-nodes-base.awsS3",
+      "typeVersion": 2,
+      "position": [
+        1200,
+        -160
+      ],
+      "credentials": {
+        "aws": {
+          "id": "wojq9Jq4bZgupPjh",
+          "name": "AWS account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "amount": 10
+      },
+      "id": "15ab57c0-d95b-4e3a-8d58-c6532ce47262",
+      "name": "Wait",
+      "type": "n8n-nodes-base.wait",
+      "typeVersion": 1.1,
+      "position": [
+        1024,
+        -160
+      ],
+      "webhookId": "efc0cd99-04f6-43b6-b1df-cbe654275984"
+    },
+    {
+      "parameters": {
+        "url": "={{ $('CODIGOS, LINKS e TELEFONES').item.json.SQL }}",
+        "options": {}
+      },
+      "id": "4d7a366e-58df-490b-a8c8-c88b0ddb57c8",
+      "name": "HTTP Request1",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.1,
+      "position": [
+        464,
+        -160
+      ],
+      "executeOnce": true
+    },
+    {
+      "parameters": {
+        "operation": "upload",
+        "bucketName": "marcolanoperacoes",
+        "fileName": "={{ $('ARQPAINEL').first().json.arq }}",
+        "additionalFields": {
+          "acl": "publicReadWrite"
+        }
+      },
+      "id": "dea14ebf-dd5c-4d11-939a-7b14c062afb1",
+      "name": "AWS S3",
+      "type": "n8n-nodes-base.awsS3",
+      "typeVersion": 2,
+      "position": [
+        640,
+        -160
+      ],
+      "credentials": {
+        "aws": {
+          "id": "wojq9Jq4bZgupPjh",
+          "name": "AWS account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "field": "weeks",
+              "triggerAtDay": [
+                1,
+                2,
+                3,
+                4,
+                5
+              ],
+              "triggerAtHour": 6,
+              "triggerAtMinute": 15
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.2,
+      "position": [
+        -1296,
+        160
+      ],
+      "id": "9f1d7e17-1215-41df-91a9-cb6c09969dd8",
+      "name": "Schedule Trigger"
+    },
+    {
+      "parameters": {
+        "url": "=https://script.google.com/macros/s/AKfycbxY8S9DaUGF1Mk9ktQcv9t1Uc_MKxFvzk3KAtLxxOClwQcSvsknIb-3fhDYrajV9vy1/exec",
+        "sendQuery": true,
+        "queryParameters": {
+          "parameters": [
+            {
+              "name": "token",
+              "value": "X$T6b@d2industria"
+            },
+            {
+              "name": "unidade",
+              "value": "={{ $json.unidade }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "f070e36d-c89e-4f76-b35f-fb5dcf244d23",
+      "name": "HTTP Request",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.1,
+      "position": [
+        48,
+        -16
+      ],
+      "executeOnce": true
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "n8n-nodes-base.splitInBatches",
+      "typeVersion": 3,
+      "position": [
+        -576,
+        160
+      ],
+      "id": "c28cbed4-6ed3-4cea-b631-d2dc9f23f1f2",
+      "name": "Loop Over Items"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "loose",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "7a09525c-694b-4655-90fa-66510768ebcc",
+              "leftValue": "={{ String($json.status) }}",
+              "rightValue": "=1",
+              "operator": {
+                "type": "string",
+                "operation": "equals",
+                "name": "filter.operator.equals"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "looseTypeValidation": true,
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        224,
+        -16
+      ],
+      "id": "bb85a40e-e3a1-4851-b1ca-a04c994aca4b",
+      "name": "If"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{ $('CODIGOS, LINKS e TELEFONES').item.json.link}}send-text",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "={{ $('CODIGOS, LINKS e TELEFONES').item.json.link2 }}",
+              "value": "={{ $('CODIGOS, LINKS e TELEFONES').item.json.link1 }}"
+            }
+          ]
+        },
+        "sendBody": true,
+        "contentType": "form-urlencoded",
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "phone",
+              "value": "={{ $('CODIGOS, LINKS e TELEFONES').item.json.Solicitante }}"
+            },
+            {
+              "name": "message",
+              "value": "={{ $('CODIGOS, LINKS e TELEFONES').item.json.ALERTA_ERRO }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "99b28768-f41d-439d-a227-441ab5bddfde",
+      "name": "MSG Grupo Produção",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.1,
+      "position": [
+        464,
+        304
+      ]
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "4d1844dd-2b1c-432a-a2e3-7cca02588f7f",
+              "name": "arq",
+              "value": "=Painel {{ $json.unidade }} - {{ $now.format('yyyy-MM-dd HH:mm:ss') }}.pdf",
+              "type": "string"
+            },
+            {
+              "id": "aac0168c-637d-4f09-b214-1bba725027d4",
+              "name": "arq2",
+              "value": "=Setores e 48hrs {{ $json.unidade }} - {{ $now.format('yyyy-MM-dd HH:mm:ss') }}.pdf",
+              "type": "string"
+            },
+            {
+              "id": "67be9d91-4cc8-44fa-ab64-bfd6d6e4e1de",
+              "name": "arq3",
+              "value": "=Produção GRUPO - {{ $now.format('yyyy-MM-dd HH:mm:ss') }}.pdf",
+              "type": "string"
+            }
+          ]
+        },
+        "includeOtherFields": true,
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        -384,
+        160
+      ],
+      "id": "4bc09368-d7d1-47ca-b641-4a0750916f9c",
+      "name": "ARQPAINEL"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{ $('CODIGOS, LINKS e TELEFONES').item.json.link}}send-document/pdf",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "={{ $('CODIGOS, LINKS e TELEFONES').item.json.link2 }}",
+              "value": "={{ $('CODIGOS, LINKS e TELEFONES').item.json.link1 }}"
+            }
+          ]
+        },
+        "sendBody": true,
+        "contentType": "form-urlencoded",
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "phone",
+              "value": "={{ $('CODIGOS, LINKS e TELEFONES').item.json.Solicitante }}"
+            },
+            {
+              "name": "fileName",
+              "value": "={{ $('ARQPAINEL').first().json.arq }}"
+            },
+            {
+              "name": "document",
+              "value": "=https://marcolanoperacoes.s3.amazonaws.com/{{ $('ARQPAINEL').first().json.arq }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "334ee8df-40d4-4e14-9025-2ebfc19d6c3f",
+      "name": "PAINEL",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.1,
+      "position": [
+        848,
+        -160
+      ]
+    },
+    {
+      "parameters": {
+        "operation": "delete",
+        "bucketName": "marcolanoperacoes",
+        "fileKey": "={{ $('ARQPAINEL').first().json.arq2 }}",
+        "options": {}
+      },
+      "id": "143cefff-b6d0-4ea9-aa7f-fb6f0bf11635",
+      "name": "AWS S33",
+      "type": "n8n-nodes-base.awsS3",
+      "typeVersion": 2,
+      "position": [
+        1200,
+        80
+      ],
+      "credentials": {
+        "aws": {
+          "id": "wojq9Jq4bZgupPjh",
+          "name": "AWS account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "amount": 10
+      },
+      "id": "2fb1e3fd-3912-4ec8-ade2-8f00768d6bf7",
+      "name": "Wait1",
+      "type": "n8n-nodes-base.wait",
+      "typeVersion": 1.1,
+      "position": [
+        1024,
+        80
+      ],
+      "webhookId": "efc0cd99-04f6-43b6-b1df-cbe654275984"
+    },
+    {
+      "parameters": {
+        "url": "=https://docs.google.com/spreadsheets/d/1-5CzQNHyRFWB_-FlZiRCfnWa0YqoPQjd2HxkW1gWlCM/export?format=pdf&gid=959395845&range=B2:L40&size=A4&portrait=true&fith=true&scale=2&sheetnames=false&printtitle=false&printnotes=false&pagenum=UNDEFINED&gridlines=false&fzr=false",
+        "options": {}
+      },
+      "id": "916e5717-9bad-4f49-82c8-f1978406f4de",
+      "name": "HTTP Request2",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.1,
+      "position": [
+        464,
+        80
+      ],
+      "executeOnce": true
+    },
+    {
+      "parameters": {
+        "operation": "upload",
+        "bucketName": "marcolanoperacoes",
+        "fileName": "={{ $('ARQPAINEL').first().json.arq2 }}",
+        "additionalFields": {
+          "acl": "publicReadWrite"
+        }
+      },
+      "id": "55debda0-669e-4cf9-9a81-2ebe94e5f3e6",
+      "name": "AWS S31",
+      "type": "n8n-nodes-base.awsS3",
+      "typeVersion": 2,
+      "position": [
+        640,
+        80
+      ],
+      "credentials": {
+        "aws": {
+          "id": "wojq9Jq4bZgupPjh",
+          "name": "AWS account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{ $('CODIGOS, LINKS e TELEFONES').item.json.link}}send-document/pdf",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "={{ $('CODIGOS, LINKS e TELEFONES').item.json.link2 }}",
+              "value": "={{ $('CODIGOS, LINKS e TELEFONES').item.json.link1 }}"
+            }
+          ]
+        },
+        "sendBody": true,
+        "contentType": "form-urlencoded",
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "phone",
+              "value": "={{ $('CODIGOS, LINKS e TELEFONES').item.json.Solicitante }}"
+            },
+            {
+              "name": "fileName",
+              "value": "={{ $('ARQPAINEL').first().json.arq2 }}"
+            },
+            {
+              "name": "document",
+              "value": "=https://marcolanoperacoes.s3.amazonaws.com/{{ $('ARQPAINEL').first().json.arq2 }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "4397888a-aec2-4f5f-a111-983b7728a8a5",
+      "name": "PAINEL1",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.1,
+      "position": [
+        848,
+        80
+      ]
+    },
+    {
+      "parameters": {
+        "operation": "delete",
+        "bucketName": "marcolanoperacoes",
+        "fileKey": "={{ $('ARQPAINEL').first().json.arq3 }}",
+        "options": {}
+      },
+      "id": "f09f2e35-c5c2-42ec-9901-e109f8d35abc",
+      "name": "AWS S34",
+      "type": "n8n-nodes-base.awsS3",
+      "typeVersion": 2,
+      "position": [
+        1168,
+        512
+      ],
+      "credentials": {
+        "aws": {
+          "id": "wojq9Jq4bZgupPjh",
+          "name": "AWS account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "amount": 10
+      },
+      "id": "aa6f945b-aa2f-49db-b52b-c5ef5961e1a7",
+      "name": "Wait2",
+      "type": "n8n-nodes-base.wait",
+      "typeVersion": 1.1,
+      "position": [
+        992,
+        512
+      ],
+      "webhookId": "efc0cd99-04f6-43b6-b1df-cbe654275984"
+    },
+    {
+      "parameters": {
+        "url": "=https://docs.google.com/spreadsheets/d/1-5CzQNHyRFWB_-FlZiRCfnWa0YqoPQjd2HxkW1gWlCM/export?format=pdf&gid=1370692743&range=B2:K25&size=A4&portrait=false&fith=true&scale=2&sheetnames=false&printtitle=false&printnotes=false&pagenum=UNDEFINED&gridlines=false&fzr=false",
+        "options": {}
+      },
+      "id": "79857a9c-8e6f-49b3-b9d2-3f48d44ecdbb",
+      "name": "HTTP Request3",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.1,
+      "position": [
+        384,
+        512
+      ],
+      "executeOnce": true
+    },
+    {
+      "parameters": {
+        "operation": "upload",
+        "bucketName": "marcolanoperacoes",
+        "fileName": "={{ $('ARQPAINEL').first().json.arq3 }}",
+        "additionalFields": {
+          "acl": "publicReadWrite"
+        }
+      },
+      "id": "6efcf783-4269-4d2b-9764-10757e21e1a6",
+      "name": "AWS S35",
+      "type": "n8n-nodes-base.awsS3",
+      "typeVersion": 2,
+      "position": [
+        592,
+        512
+      ],
+      "credentials": {
+        "aws": {
+          "id": "wojq9Jq4bZgupPjh",
+          "name": "AWS account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{ $('CODIGOS, LINKS e TELEFONES').item.json.link}}send-document/pdf",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "={{ $('CODIGOS, LINKS e TELEFONES').item.json.link2 }}",
+              "value": "={{ $('CODIGOS, LINKS e TELEFONES').item.json.link1 }}"
+            }
+          ]
+        },
+        "sendBody": true,
+        "contentType": "form-urlencoded",
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "phone",
+              "value": "={{ $('CODIGOS, LINKS e TELEFONES').item.json.Solicitante }}"
+            },
+            {
+              "name": "fileName",
+              "value": "={{ $('ARQPAINEL').first().json.arq3 }}"
+            },
+            {
+              "name": "document",
+              "value": "=https://marcolanoperacoes.s3.amazonaws.com/{{ $('ARQPAINEL').first().json.arq3 }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "29387348-7d01-4bc0-98d7-01dcf5125e21",
+      "name": "PAINEL2",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.1,
+      "position": [
+        784,
+        512
+      ]
+    },
+    {
+      "parameters": {
+        "rules": {
+          "values": [
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "leftValue": "={{ $('CODIGOS, LINKS e TELEFONES').item.json['NOME ZAP'] }}",
+                    "rightValue": "Produção",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    },
+                    "id": "93ce50b2-6828-4947-8d3b-65a95016bda6"
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "PRODUCAO"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "id": "4a597c75-a239-459d-9d7c-7eef93badb87",
+                    "leftValue": "={{ $('CODIGOS, LINKS e TELEFONES').item.json['NOME ZAP'] }}",
+                    "rightValue": "PAINEL PRODUCAO",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals",
+                      "name": "filter.operator.equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "PAINEL PRODUÇÃO"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 3.2,
+      "position": [
+        -208,
+        160
+      ],
+      "id": "86111e18-5afb-4d75-bd57-9d0655dda4f0",
+      "name": "Switch"
+    },
+    {
+      "parameters": {
+        "documentId": {
+          "__rl": true,
+          "value": "={{ $('LINKs SHEETS').first().json.PAINEL_INDUSTRIAL }}",
+          "mode": "url"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 1370692743,
+          "mode": "list",
+          "cachedResultName": "PAINEL",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1-5CzQNHyRFWB_-FlZiRCfnWa0YqoPQjd2HxkW1gWlCM/edit#gid=1370692743"
+        },
+        "filtersUI": {
+          "values": [
+            {
+              "lookupColumn": "flag",
+              "lookupValue": "flagGRUPO"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "4104f768-d917-496a-ad62-c51c107d9fc9",
+      "name": "FLAG GRUPO",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.3,
+      "position": [
+        -16,
+        512
+      ],
+      "executeOnce": true,
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "pcOUCMZeQaE24Td8",
+          "name": "SHEETS INDUSTRIAL"
+        }
+      },
+      "onError": "continueRegularOutput"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "loose",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "e3a0ab0a-0006-4f97-910f-e554c19256b3",
+              "leftValue": "={{ String($json.fl) }}",
+              "rightValue": "1",
+              "operator": {
+                "type": "string",
+                "operation": "equals",
+                "name": "filter.operator.equals"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "looseTypeValidation": true,
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        144,
+        512
+      ],
+      "id": "5f3f7996-cfae-4362-a39a-fffd5026822e",
+      "name": "If1"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "LINKs SHEETS": {
+      "main": [
+        [
+          {
+            "node": "CODIGO",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "CODIGOS, LINKS e TELEFONES": {
+      "main": [
+        [
+          {
+            "node": "Loop Over Items",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "CODIGO": {
+      "main": [
+        [
+          {
+            "node": "CODIGOS, LINKS e TELEFONES",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Wait": {
+      "main": [
+        [
+          {
+            "node": "AWS S32",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTTP Request1": {
+      "main": [
+        [
+          {
+            "node": "AWS S3",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "AWS S3": {
+      "main": [
+        [
+          {
+            "node": "PAINEL",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Schedule Trigger": {
+      "main": [
+        [
+          {
+            "node": "LINKs SHEETS",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTTP Request": {
+      "main": [
+        [
+          {
+            "node": "If",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Loop Over Items": {
+      "main": [
+        [],
+        [
+          {
+            "node": "ARQPAINEL",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If": {
+      "main": [
+        [
+          {
+            "node": "HTTP Request1",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "MSG Grupo Produção",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "MSG Grupo Produção": {
+      "main": [
+        [
+          {
+            "node": "Loop Over Items",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "AWS S32": {
+      "main": [
+        [
+          {
+            "node": "HTTP Request2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "ARQPAINEL": {
+      "main": [
+        [
+          {
+            "node": "Switch",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "PAINEL": {
+      "main": [
+        [
+          {
+            "node": "Wait",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Wait1": {
+      "main": [
+        [
+          {
+            "node": "AWS S33",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTTP Request2": {
+      "main": [
+        [
+          {
+            "node": "AWS S31",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "AWS S31": {
+      "main": [
+        [
+          {
+            "node": "PAINEL1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "PAINEL1": {
+      "main": [
+        [
+          {
+            "node": "Wait1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "AWS S33": {
+      "main": [
+        [
+          {
+            "node": "Loop Over Items",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Wait2": {
+      "main": [
+        [
+          {
+            "node": "AWS S34",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTTP Request3": {
+      "main": [
+        [
+          {
+            "node": "AWS S35",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "AWS S35": {
+      "main": [
+        [
+          {
+            "node": "PAINEL2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "PAINEL2": {
+      "main": [
+        [
+          {
+            "node": "Wait2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Switch": {
+      "main": [
+        [
+          {
+            "node": "HTTP Request",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "FLAG GRUPO",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "AWS S34": {
+      "main": [
+        [
+          {
+            "node": "Loop Over Items",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "FLAG GRUPO": {
+      "main": [
+        [
+          {
+            "node": "If1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If1": {
+      "main": [
+        [
+          {
+            "node": "HTTP Request3",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "MSG Grupo Produção",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": true,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "0a64afd7-3463-4d0b-ad7e-c00189a841c5",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "a5e8675e548a032fda81ee9dc775b4fc0a1b2003aee794fb0b37064013276a0f"
+  },
+  "id": "QKhdQDU3qqLMHCXh",
+  "tags": [
+    {
+      "updatedAt": "2025-03-21T16:08:01.406Z",
+      "createdAt": "2025-03-21T16:08:01.406Z",
+      "id": "TOQ3ATxyyu1bCn2c",
+      "name": "AUTO"
+    },
+    {
+      "updatedAt": "2025-03-21T11:31:29.426Z",
+      "createdAt": "2025-03-21T11:31:29.426Z",
+      "id": "RkprmC0aTVoaMnTe",
+      "name": "E.Ind"
+    }
+  ]
+}

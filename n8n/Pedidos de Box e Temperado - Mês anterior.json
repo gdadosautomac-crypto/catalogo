@@ -1,0 +1,557 @@
+{
+  "name": "Pedidos de Box e Temperado - Mês anterior",
+  "nodes": [
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "field": "months",
+              "triggerAtHour": 5
+            }
+          ]
+        }
+      },
+      "id": "823195f9-f94e-4c50-99cc-daf8f3f97c41",
+      "name": "Schedule Trigger1",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.1,
+      "position": [
+        -336,
+        320
+      ]
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "c9777b34-96c3-49cb-9e8f-5171d677c039",
+              "name": "name",
+              "value": "={{ $json.Name }}",
+              "type": "string"
+            },
+            {
+              "id": "c29c9cfb-b76e-4088-b0ca-7748646d4779",
+              "name": "value",
+              "value": "={{ $json.Value }}",
+              "type": "string"
+            },
+            {
+              "id": "a2465349-2aee-4dc2-8ce6-9a40bf305fa7",
+              "name": "link",
+              "value": "={{ $json.Link }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "75caf9da-6a17-4419-b34b-b1465ece921c",
+      "name": "Org_TK",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.3,
+      "position": [
+        224,
+        -48
+      ]
+    },
+    {
+      "parameters": {
+        "documentId": {
+          "__rl": true,
+          "value": "https://docs.google.com/spreadsheets/d/1J9xHE08UPG2QnDrjFsiy3VU3Z8ziZT9aO9MF7ct5ruA/edit?usp=sharing",
+          "mode": "url"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 1527829100,
+          "mode": "list",
+          "cachedResultName": "Corporativo",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1J9xHE08UPG2QnDrjFsiy3VU3Z8ziZT9aO9MF7ct5ruA/edit#gid=1527829100"
+        },
+        "options": {}
+      },
+      "id": "3955a725-6e45-4e87-8852-2e6d086d5c27",
+      "name": "GM_Corp_DT1",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.3,
+      "position": [
+        464,
+        -80
+      ],
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "HfbTEVMQHA5O66Ya",
+          "name": "Sheets JG e Japa"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "documentId": {
+          "__rl": true,
+          "value": "https://docs.google.com/spreadsheets/d/1J9xHE08UPG2QnDrjFsiy3VU3Z8ziZT9aO9MF7ct5ruA/edit?usp=sharing",
+          "mode": "url"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 564051929,
+          "mode": "list",
+          "cachedResultName": "Token",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1J9xHE08UPG2QnDrjFsiy3VU3Z8ziZT9aO9MF7ct5ruA/edit#gid=564051929"
+        },
+        "options": {}
+      },
+      "id": "af1d92db-bf9c-4e11-b6c3-914e3c8189c8",
+      "name": "Token",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.3,
+      "position": [
+        -144,
+        320
+      ],
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "HfbTEVMQHA5O66Ya",
+          "name": "Sheets JG e Japa"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "select \n\tnome_cliente as nome, \n\tcod_pedido as pedido,\n\tcase \n\t\twhen categoria_produto like '%TEMPERADO%' then 'TEMPERADO'\n\t\twhen categoria_produto like '%BOX%' then 'BOX'\n\tend categoria, \n\tclasse_produto as cor, \n\tsub_classe_produto as espessura, \n\tround(sum(valor_entregue + coalesce(acrescimo, 0) ), 2) as valor_expedido, \n\tROUND(sum(custo_entregue), 2) as custo_expedido, \n\tROUND(sum(replace(metragem_entregue, ',','.')::numeric), 2) as m2, \n\tround(abs(sum(custo_entregue) / nullif((sum(valor_entregue) - 1), 0)), 4) as Margem, \n\tround(sum(valor_entregue) / sum(replace(metragem_entregue,',','.')::numeric),4) as preco_venda_m2, \n\tcase \n\t\twhen date_part('MONTH', data_hora_entregue::date) = 1 then 'JANEIRO'\n\t\twhen date_part('MONTH', data_hora_entregue::date) = 2 then 'FEVEREIRO'\n\t\twhen date_part('MONTH', data_hora_entregue::date) = 3 then 'MARÇO'\n\t\twhen date_part('MONTH', data_hora_entregue::date) = 4 then 'ABRIL'\n\t\twhen date_part('MONTH', data_hora_entregue::date) = 5 then 'MAIO'\n\t\twhen date_part('MONTH', data_hora_entregue::date) = 6 then 'JUNHO'\n\t\twhen date_part('MONTH', data_hora_entregue::date) = 7 then 'JULHO' \n\t\twhen date_part('MONTH', data_hora_entregue::date) = 8 then 'AGOSTO' \n\t\twhen date_part('MONTH', data_hora_entregue::date) = 9 then 'SETEMBRO' \n\t\twhen date_part('MONTH', data_hora_entregue::date) = 10 then 'OTUBRO'\n\t\twhen date_part('MONTH', data_hora_entregue::date) = 11 then 'NOVEMBBRO'\n\t\twhen date_part('MONTH', data_hora_entregue::date) = 12 then 'DEZEMBRO'\n\tend as mes \nfrom entregas_geral eg \nwhere \n\tcategoria_produto in ('TEMPERADO','TEMPERADO ESPECIAL','BOX PADRÃO','BOX PADRÃO 1900') and unidade = 'VITORIA DE SANTO ANTAO'\n\tand data_hora_entregue::date between date_trunc('MONTH', current_date) - interval '1 MONTH' \n\tand date_trunc('MONTH', current_date) - interval '1 SECOND' \ngroup by nome_cliente, cod_pedido, categoria_produto, classe_produto, sub_classe_produto, date_part('MONTH', data_hora_entregue::date)",
+        "options": {}
+      },
+      "id": "3de52bff-4960-4b06-a403-94d0c4ef0144",
+      "name": "Postgres",
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 2.3,
+      "position": [
+        304,
+        320
+      ],
+      "credentials": {
+        "postgres": {
+          "id": "G50fA6A0L90xaBIe",
+          "name": "Postgres account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "c9777b34-96c3-49cb-9e8f-5171d677c039",
+              "name": "arq",
+              "value": "=Box_Temp_Manu - d{{ $now.day }}-{{ $now.hour }}h{{ $now.minute }}m{{ $now.second }}s",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "5638968e-7124-460a-8caf-04c7d9e1c782",
+      "name": "ARQUIVO",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.3,
+      "position": [
+        80,
+        320
+      ]
+    },
+    {
+      "parameters": {
+        "operation": "xlsx",
+        "options": {
+          "fileName": "={{ $('ARQUIVO').item.json.arq }}"
+        }
+      },
+      "id": "9a870401-96b0-4d2b-8e55-529b024881df",
+      "name": "Convert to File",
+      "type": "n8n-nodes-base.convertToFile",
+      "typeVersion": 1.1,
+      "position": [
+        480,
+        320
+      ]
+    },
+    {
+      "parameters": {
+        "operation": "upload",
+        "bucketName": "marcolanoperacoes",
+        "fileName": "={{ $('ARQUIVO').item.json.arq }}",
+        "additionalFields": {
+          "acl": "publicReadWrite"
+        }
+      },
+      "id": "8139a3b1-85d2-407d-ac74-79a2d498caab",
+      "name": "AWS S31",
+      "type": "n8n-nodes-base.awsS3",
+      "typeVersion": 2,
+      "position": [
+        752,
+        320
+      ],
+      "credentials": {
+        "aws": {
+          "id": "wojq9Jq4bZgupPjh",
+          "name": "AWS account"
+        }
+      }
+    },
+    {
+      "parameters": {},
+      "id": "63d8a508-eebb-4e09-801e-c85480bfa05f",
+      "name": "Wait",
+      "type": "n8n-nodes-base.wait",
+      "typeVersion": 1.1,
+      "position": [
+        1232,
+        208
+      ],
+      "webhookId": "a91ea6df-8a69-4063-96b7-40d062546a8f"
+    },
+    {
+      "parameters": {
+        "operation": "delete",
+        "bucketName": "marcolanoperacoes",
+        "fileKey": "={{ $('ARQUIVO').item.json.arq }}",
+        "options": {}
+      },
+      "id": "c66f53b4-bed6-4545-bde4-ceb61400c4c9",
+      "name": "AWS S33",
+      "type": "n8n-nodes-base.awsS3",
+      "typeVersion": 2,
+      "position": [
+        1408,
+        208
+      ],
+      "credentials": {
+        "aws": {
+          "id": "wojq9Jq4bZgupPjh",
+          "name": "AWS account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "delete",
+        "bucketName": "marcolanoperacoes",
+        "fileKey": "=Contas a Receber - Vitoria - d23-8h24m47s",
+        "options": {}
+      },
+      "id": "daa5d65c-fbe5-4863-9eea-61a7755fcbe3",
+      "name": "AWS S37",
+      "type": "n8n-nodes-base.awsS3",
+      "typeVersion": 2,
+      "position": [
+        64,
+        688
+      ],
+      "credentials": {
+        "aws": {
+          "id": "wojq9Jq4bZgupPjh",
+          "name": "AWS account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "getAll",
+        "bucketName": "marcolanoperacoes",
+        "returnAll": true,
+        "options": {}
+      },
+      "id": "d29c705e-8095-4814-9109-45030bd8e1ed",
+      "name": "AWS S3",
+      "type": "n8n-nodes-base.awsS3",
+      "typeVersion": 2,
+      "position": [
+        -160,
+        688
+      ],
+      "credentials": {
+        "aws": {
+          "id": "wojq9Jq4bZgupPjh",
+          "name": "AWS account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{ $('Token').item.json.Link }}send-document/xlsx",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "={{ $('Token').item.json.Name }}",
+              "value": "={{ $('Token').item.json.Value }}"
+            }
+          ]
+        },
+        "sendBody": true,
+        "contentType": "form-urlencoded",
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "phone",
+              "value": "5581981598765"
+            },
+            {
+              "name": "fileName",
+              "value": "=Pedidos de Box e Temperado - {{ new Date(new Date().setMonth($now.month - 2)).toLocaleString('pt-BR', { month: 'long' }).toUpperCase() }}"
+            },
+            {
+              "name": "document",
+              "value": "=https://marcolanoperacoes.s3.amazonaws.com/{{ $('ARQUIVO').item.json.arq }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "07162449-69d3-4455-ba68-d2018ad85817",
+      "name": "HTTP Request1",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.1,
+      "position": [
+        1072,
+        -80
+      ]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{ $('Token').item.json.Link }}send-document/xlsx",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "={{ $('Token').item.json.Name }}",
+              "value": "={{ $('Token').item.json.Value }}"
+            }
+          ]
+        },
+        "sendBody": true,
+        "contentType": "form-urlencoded",
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "phone",
+              "value": "5581987198774"
+            },
+            {
+              "name": "fileName",
+              "value": "=Pedidos de Box e Temperado - {{ new Date(new Date().setMonth($now.month - 2)).toLocaleString('pt-BR', { month: 'long' }).toUpperCase() }}"
+            },
+            {
+              "name": "document",
+              "value": "=https://marcolanoperacoes.s3.amazonaws.com/{{ $('ARQUIVO').item.json.arq }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "4e3d1546-3309-4ed8-997e-73bc17604506",
+      "name": "Manuelle Muniz",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.1,
+      "position": [
+        1024,
+        208
+      ]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{ $('Token').item.json.Link }}send-document/xlsx",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "={{ $('Token').item.json.Name }}",
+              "value": "={{ $('Token').item.json.Value }}"
+            }
+          ]
+        },
+        "sendBody": true,
+        "contentType": "form-urlencoded",
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "phone",
+              "value": "5581983957230"
+            },
+            {
+              "name": "fileName",
+              "value": "=Pedidos de Box e Temperado - {{ new Date(new Date().setMonth($now.month - 2)).toLocaleString('pt-BR', { month: 'long' }).toUpperCase() }}"
+            },
+            {
+              "name": "document",
+              "value": "=https://marcolanoperacoes.s3.amazonaws.com/{{ $('ARQUIVO').item.json.arq }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "e2dfd45c-c94b-449b-b67b-fe3490f21009",
+      "name": "Annita",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.1,
+      "position": [
+        1024,
+        400
+      ]
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Schedule Trigger1": {
+      "main": [
+        [
+          {
+            "node": "Token",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Token": {
+      "main": [
+        [
+          {
+            "node": "ARQUIVO",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "ARQUIVO": {
+      "main": [
+        [
+          {
+            "node": "Postgres",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Convert to File": {
+      "main": [
+        [
+          {
+            "node": "AWS S31",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Wait": {
+      "main": [
+        [
+          {
+            "node": "AWS S33",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Postgres": {
+      "main": [
+        [
+          {
+            "node": "Convert to File",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "AWS S31": {
+      "main": [
+        [
+          {
+            "node": "Manuelle Muniz",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Annita",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "AWS S3": {
+      "main": [
+        [
+          {
+            "node": "AWS S37",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Manuelle Muniz": {
+      "main": [
+        [
+          {
+            "node": "Wait",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Annita": {
+      "main": [
+        [
+          {
+            "node": "Wait",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "87ca7f06-33b9-4bf1-8cd4-7131b6784ed0",
+  "meta": {
+    "instanceId": "a5e8675e548a032fda81ee9dc775b4fc0a1b2003aee794fb0b37064013276a0f"
+  },
+  "id": "2RZAO2ZOUUdrLYIY",
+  "tags": [
+    {
+      "updatedAt": "2025-08-15T17:47:41.613Z",
+      "createdAt": "2025-08-15T17:47:41.613Z",
+      "id": "7xlDyYK92ZS4jeuZ",
+      "name": "Manu"
+    },
+    {
+      "updatedAt": "2025-03-21T11:52:03.823Z",
+      "createdAt": "2025-03-21T11:52:03.823Z",
+      "id": "VQmA23kx6h1wy92X",
+      "name": "GUIS"
+    },
+    {
+      "updatedAt": "2025-03-24T14:24:48.667Z",
+      "createdAt": "2025-03-24T14:24:48.667Z",
+      "id": "DRs3JJesnD7xa1AS",
+      "name": "Setor - Comercial"
+    }
+  ]
+}

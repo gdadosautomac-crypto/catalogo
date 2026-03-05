@@ -1,0 +1,285 @@
+{
+  "name": "WHATSAPP-FILA-PRODUTOR",
+  "nodes": [
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "b3fb8877-90c7-4766-ae37-018c45223cda",
+              "name": "telefone",
+              "value": "={{ $json.body.telefone }}",
+              "type": "string"
+            },
+            {
+              "id": "3e62ab34-8795-4b44-b7e8-4467b52900b2",
+              "name": "tipo_envio",
+              "value": "={{ $json.body.tipo_envio }}",
+              "type": "string"
+            },
+            {
+              "id": "87660ae3-813e-4792-b959-46a50d9ebc11",
+              "name": "arquivo_url",
+              "value": "={{$json.body.arquivo_url}}",
+              "type": "string"
+            },
+            {
+              "id": "762d7103-7fac-4500-b12b-8559af82d954",
+              "name": "arquivo_nome",
+              "value": "={{$json.body.arquivo_nome}}",
+              "type": "string"
+            },
+            {
+              "id": "1796a8bc-b923-43e3-9e5b-c11811f289a9",
+              "name": "mime_type",
+              "value": "={{$json.body.mime_type}}",
+              "type": "string"
+            },
+            {
+              "id": "21155051-b8b4-4a5c-80d0-155131a74da3",
+              "name": "prioridade",
+              "value": "={{ $json.body.prioridade }}",
+              "type": "string"
+            },
+            {
+              "id": "faded895-6525-4a9d-b089-6ce20dd1f7c3",
+              "name": "=mensagem",
+              "value": "={{ $json.body.mensagem }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        -48,
+        0
+      ],
+      "id": "efb997a2-2324-48e3-9310-bfc7820b913b",
+      "name": "Edit Fields"
+    },
+    {
+      "parameters": {
+        "schema": {
+          "__rl": true,
+          "mode": "list",
+          "value": "public"
+        },
+        "table": {
+          "__rl": true,
+          "value": "whatsapp_fila",
+          "mode": "name"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "mime_type": "={{ $json.mime_type }}",
+            "telefone": "={{ $json.telefone }}",
+            "tipo_envio": "={{ $json.tipo_envio }}",
+            "arquivo_url": "={{ $json.arquivo_url }}",
+            "mensagem": "={{ $json.mensagem }}",
+            "arquivo_nome": "={{ $json.arquivo_nome }}",
+            "prioridade": "={{ $json.prioridade }}"
+          },
+          "matchingColumns": [
+            "id"
+          ],
+          "schema": [
+            {
+              "id": "id",
+              "displayName": "id",
+              "required": false,
+              "defaultMatch": true,
+              "display": true,
+              "type": "number",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "telefone",
+              "displayName": "telefone",
+              "required": true,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "tipo_envio",
+              "displayName": "tipo_envio",
+              "required": true,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "mensagem",
+              "displayName": "mensagem",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "arquivo_url",
+              "displayName": "arquivo_url",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "arquivo_nome",
+              "displayName": "arquivo_nome",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "mime_type",
+              "displayName": "mime_type",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "prioridade",
+              "displayName": "prioridade",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "status",
+              "displayName": "status",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "erro",
+              "displayName": "erro",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "criado_em",
+              "displayName": "criado_em",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "dateTime",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "enviado_em",
+              "displayName": "enviado_em",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "dateTime",
+              "canBeUsedToMatch": true
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 2.6,
+      "position": [
+        160,
+        0
+      ],
+      "id": "60f3f360-461c-490d-9c62-4baf66470334",
+      "name": "Insert rows in a table",
+      "credentials": {
+        "postgres": {
+          "id": "G50fA6A0L90xaBIe",
+          "name": "Postgres account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "whatsapp/fila",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2.1,
+      "position": [
+        -272,
+        0
+      ],
+      "id": "fb99f6a2-33e1-4586-9f5f-f0bc9f6c0c33",
+      "name": "Webhook",
+      "webhookId": "05955888-72f7-41f2-9e6a-2e9ad278f135"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Edit Fields": {
+      "main": [
+        [
+          {
+            "node": "Insert rows in a table",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Webhook": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Insert rows in a table": {
+      "main": [
+        []
+      ]
+    }
+  },
+  "active": true,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "b49275dd-244b-47cf-9821-fd42f6a3f0c5",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "a5e8675e548a032fda81ee9dc775b4fc0a1b2003aee794fb0b37064013276a0f"
+  },
+  "id": "SVOHbmX21kC7S3Rd",
+  "tags": [
+    {
+      "updatedAt": "2026-01-14T11:04:00.895Z",
+      "createdAt": "2025-03-21T11:47:30.374Z",
+      "id": "CvCy3KNJKyMxSQ3C",
+      "name": "GDA"
+    }
+  ]
+}

@@ -1,0 +1,399 @@
+{
+  "name": "Consulta Chats JOAO GUI",
+  "nodes": [
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{ $('AUTH').item.json.link }}",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "={{ $('AUTH').item.json.link2 }}",
+              "value": "={{ $('AUTH').item.json.link1 }}"
+            }
+          ]
+        },
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "phone",
+              "value": "={{ $('EditField').item.json.Solicitante }}"
+            },
+            {
+              "name": "message",
+              "value": "=*{{ $json[\"name\"][0] }} -* {{ $json[\"phone\"][0] }}\n*{{ $json[\"name\"][1] }} -* {{ $json[\"phone\"][1] }}\n*{{ $json[\"name\"][2] }} -* {{ $json[\"phone\"][2] }}\n*{{ $json[\"name\"][3] }} -* {{ $json[\"phone\"][3] }}\n*{{ $json[\"name\"][4] }} -* {{ $json[\"phone\"][4] }}\n*{{ $json[\"name\"][5] }} -* {{ $json[\"phone\"][5] }}\n*{{ $json[\"name\"][6] }} -* {{ $json[\"phone\"][6] }}\n*{{ $json[\"name\"][7] }} -* {{ $json[\"phone\"][7] }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "cfcb0bae-9b38-477d-a6ac-5b429277f0a6",
+      "name": "MSG Grupo Produção6",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.1,
+      "position": [
+        928,
+        160
+      ]
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": false,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 1
+          },
+          "conditions": [
+            {
+              "id": "c74f0a9f-bac5-492d-b212-45468374d762",
+              "leftValue": "={{ $json.body.text.message }}",
+              "rightValue": "=Oi",
+              "operator": {
+                "type": "string",
+                "operation": "startsWith"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {
+          "ignoreCase": true
+        }
+      },
+      "id": "a14ed61a-4a3d-49e4-9a64-4a69ec884fb9",
+      "name": "If",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2,
+      "position": [
+        -384,
+        288
+      ]
+    },
+    {
+      "parameters": {
+        "url": "=",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "={{ $('AUTH').item.json.link2 }}",
+              "value": "={{ $('AUTH').item.json.link1 }}"
+            }
+          ]
+        },
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "phone"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "865b9679-1fea-4a44-9803-e5ed553cccc4",
+      "name": "MSG Grupo Produção",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.1,
+      "position": [
+        480,
+        0
+      ]
+    },
+    {
+      "parameters": {},
+      "id": "3732bfbb-4e6d-44d0-b51c-4b753e0c486b",
+      "name": "Execute Workflow Trigger",
+      "type": "n8n-nodes-base.executeWorkflowTrigger",
+      "typeVersion": 1,
+      "position": [
+        -560,
+        288
+      ]
+    },
+    {
+      "parameters": {
+        "content": "VITORIA - 120363029024303927-group\n4D VIDROS - 120363318677542872-group\nIMBRA - 120363045826337459-group\nBSB - 120363303994406477-group\nOAZEM - 120363299079918495-group\nFORTAL - 120363029384866068-group\nALLGLASS - 120363165082741608-group\n\n{{ $json.body.phone }}",
+        "height": 187.4425794325988,
+        "width": 314.6925384846883
+      },
+      "id": "b227ec16-1a2a-48e5-b2fe-2ab72ea1e46f",
+      "name": "Sticky Note1",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        0,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 1
+          },
+          "conditions": [
+            {
+              "id": "60816164-891d-4979-97dd-3918a086e4ae",
+              "leftValue": "={{ $('MSG Grupo Produção').item.json.phone }}",
+              "rightValue": "=558199845029-1621533163",
+              "operator": {
+                "type": "string",
+                "operation": "notEquals"
+              }
+            },
+            {
+              "id": "536aa2cc-fecf-483d-bf11-e016e1c2d7fc",
+              "leftValue": "={{ $('MSG Grupo Produção').item.json.phone }}",
+              "rightValue": "=558498163702-1474036705",
+              "operator": {
+                "type": "string",
+                "operation": "notEquals"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "id": "770d662c-57da-4caa-a28b-dbd60c2722ab",
+      "name": "If1",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2,
+      "position": [
+        512,
+        272
+      ]
+    },
+    {
+      "parameters": {
+        "fieldsToAggregate": {
+          "fieldToAggregate": [
+            {
+              "fieldToAggregate": "=phone"
+            },
+            {
+              "fieldToAggregate": "=name"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "ff5d40e0-cbb4-40f0-b33f-51e2c570d07f",
+      "name": "Aggregate",
+      "type": "n8n-nodes-base.aggregate",
+      "typeVersion": 1,
+      "position": [
+        736,
+        160
+      ]
+    },
+    {
+      "parameters": {
+        "documentId": {
+          "__rl": true,
+          "value": "https://docs.google.com/spreadsheets/d/1J9xHE08UPG2QnDrjFsiy3VU3Z8ziZT9aO9MF7ct5ruA/edit?usp=sharing",
+          "mode": "url"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 564051929,
+          "mode": "list",
+          "cachedResultName": "Token",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1J9xHE08UPG2QnDrjFsiy3VU3Z8ziZT9aO9MF7ct5ruA/edit#gid=564051929"
+        },
+        "options": {}
+      },
+      "id": "3dc2b6ea-47d6-4209-ae1e-6716d62cd96b",
+      "name": "Token",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.3,
+      "position": [
+        32,
+        272
+      ],
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "HfbTEVMQHA5O66Ya",
+          "name": "Sheets JG e Japa"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{ $('Token').item.json.Link }}send-document/xlsx",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "={{ $('Token').item.json.Name }}",
+              "value": "={{ $('Token').item.json.Value }}"
+            }
+          ]
+        },
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "phone",
+              "value": "={{ $('EditField').item.json.contato }}"
+            },
+            {
+              "name": "message",
+              "value": "=Olá, {{ $('EditField').item.json.nome }}! Estou pronto para servi-lo!"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "dd5ead09-dd4b-46d4-ac2a-f602f20ac478",
+      "name": "Mensagem",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.1,
+      "position": [
+        240,
+        272
+      ]
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "e3c1875a-86e1-4d91-97ad-5d600a3587be",
+              "name": "nome",
+              "value": "={{ $json.body.senderName }}",
+              "type": "string"
+            },
+            {
+              "id": "f7abec7c-8d42-464e-8cdb-3fa04f821faa",
+              "name": "contato",
+              "value": "={{ $json.body.phone }}",
+              "type": "string"
+            },
+            {
+              "id": "5972fd30-99d2-40d4-a791-d89985270dcf",
+              "name": "MSG",
+              "value": "={{ $json.body.text.message }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "c9be3bf2-d6b2-4a2e-b0ba-17020a0a3edb",
+      "name": "EditField",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.3,
+      "position": [
+        -160,
+        272
+      ]
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "If": {
+      "main": [
+        [
+          {
+            "node": "EditField",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Execute Workflow Trigger": {
+      "main": [
+        [
+          {
+            "node": "If",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If1": {
+      "main": [
+        [
+          {
+            "node": "Aggregate",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "MSG Grupo Produção": {
+      "main": [
+        []
+      ]
+    },
+    "Aggregate": {
+      "main": [
+        [
+          {
+            "node": "MSG Grupo Produção6",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Token": {
+      "main": [
+        [
+          {
+            "node": "Mensagem",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "EditField": {
+      "main": [
+        [
+          {
+            "node": "Token",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": true,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "879e1d23-3582-411c-96ec-e57897a7589b",
+  "meta": {
+    "instanceId": "a5e8675e548a032fda81ee9dc775b4fc0a1b2003aee794fb0b37064013276a0f"
+  },
+  "id": "OAWhTdUTCjf6wHRY",
+  "tags": [
+    {
+      "updatedAt": "2025-03-21T11:52:03.823Z",
+      "createdAt": "2025-03-21T11:52:03.823Z",
+      "id": "VQmA23kx6h1wy92X",
+      "name": "GUIS"
+    },
+    {
+      "updatedAt": "2025-03-21T11:52:53.040Z",
+      "createdAt": "2025-03-21T11:52:53.040Z",
+      "id": "9sBc8DYqQwfJKaa4",
+      "name": "Setor - Data Science"
+    }
+  ]
+}

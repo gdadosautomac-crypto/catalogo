@@ -1,0 +1,427 @@
+{
+  "name": "Auditoria Condição de Pagamento",
+  "nodes": [
+    {
+      "parameters": {
+        "documentId": {
+          "__rl": true,
+          "value": "https://docs.google.com/spreadsheets/d/1avLuf5Qpu0lBIFVS-Ny0j-iIFZGkVqqufVGy-sfbqM4/edit?usp=sharing",
+          "mode": "url"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "Página1",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1avLuf5Qpu0lBIFVS-Ny0j-iIFZGkVqqufVGy-sfbqM4/edit#gid=0"
+        },
+        "options": {}
+      },
+      "id": "9d416c7f-8960-425a-9864-956966f60f61",
+      "name": "Google Sheets",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.3,
+      "position": [
+        -1424,
+        144
+      ],
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "8Ytd3zZKAOSyZNqC",
+          "name": "Sheets Andre"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "c9777b34-96c3-49cb-9e8f-5171d677c039",
+              "name": "link",
+              "value": "={{ $json.Link }}",
+              "type": "string"
+            },
+            {
+              "id": "c29c9cfb-b76e-4088-b0ca-7748646d4779",
+              "name": "link1",
+              "value": "={{ $json.Value }}",
+              "type": "string"
+            },
+            {
+              "id": "a2465349-2aee-4dc2-8ce6-9a40bf305fa7",
+              "name": "link2",
+              "value": "={{ $json.Field }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "a068f53f-65f1-42e9-b419-850bae069a2c",
+      "name": "AUTH",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.3,
+      "position": [
+        -1200,
+        144
+      ]
+    },
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "field": "hours",
+              "triggerAtMinute": 59
+            }
+          ]
+        }
+      },
+      "id": "2afee4b3-503f-49c8-a1bf-1f475dd4475e",
+      "name": "Schedule Trigger",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.1,
+      "position": [
+        -1648,
+        144
+      ]
+    },
+    {
+      "parameters": {
+        "documentId": {
+          "__rl": true,
+          "value": "https://docs.google.com/spreadsheets/d/1-POicyrzt3pF737lETypFKUwZu1wf9iQwqYqQnse5bk/edit?hl=pt-br&gid=0#gid=0",
+          "mode": "url"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "Página1",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1-POicyrzt3pF737lETypFKUwZu1wf9iQwqYqQnse5bk/edit#gid=0"
+        },
+        "options": {}
+      },
+      "id": "8c3e12f3-7879-4559-80dc-78c2b9e1ce57",
+      "name": "Google Sheets1",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.3,
+      "position": [
+        -976,
+        144
+      ],
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "8Ytd3zZKAOSyZNqC",
+          "name": "Sheets Andre"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "2bae94fc-16e6-422b-a70d-b488666e0510",
+              "name": "tipo_unidade",
+              "value": "={{ $json.tipo_unidade }}",
+              "type": "string"
+            },
+            {
+              "id": "674a349e-fc00-4c9b-ada6-0d216d0a80db",
+              "name": "unidade",
+              "value": "={{ $json.unidade }}",
+              "type": "string"
+            },
+            {
+              "id": "67ac34de-fd36-4b6c-b797-f6837ea7d981",
+              "name": "host",
+              "value": "={{ $json.host }}",
+              "type": "string"
+            },
+            {
+              "id": "f022d193-0473-4fbc-9a48-3f29487dd5fa",
+              "name": "name",
+              "value": "={{ $json.name }}",
+              "type": "string"
+            },
+            {
+              "id": "4146a9c6-c7a0-4231-adea-914085fef4f6",
+              "name": "port",
+              "value": "={{ $json.port }}",
+              "type": "number"
+            },
+            {
+              "id": "e9f4fa0c-455b-4366-9988-b45c6a53615d",
+              "name": "user",
+              "value": "={{ $json.user }}",
+              "type": "string"
+            },
+            {
+              "id": "e973f1f7-c07d-4409-8617-4d8e9735a819",
+              "name": "senha",
+              "value": "={{ $json.senha }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "8395b34d-10f0-4cd7-b648-b5cffcab8f38",
+      "name": "Edit Fields",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.3,
+      "position": [
+        -768,
+        144
+      ]
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "727ce480-1dfa-4f79-a51d-b177a26791a9",
+              "name": "alerta",
+              "value": "={{ $json.tipo_unidade }}\n{{ $json.unidade }}\n{{ $json.DS_LOG }}\n{{ $json.nome_usuario }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "e81d6b82-1692-44dc-822e-bc76b02be013",
+      "name": "formata_document",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.3,
+      "position": [
+        -48,
+        128
+      ],
+      "onError": "continueRegularOutput"
+    },
+    {
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "SELECT \n    '{{ $json[\"tipo_unidade\"] }}' as tipo_unidade,\n    '{{ $json[\"unidade\"] }}' as unidade,\n    m.NU_LOG,\n    m.NU_USU,\n    usuario.DS_LOGIN AS login,\n    usuario.NOM_USU AS nome_usuario,\n    m.DTH AS data_operacao,\n    m.tipo,\n    m.TABELA,\n    m.DS_LOG\nFROM mglog01011 m\nLEFT JOIN mgusu01010 usuario ON m.NU_USU = usuario.NU_USU\nWHERE m.TABELA = 'mgcpg01010'\nAND m.TIPO = '3'\nAND m.DTH >= DATE_SUB(NOW(), INTERVAL 1 HOUR);\n",
+        "options": {
+          "connectionTimeoutMillis": 10
+        }
+      },
+      "id": "f7054fcc-1328-4d3c-9c64-9c6e8fd511a7",
+      "name": "MySQL1",
+      "type": "n8n-nodes-base.mySql",
+      "typeVersion": 2.2,
+      "position": [
+        -416,
+        288
+      ],
+      "executeOnce": false,
+      "retryOnFail": false,
+      "alwaysOutputData": true,
+      "credentials": {
+        "mySql": {
+          "id": "INDKBtYNaYfBC3it",
+          "name": "MySQL Connection"
+        }
+      },
+      "onError": "continueRegularOutput"
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "id": "79e447dd-70ff-479d-8c50-f47efbd66057",
+      "name": "Loop Over Items1",
+      "type": "n8n-nodes-base.splitInBatches",
+      "typeVersion": 3,
+      "position": [
+        -544,
+        144
+      ]
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "b9e45513-418d-4206-b15f-658d764f912d",
+              "leftValue": "={{ $json.NU_LOG }}",
+              "rightValue": "",
+              "operator": {
+                "type": "string",
+                "operation": "notEmpty",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        -288,
+        144
+      ],
+      "id": "db833b02-698f-44df-bdf3-5e4c01926ba3",
+      "name": "If"
+    },
+    {
+      "parameters": {
+        "phone": "5581994541473",
+        "text": "={{ $json.alerta }}",
+        "additionalFields": {}
+      },
+      "type": "n8n-nodes-zapi.zapi",
+      "typeVersion": 1,
+      "position": [
+        192,
+        128
+      ],
+      "id": "fa74030a-fd86-49fa-b385-f0765f263e8a",
+      "name": "Z-API",
+      "credentials": {
+        "zapiApi": {
+          "id": "cGI15AvSkFAV8Qrr",
+          "name": "Z-API account"
+        }
+      }
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Google Sheets": {
+      "main": [
+        [
+          {
+            "node": "AUTH",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "AUTH": {
+      "main": [
+        [
+          {
+            "node": "Google Sheets1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Schedule Trigger": {
+      "main": [
+        [
+          {
+            "node": "Google Sheets",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Google Sheets1": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Edit Fields": {
+      "main": [
+        [
+          {
+            "node": "Loop Over Items1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "MySQL1": {
+      "main": [
+        [
+          {
+            "node": "Loop Over Items1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Loop Over Items1": {
+      "main": [
+        [
+          {
+            "node": "If",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "MySQL1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If": {
+      "main": [
+        [
+          {
+            "node": "formata_document",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "formata_document": {
+      "main": [
+        [
+          {
+            "node": "Z-API",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "e9eee940-40a8-497f-ba79-9c96b989099d",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "a5e8675e548a032fda81ee9dc775b4fc0a1b2003aee794fb0b37064013276a0f"
+  },
+  "id": "P2JSwIIIazt2jZPA",
+  "tags": [
+    {
+      "updatedAt": "2026-01-14T11:04:00.895Z",
+      "createdAt": "2025-03-21T11:47:30.374Z",
+      "id": "CvCy3KNJKyMxSQ3C",
+      "name": "GDA"
+    }
+  ]
+}

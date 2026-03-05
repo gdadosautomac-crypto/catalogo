@@ -1,0 +1,1032 @@
+{
+  "name": "Acompanhamento de metragem",
+  "nodes": [
+    {
+      "parameters": {
+        "operation": "delete",
+        "bucketName": "marcolanoperacoes",
+        "fileKey": "={{ $json.Key }}",
+        "options": {}
+      },
+      "id": "40274779-a017-452c-b8f8-3aa6398a07c3",
+      "name": "AWS S37",
+      "type": "n8n-nodes-base.awsS3",
+      "typeVersion": 2,
+      "position": [
+        -144,
+        1360
+      ],
+      "credentials": {
+        "aws": {
+          "id": "wojq9Jq4bZgupPjh",
+          "name": "AWS account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "getAll",
+        "bucketName": "marcolanoperacoes",
+        "returnAll": true,
+        "options": {}
+      },
+      "id": "e2c6c84c-6658-470b-9599-084c9be91dcb",
+      "name": "AWS S3",
+      "type": "n8n-nodes-base.awsS3",
+      "typeVersion": 2,
+      "position": [
+        -352,
+        1360
+      ],
+      "credentials": {
+        "aws": {
+          "id": "wojq9Jq4bZgupPjh",
+          "name": "AWS account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "xlsx",
+        "options": {}
+      },
+      "id": "83b78d92-2d27-4422-bafd-41ce3b9b13b5",
+      "name": "Convert to File2",
+      "type": "n8n-nodes-base.convertToFile",
+      "typeVersion": 1.1,
+      "position": [
+        592,
+        832
+      ]
+    },
+    {
+      "parameters": {},
+      "id": "6c82339d-3a64-41e5-90e4-c4aa2dff920f",
+      "name": "Wait2",
+      "type": "n8n-nodes-base.wait",
+      "typeVersion": 1.1,
+      "position": [
+        1120,
+        832
+      ],
+      "webhookId": "96d8c7e8-f0c1-417f-833b-30a770f3a16b"
+    },
+    {
+      "parameters": {
+        "operation": "upload",
+        "bucketName": "marcolanoperacoes",
+        "fileName": "={{ $('ARQUIVO2').item.json.arq }}",
+        "additionalFields": {
+          "acl": "publicReadWrite"
+        }
+      },
+      "id": "4dbda6ef-a54e-40d0-9cae-521dde0039b4",
+      "name": "AWS S35",
+      "type": "n8n-nodes-base.awsS3",
+      "typeVersion": 2,
+      "position": [
+        768,
+        832
+      ],
+      "credentials": {
+        "aws": {
+          "id": "wojq9Jq4bZgupPjh",
+          "name": "AWS account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "delete",
+        "bucketName": "marcolanoperacoes",
+        "fileKey": "={{ $('ARQUIVO2').item.json.arq }}",
+        "options": {}
+      },
+      "id": "34ebdd77-f939-4c68-b3e2-2324a7aae8bc",
+      "name": "AWS S36",
+      "type": "n8n-nodes-base.awsS3",
+      "typeVersion": 2,
+      "position": [
+        1296,
+        832
+      ],
+      "credentials": {
+        "aws": {
+          "id": "wojq9Jq4bZgupPjh",
+          "name": "AWS account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "c9777b34-96c3-49cb-9e8f-5171d677c039",
+              "name": "arq",
+              "value": "=Metragem_Mes_LojaBode - d{{ $now.day }}-{{ $now.hour }}h{{ $now.minute }}m{{ $now.second }}s",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "dcccedf0-574f-4eed-8a33-6f8dc2bd3c1a",
+      "name": "ARQUIVO2",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.3,
+      "position": [
+        224,
+        832
+      ]
+    },
+    {
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "/* Metragem acumulada do Mês - Lojas e Bodinhos */\n\nSELECT\n\tCOALESCE(temp.tipo_unidade, COALESCE(box.tipo_unidade, inc8.tipo_unidade)) AS tipo_unidade,\n\tCOALESCE(temp.unidade, COALESCE(box.unidade, inc8.unidade)) AS unidade, \n\ttemp.metragem_temp, \n\tbox.metragem_box, \n\tinc8.metragem_inc8, \n\tvlr_inc8.vlr_inc8 \nFROM ( \n\tSELECT \n\tp.tipo_unidade, \n\tp.unidade, \n\tROUND(SUM(REPLACE(p.metragem_cobrada, ',', '.')::NUMERIC), 2) AS metragem_temp \n\tFROM pedidos p \n\tLEFT JOIN coes c ON p.coes = c.nome \n\tLEFT JOIN unidades u ON p.unidade = u.unidade \n\tWHERE p.categoria_produto IN ('TEMPERADO', 'TEMPERADO ESPECIAL', 'TEMPERADO PADRÃO') \n\tAND p.tipo_unidade <> 'Tempera' \n\tAND u.matriz IN ('VITORIA DE SANTO ANTAO', 'FORTALEZA', 'Oazem', 'INBRAVIDROS', '4D Vidros') \n\tAND c.gerafaturamento = 'SIM' \n\tAND p.data_hora_pedido::date BETWEEN TO_CHAR(NOW()::DATE, 'yyyy-mm-01')::date AND current_date \n    --AND p.data_hora_pedido::date BETWEEN '2025-12-01' AND '2025-12-31'\n\tGROUP BY p.tipo_unidade, p.unidade \n) AS temp FULL OUTER JOIN ( \n\tSELECT \n\t\tp.tipo_unidade, \n\t\tp.unidade, \n\t\tROUND(SUM(REPLACE(p.metragem_cobrada, ',', '.')::NUMERIC), 2) AS metragem_box \n\tFROM pedidos p \n\t\tLEFT JOIN coes c ON p.coes = c.nome \n\t\tLEFT JOIN unidades u ON p.unidade = u.unidade \n\tWHERE \n\t\tp.categoria_produto IN ('BOX 06MM', 'BOX FORA DE PADRÃO', 'BOX PADRÃO', 'BOX PADRÃO 1800', 'BOX PADRAO 1900', 'BOX PADRÃO 1900') \n\t\tAND p.tipo_unidade <> 'Tempera' AND u.matriz IN ('VITORIA DE SANTO ANTAO', 'FORTALEZA', 'Oazem', 'INBRAVIDROS', '4D Vidros') \n\t\tAND c.gerafaturamento = 'SIM' AND p.data_hora_pedido::date BETWEEN TO_CHAR(NOW()::DATE, 'yyyy-mm-01')::date AND current_date \n        --AND p.data_hora_pedido::date BETWEEN '2025-12-01' AND '2025-12-31'\n\tGROUP BY p.tipo_unidade, p.unidade \n) AS box ON temp.tipo_unidade = box.tipo_unidade AND temp.unidade = box.unidade \nFULL OUTER JOIN ( \n\tSELECT \n\t\tp.tipo_unidade, \n\t\tp.unidade, \n\t\tROUND(SUM(REPLACE(p.metragem_cobrada, ',', '.')::NUMERIC), 2) AS metragem_inc8 \n\tFROM pedidos p \n\t\tLEFT JOIN coes c ON p.coes = c.nome \n\t\tLEFT JOIN unidades u ON p.unidade = u.unidade \n\tWHERE \n\t\tp.categoria_produto IN ('TEMPERADO') AND p.classe_produto LIKE '%INC%' and p.sub_classe_produto like '%8%' \n\t\tAND p.tipo_unidade <> 'Tempera' AND u.matriz IN ('VITORIA DE SANTO ANTAO', 'FORTALEZA', 'Oazem', 'INBRAVIDROS', '4D Vidros') \n\t\tAND c.gerafaturamento = 'SIM' AND p.data_hora_pedido::date BETWEEN TO_CHAR(NOW()::DATE, 'yyyy-mm-01')::date AND current_date \n        --AND p.data_hora_pedido::date BETWEEN '2025-12-01' AND '2025-12-31'\n\tGROUP BY p.tipo_unidade, p.unidade \n) AS inc8 ON temp.tipo_unidade = inc8.tipo_unidade AND temp.unidade = inc8.unidade \nFULL OUTER JOIN ( \n\tSELECT \n\t\tp.tipo_unidade, \n\t\tp.unidade, \n\t\tROUND(SUM(REPLACE(p.valor_unitario_total_com_desconto, ',', '.')::NUMERIC), 2) AS vlr_inc8 \n\tFROM pedidos p \n\t\tLEFT JOIN coes c ON p.coes = c.nome \n\t\tLEFT JOIN unidades u ON p.unidade = u.unidade \n\tWHERE \n\t\tp.categoria_produto IN ('TEMPERADO') AND p.classe_produto LIKE '%INC%' and p.sub_classe_produto like '%8%' \n\t\tAND p.tipo_unidade <> 'Tempera' AND u.matriz IN ('VITORIA DE SANTO ANTAO', 'FORTALEZA', 'Oazem', 'INBRAVIDROS', '4D Vidros') \n\t\tAND c.gerafaturamento = 'SIM' AND p.data_hora_pedido::date BETWEEN TO_CHAR(NOW()::DATE, 'yyyy-mm-01')::date AND current_date \n        --AND p.data_hora_pedido::date BETWEEN '2025-12-01' AND '2025-12-31'\n\tGROUP BY p.tipo_unidade, p.unidade \n) AS vlr_inc8 ON temp.tipo_unidade = vlr_inc8.tipo_unidade AND temp.unidade = vlr_inc8.unidade",
+        "options": {}
+      },
+      "id": "3609299d-e496-4332-b024-431171bc3a33",
+      "name": "Postgres2",
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 2.3,
+      "position": [
+        400,
+        832
+      ],
+      "credentials": {
+        "postgres": {
+          "id": "G50fA6A0L90xaBIe",
+          "name": "Postgres account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "field": "weeks",
+              "triggerAtDay": [
+                1,
+                2,
+                3,
+                4
+              ],
+              "triggerAtHour": 19,
+              "triggerAtMinute": 3
+            },
+            {
+              "field": "weeks",
+              "triggerAtDay": [
+                5
+              ],
+              "triggerAtHour": 17,
+              "triggerAtMinute": 33
+            }
+          ]
+        }
+      },
+      "id": "85a68a55-24ed-4e9b-bd27-9e99c4a2bc3e",
+      "name": "Dias",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.1,
+      "position": [
+        -352,
+        1184
+      ],
+      "retryOnFail": true
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{ $('Token').item.json.Link }}send-document/xlsx",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "={{ $('Token').item.json.Name }}",
+              "value": "={{ $('Token').item.json.Value }}"
+            }
+          ]
+        },
+        "sendBody": true,
+        "contentType": "form-urlencoded",
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "phone",
+              "value": "=5581987198774"
+            },
+            {
+              "name": "fileName",
+              "value": "M² acumulada do mês"
+            },
+            {
+              "name": "document",
+              "value": "=https://marcolanoperacoes.s3.amazonaws.com/{{ $('ARQUIVO2').item.json.arq }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "2cdfa95b-2c03-4a77-9b34-e6c48bb1af79",
+      "name": "Manuelle",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.1,
+      "position": [
+        944,
+        736
+      ]
+    },
+    {
+      "parameters": {
+        "operation": "xlsx",
+        "options": {}
+      },
+      "id": "421073d1-e10c-4bb0-8d7b-7dae95d32174",
+      "name": "Convert to File5",
+      "type": "n8n-nodes-base.convertToFile",
+      "typeVersion": 1.1,
+      "position": [
+        592,
+        1520
+      ]
+    },
+    {
+      "parameters": {},
+      "id": "2df0a3c9-9c19-4ed3-aa87-7c8f2960dac3",
+      "name": "Wait5",
+      "type": "n8n-nodes-base.wait",
+      "typeVersion": 1.1,
+      "position": [
+        1120,
+        1520
+      ],
+      "webhookId": "87a9066f-8cfc-45b1-89db-5f685cb57b60"
+    },
+    {
+      "parameters": {
+        "operation": "upload",
+        "bucketName": "marcolanoperacoes",
+        "fileName": "={{ $('ARQUIVO6').item.json.arq }}",
+        "additionalFields": {
+          "acl": "publicReadWrite"
+        }
+      },
+      "id": "06fc524d-47d8-47af-a02d-10a0b8fc1231",
+      "name": "AWS S312",
+      "type": "n8n-nodes-base.awsS3",
+      "typeVersion": 2,
+      "position": [
+        768,
+        1520
+      ],
+      "credentials": {
+        "aws": {
+          "id": "wojq9Jq4bZgupPjh",
+          "name": "AWS account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "delete",
+        "bucketName": "marcolanoperacoes",
+        "fileKey": "={{ $('ARQUIVO6').item.json.arq }}",
+        "options": {}
+      },
+      "id": "b7b8da91-f28d-4355-ba8a-9da2de75b5ff",
+      "name": "AWS S313",
+      "type": "n8n-nodes-base.awsS3",
+      "typeVersion": 2,
+      "position": [
+        1312,
+        1520
+      ],
+      "credentials": {
+        "aws": {
+          "id": "wojq9Jq4bZgupPjh",
+          "name": "AWS account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "c9777b34-96c3-49cb-9e8f-5171d677c039",
+              "name": "arq",
+              "value": "=MetragemRay - d{{ $now.day }}-{{ $now.hour }}h{{ $now.minute }}m{{ $now.second }}s",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "5c519f1d-4457-4737-9e99-709834bf1222",
+      "name": "ARQUIVO3",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.3,
+      "position": [
+        224,
+        1184
+      ]
+    },
+    {
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "/* METRAGEM DE BOX DO DIA */ \n\nselect \n\tcoalesce(inc.tipo_unidade, clr.tipo_unidade) as tipo_unidade, \n\tcoalesce(inc.unidade, clr.unidade) as unidades, \n\tinc.mrt_box as mtr_inc, \n\tclr.mrt_box as mtr_clr \nfrom ( \n\tSELECT \n\t\tp.tipo_unidade, \n\t\tu.nome_sugerido as unidade, \n\t\tROUND(SUM(REPLACE(p.metragem_cobrada, ',', '.')::NUMERIC), 2) AS mrt_box \n\tFROM pedidos p \n\t\tLEFT JOIN coes c ON p.coes = c.nome \n\t\tLEFT JOIN unidades u ON p.unidade = u.unidade \n\tWHERE \n\t\tp.categoria_produto IN ('BOX 06MM', 'BOX FORA DE PADRÃO', 'BOX PADRÃO', 'BOX PADRÃO 1800', 'BOX PADRAO 1900', 'BOX PADRÃO 1900') \n\t\tAND p.tipo_unidade <> 'Tempera' AND c.gerafaturamento = 'SIM' and p.classe_produto = 'INCOLOR' \n\t\tAND p.data_hora_pedido::date = current_date --para acumulado no dia\n\tGROUP BY p.tipo_unidade, u.nome_sugerido \n) as inc full OUTER JOIN ( \n\tSELECT \n\t\tp.tipo_unidade, \n\t\tu.nome_sugerido as unidade, \n\t\tROUND(SUM(REPLACE(p.metragem_cobrada, ',', '.')::NUMERIC), 2) AS mrt_box \n\tFROM pedidos p \n\t\tLEFT JOIN coes c ON p.coes = c.nome \n\t\tLEFT JOIN unidades u ON p.unidade = u.unidade \n\tWHERE \n\t\tp.categoria_produto IN ('BOX 06MM', 'BOX FORA DE PADRÃO', 'BOX PADRÃO', 'BOX PADRÃO 1800', 'BOX PADRAO 1900', 'BOX PADRÃO 1900') \n\t\tAND p.tipo_unidade <> 'Tempera' AND c.gerafaturamento = 'SIM' and p.classe_produto IN ('FUME', 'VERDE') \n\t\tAND p.data_hora_pedido::date = current_date --para acumulado no dia\n\tGROUP BY p.tipo_unidade, u.nome_sugerido \n) as clr on inc.unidade = clr.unidade",
+        "options": {}
+      },
+      "id": "67f20d05-2e6f-4db1-a361-c3478bff7f21",
+      "name": "Postgres5",
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 2.3,
+      "position": [
+        400,
+        1520
+      ],
+      "credentials": {
+        "postgres": {
+          "id": "G50fA6A0L90xaBIe",
+          "name": "Postgres account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "xlsx",
+        "options": {}
+      },
+      "id": "c754b43e-8f07-4a1a-b327-978d8e089bca",
+      "name": "Convert to File6",
+      "type": "n8n-nodes-base.convertToFile",
+      "typeVersion": 1.1,
+      "position": [
+        592,
+        1184
+      ]
+    },
+    {
+      "parameters": {},
+      "id": "e7b6361a-e105-4b21-9665-ee03be1a2e10",
+      "name": "Wait6",
+      "type": "n8n-nodes-base.wait",
+      "typeVersion": 1.1,
+      "position": [
+        1120,
+        1184
+      ],
+      "webhookId": "87a9066f-8cfc-45b1-89db-5f685cb57b60"
+    },
+    {
+      "parameters": {
+        "operation": "upload",
+        "bucketName": "marcolanoperacoes",
+        "fileName": "={{ $('ARQUIVO3').item.json.arq }}",
+        "additionalFields": {
+          "acl": "publicReadWrite"
+        }
+      },
+      "id": "24d3dd03-0e67-486c-9147-d768ddd76a02",
+      "name": "AWS S314",
+      "type": "n8n-nodes-base.awsS3",
+      "typeVersion": 2,
+      "position": [
+        768,
+        1184
+      ],
+      "credentials": {
+        "aws": {
+          "id": "wojq9Jq4bZgupPjh",
+          "name": "AWS account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "delete",
+        "bucketName": "marcolanoperacoes",
+        "fileKey": "={{ $('ARQUIVO3').item.json.arq }}",
+        "options": {}
+      },
+      "id": "7f84cf31-4a5a-42e1-99d4-6a593d9fb71c",
+      "name": "AWS S315",
+      "type": "n8n-nodes-base.awsS3",
+      "typeVersion": 2,
+      "position": [
+        1312,
+        1184
+      ],
+      "credentials": {
+        "aws": {
+          "id": "wojq9Jq4bZgupPjh",
+          "name": "AWS account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "/* METRAGEM DE BOX DO MÊS */ \n\nselect \n\tcoalesce(inc.tipo_unidade, clr.tipo_unidade) as tipo_unidade, \n\tcoalesce(inc.unidade, clr.unidade) as unidades, \n\tinc.mrt_box as mtr_inc, \n\tclr.mrt_box as mtr_clr \nfrom ( \n\tSELECT \n\t\tp.tipo_unidade, \n\t\tu.nome_sugerido as unidade, \n\t\tROUND(SUM(REPLACE(p.metragem_cobrada, ',', '.')::NUMERIC), 2) AS mrt_box \n\tFROM pedidos p \n\t\tLEFT JOIN coes c ON p.coes = c.nome \n\t\tLEFT JOIN unidades u ON p.unidade = u.unidade \n\tWHERE \n\t\tp.categoria_produto IN ('BOX 06MM', 'BOX FORA DE PADRÃO', 'BOX PADRÃO', 'BOX PADRÃO 1800', 'BOX PADRAO 1900', 'BOX PADRÃO 1900') \n\t\tAND p.tipo_unidade <> 'Tempera' AND c.gerafaturamento = 'SIM' and p.classe_produto = 'INCOLOR' \n\t\tAND p.data_hora_pedido::date between TO_CHAR(NOW()::DATE, 'yyyy-mm-01')::date and current_date \n        --AND p.data_hora_pedido::date between '2025-12-01' and '2025-12-31'\n\tGROUP BY p.tipo_unidade, u.nome_sugerido \n) as inc full OUTER JOIN ( \n\tSELECT \n\t\tp.tipo_unidade, \n\t\tu.nome_sugerido as unidade, \n\t\tROUND(SUM(REPLACE(p.metragem_cobrada, ',', '.')::NUMERIC), 2) AS mrt_box \n\tFROM pedidos p \n\t\tLEFT JOIN coes c ON p.coes = c.nome \n\t\tLEFT JOIN unidades u ON p.unidade = u.unidade \n\tWHERE \n\t\tp.categoria_produto IN ('BOX 06MM', 'BOX FORA DE PADRÃO', 'BOX PADRÃO', 'BOX PADRÃO 1800', 'BOX PADRAO 1900', 'BOX PADRÃO 1900') \n\t\tAND p.tipo_unidade <> 'Tempera' AND c.gerafaturamento = 'SIM' and p.classe_produto IN ('FUME', 'VERDE') \n\t\tAND p.data_hora_pedido::date between TO_CHAR(NOW()::DATE, 'yyyy-mm-01')::date and current_date \n        --AND p.data_hora_pedido::date between '2025-12-01' and '2025-12-31'\n\tGROUP BY p.tipo_unidade, u.nome_sugerido \n) as clr on inc.unidade = clr.unidade",
+        "options": {}
+      },
+      "id": "6487d60b-0d5c-4765-941c-dece48d5e3a0",
+      "name": "Postgres6",
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 2.3,
+      "position": [
+        400,
+        1184
+      ],
+      "credentials": {
+        "postgres": {
+          "id": "G50fA6A0L90xaBIe",
+          "name": "Postgres account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{ $('Token').item.json.Link }}send-document/xlsx",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "={{ $('Token').item.json.Name }}",
+              "value": "={{ $('Token').item.json.Value }}"
+            }
+          ]
+        },
+        "sendBody": true,
+        "contentType": "form-urlencoded",
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "phone",
+              "value": "=5581987198774"
+            },
+            {
+              "name": "fileName",
+              "value": "M² de Box do mês"
+            },
+            {
+              "name": "document",
+              "value": "=https://marcolanoperacoes.s3.amazonaws.com/{{ $('ARQUIVO3').item.json.arq }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "b2190b4a-45fe-47ca-9f30-a9f2eccac7f7",
+      "name": "Manuelle1",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.1,
+      "position": [
+        944,
+        1088
+      ]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{ $('Token').item.json.Link }}send-document/xlsx",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "={{ $('Token').item.json.Name }}",
+              "value": "={{ $('Token').item.json.Value }}"
+            }
+          ]
+        },
+        "sendBody": true,
+        "contentType": "form-urlencoded",
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "phone",
+              "value": "=5581987198774"
+            },
+            {
+              "name": "fileName",
+              "value": "M² de Box do dia"
+            },
+            {
+              "name": "document",
+              "value": "=https://marcolanoperacoes.s3.amazonaws.com/{{ $('ARQUIVO6').item.json.arq }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "5b2de090-b1ff-4cb4-87bc-093a40eaf02e",
+      "name": "Manuelle2",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.1,
+      "position": [
+        944,
+        1440
+      ]
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "c9777b34-96c3-49cb-9e8f-5171d677c039",
+              "name": "arq",
+              "value": "=MetragemRay - d{{ $now.day }}-{{ $now.hour }}h{{ $now.minute }}m{{ $now.second }}s",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "a879c8db-74ab-4ac5-8190-3b710d8b3255",
+      "name": "ARQUIVO6",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.3,
+      "position": [
+        224,
+        1520
+      ]
+    },
+    {
+      "parameters": {
+        "documentId": {
+          "__rl": true,
+          "value": "https://docs.google.com/spreadsheets/d/1J9xHE08UPG2QnDrjFsiy3VU3Z8ziZT9aO9MF7ct5ruA/edit?usp=sharing",
+          "mode": "url"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 564051929,
+          "mode": "list",
+          "cachedResultName": "Token",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1J9xHE08UPG2QnDrjFsiy3VU3Z8ziZT9aO9MF7ct5ruA/edit#gid=564051929"
+        },
+        "options": {}
+      },
+      "id": "387793c0-8708-47af-9aed-0744548f1d65",
+      "name": "Token",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.3,
+      "position": [
+        -144,
+        1184
+      ],
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "8Ytd3zZKAOSyZNqC",
+          "name": "Sheets Andre"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{ $('Token').item.json.Link }}send-document/xlsx",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "={{ $('Token').item.json.Name }}",
+              "value": "={{ $('Token').item.json.Value }}"
+            }
+          ]
+        },
+        "sendBody": true,
+        "contentType": "form-urlencoded",
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "phone",
+              "value": "=5581983857230"
+            },
+            {
+              "name": "fileName",
+              "value": "M² acumulada do mês"
+            },
+            {
+              "name": "document",
+              "value": "=https://marcolanoperacoes.s3.amazonaws.com/{{ $('ARQUIVO2').item.json.arq }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "6be3ebb1-196a-48e8-a839-cd0afc59da5a",
+      "name": "Annita",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.1,
+      "position": [
+        944,
+        912
+      ]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{ $('Token').item.json.Link }}send-document/xlsx",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "={{ $('Token').item.json.Name }}",
+              "value": "={{ $('Token').item.json.Value }}"
+            }
+          ]
+        },
+        "sendBody": true,
+        "contentType": "form-urlencoded",
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "phone",
+              "value": "=5581983857230"
+            },
+            {
+              "name": "fileName",
+              "value": "M² de Box do mês"
+            },
+            {
+              "name": "document",
+              "value": "=https://marcolanoperacoes.s3.amazonaws.com/{{ $('ARQUIVO3').item.json.arq }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "bda85c0d-01b0-4715-b11a-8c3192187ada",
+      "name": "Annita1",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.1,
+      "position": [
+        944,
+        1264
+      ]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{ $('Token').item.json.Link }}send-document/xlsx",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "={{ $('Token').item.json.Name }}",
+              "value": "={{ $('Token').item.json.Value }}"
+            }
+          ]
+        },
+        "sendBody": true,
+        "contentType": "form-urlencoded",
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "phone",
+              "value": "=5581983857230"
+            },
+            {
+              "name": "fileName",
+              "value": "M² de Box do dia"
+            },
+            {
+              "name": "document",
+              "value": "=https://marcolanoperacoes.s3.amazonaws.com/{{ $('ARQUIVO6').item.json.arq }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "5e6dca6a-fb69-4a1b-8437-fb7dc3969a34",
+      "name": "Annita2",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.1,
+      "position": [
+        944,
+        1616
+      ]
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Convert to File2": {
+      "main": [
+        [
+          {
+            "node": "AWS S35",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Wait2": {
+      "main": [
+        [
+          {
+            "node": "AWS S36",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "ARQUIVO2": {
+      "main": [
+        [
+          {
+            "node": "Postgres2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Postgres2": {
+      "main": [
+        [
+          {
+            "node": "Convert to File2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Dias": {
+      "main": [
+        [
+          {
+            "node": "Token",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Manuelle": {
+      "main": [
+        [
+          {
+            "node": "Wait2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "AWS S35": {
+      "main": [
+        [
+          {
+            "node": "Annita",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Manuelle",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Convert to File5": {
+      "main": [
+        [
+          {
+            "node": "AWS S312",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Wait5": {
+      "main": [
+        [
+          {
+            "node": "AWS S313",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "AWS S312": {
+      "main": [
+        [
+          {
+            "node": "Annita2",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Manuelle2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "ARQUIVO3": {
+      "main": [
+        [
+          {
+            "node": "Postgres6",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Postgres5": {
+      "main": [
+        [
+          {
+            "node": "Convert to File5",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Convert to File6": {
+      "main": [
+        [
+          {
+            "node": "AWS S314",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Wait6": {
+      "main": [
+        [
+          {
+            "node": "AWS S315",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "AWS S314": {
+      "main": [
+        [
+          {
+            "node": "Annita1",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Manuelle1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Postgres6": {
+      "main": [
+        [
+          {
+            "node": "Convert to File6",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Manuelle1": {
+      "main": [
+        [
+          {
+            "node": "Wait6",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Manuelle2": {
+      "main": [
+        [
+          {
+            "node": "Wait5",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "ARQUIVO6": {
+      "main": [
+        [
+          {
+            "node": "Postgres5",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Token": {
+      "main": [
+        [
+          {
+            "node": "ARQUIVO2",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "ARQUIVO3",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "ARQUIVO6",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Annita": {
+      "main": [
+        [
+          {
+            "node": "Wait2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Annita1": {
+      "main": [
+        [
+          {
+            "node": "Wait6",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Annita2": {
+      "main": [
+        [
+          {
+            "node": "Wait5",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": true,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "777fd200-2ddf-4d2f-a108-faaacdb00841",
+  "meta": {
+    "instanceId": "a5e8675e548a032fda81ee9dc775b4fc0a1b2003aee794fb0b37064013276a0f"
+  },
+  "id": "M0Sxrr0B77KZ7RKP",
+  "tags": [
+    {
+      "updatedAt": "2025-03-21T11:52:03.823Z",
+      "createdAt": "2025-03-21T11:52:03.823Z",
+      "id": "VQmA23kx6h1wy92X",
+      "name": "GUIS"
+    },
+    {
+      "updatedAt": "2025-03-24T14:24:48.667Z",
+      "createdAt": "2025-03-24T14:24:48.667Z",
+      "id": "DRs3JJesnD7xa1AS",
+      "name": "Setor - Comercial"
+    },
+    {
+      "updatedAt": "2025-08-15T17:47:41.613Z",
+      "createdAt": "2025-08-15T17:47:41.613Z",
+      "id": "7xlDyYK92ZS4jeuZ",
+      "name": "Manu"
+    },
+    {
+      "updatedAt": "2025-03-24T14:13:38.023Z",
+      "createdAt": "2025-03-24T14:13:38.023Z",
+      "id": "4ZyNuatpCj0NdhLU",
+      "name": "Bodinhos"
+    }
+  ]
+}

@@ -1,0 +1,356 @@
+{
+  "name": "Webhook - Cargas Vivix e Guardian",
+  "nodes": [
+    {
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "select \n    TO_CHAR(ROUND(SUM(replace(peso,',','.')::numeric),2), '9G999G999D99') AS peso_guardian_formatado,\n\tROUND(SUM(replace(peso,',','.')::numeric),2) as pesog \nfrom ( \n\tselect \n\t\temissor, \n\t\tdata_emissao::date, \n\t\tnfe, \n\t\tdestinario, \n\t\tpeso, \n\t\tnatureza_operacao \n\tfrom notas_fiscais nf \n\twhere \n\t\temissor like ('%GUARDIAN%') and natureza_operacao not like ('Rem%') \n\t\tand data_emissao::date >= TO_CHAR(NOW()::DATE, 'yyyy-mm-01')::date \n\tgroup by emissor, nfe, destinario, peso, natureza_operacao, data_emissao::date \n\torder by data_emissao::date desc \n) x",
+        "options": {}
+      },
+      "id": "93f6d068-8800-4f21-be80-b432eefcd6aa",
+      "name": "Guardian1",
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 2.3,
+      "position": [
+        528,
+        1344
+      ],
+      "credentials": {
+        "postgres": {
+          "id": "G50fA6A0L90xaBIe",
+          "name": "Postgres account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "select \n      TO_CHAR(ROUND(SUM(replace(peso,',','.')::numeric),2), '9G999G999D99') AS peso_vivix_formatado,\n\tROUND(SUM(replace(peso,',','.')::numeric),2) as pesov \nfrom ( \n\tselect \n\t\temissor, \n\t\tdata_emissao::date, \n\t\tnfe, \n\t\tdestinario, \n\t\tpeso, \n\t\tnatureza_operacao \n\tfrom notas_fiscais nf \n\twhere \n\t\temissor = 'COMPANHIA BRASILEIRA DE VIDROS PLAN - CBVP' \n\t\tand natureza_operacao not like ('Rem%') \n\t\tand data_emissao::date >= TO_CHAR(NOW()::DATE, 'yyyy-mm-01')::date \n\tgroup by emissor, nfe, destinario, peso, natureza_operacao, data_emissao::date \n\torder by data_emissao::date desc \n) x",
+        "options": {}
+      },
+      "id": "e3638fa5-8a1a-46ee-b694-85897eb0cd38",
+      "name": "Vivix1",
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 2.3,
+      "position": [
+        528,
+        1632
+      ],
+      "credentials": {
+        "postgres": {
+          "id": "G50fA6A0L90xaBIe",
+          "name": "Postgres account"
+        }
+      }
+    },
+    {
+      "parameters": {},
+      "id": "6c6211f9-74e5-476d-ae1b-b6580754c57d",
+      "name": "Merge2",
+      "type": "n8n-nodes-base.merge",
+      "typeVersion": 2.1,
+      "position": [
+        720,
+        1488
+      ]
+    },
+    {
+      "parameters": {
+        "fieldsToSummarize": {
+          "values": [
+            {
+              "aggregation": "concatenate",
+              "field": "pesog",
+              "separateBy": "\n"
+            },
+            {
+              "aggregation": "concatenate",
+              "field": "pesov",
+              "separateBy": "\n"
+            },
+            {
+              "aggregation": "sum"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "478cc2a9-1b0b-4cb7-bc02-461d51d524d7",
+      "name": "SummarizeV1",
+      "type": "n8n-nodes-base.summarize",
+      "typeVersion": 1,
+      "position": [
+        912,
+        1488
+      ]
+    },
+    {
+      "parameters": {
+        "fieldToSplitOut": "numeros",
+        "options": {}
+      },
+      "id": "47ef3ba2-9171-413b-8883-11d217bdd43f",
+      "name": "Split Out",
+      "type": "n8n-nodes-base.splitOut",
+      "typeVersion": 1,
+      "position": [
+        1264,
+        1488
+      ]
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "e7a9690f-2fa2-4093-b047-70ec59abc15c",
+              "name": "numeros",
+              "value": "=[\"5581996730645\"]",
+              "type": "array"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "43f82736-8800-4910-801d-be799a168e88",
+      "name": "Telefones",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.3,
+      "position": [
+        1088,
+        1488
+      ]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{ $('Token').item.json.Link }}send-text",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "={{ $('Token').item.json.Name }}",
+              "value": "={{ $('Token').item.json.Value }}"
+            }
+          ]
+        },
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "phone",
+              "value": "={{ $json.numeros }}"
+            },
+            {
+              "name": "message",
+              "value": "=----------------------------------------\nTOTAL CARREGADO ATÉ *{{ $now.day }}/{{ $now.month }}/{{ $now.year }}*\n\n*VIVIX:* {{ $('SummarizeV1').item.json[\"concatenated_pesov\"] }} KG\n*GUARDIAN:* {{ $('SummarizeV1').item.json[\"concatenated_pesog\"] }} KG\n-------------------------------------------"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "918bf9a2-486e-4f3a-b613-7e65799da1da",
+      "name": "Mensagem",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.1,
+      "position": [
+        1472,
+        1488
+      ]
+    },
+    {
+      "parameters": {
+        "documentId": {
+          "__rl": true,
+          "value": "https://docs.google.com/spreadsheets/d/1J9xHE08UPG2QnDrjFsiy3VU3Z8ziZT9aO9MF7ct5ruA/edit?usp=sharing",
+          "mode": "url"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 564051929,
+          "mode": "list",
+          "cachedResultName": "Token",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1J9xHE08UPG2QnDrjFsiy3VU3Z8ziZT9aO9MF7ct5ruA/edit#gid=564051929"
+        },
+        "options": {}
+      },
+      "id": "273a492d-7928-4fab-a561-4952a367ac26",
+      "name": "Token",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.3,
+      "position": [
+        272,
+        1488
+      ],
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "HfbTEVMQHA5O66Ya",
+          "name": "Sheets JG e Japa"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "e7a9690f-2fa2-4093-b047-70ec59abc15c",
+              "name": "numeros",
+              "value": "=[\"5581981598765\",\"5581996730645\",\"5581981308564\",\"5581996177351\",\"5582999410447\"]",
+              "type": "array"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "fb3ff00f-2c5e-4aa2-a8ec-779836990202",
+      "name": "NÚMEROS COMPLETOS",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.3,
+      "position": [
+        1072,
+        1760
+      ]
+    },
+    {
+      "parameters": {
+        "path": "c2374d63-80c7-4517-8107-78b94c0cc5c7",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2.1,
+      "position": [
+        32,
+        1488
+      ],
+      "id": "a2b5263b-4df6-445f-969a-db53cca25885",
+      "name": "Webhook",
+      "webhookId": "c2374d63-80c7-4517-8107-78b94c0cc5c7"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Guardian1": {
+      "main": [
+        [
+          {
+            "node": "Merge2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Vivix1": {
+      "main": [
+        [
+          {
+            "node": "Merge2",
+            "type": "main",
+            "index": 1
+          }
+        ]
+      ]
+    },
+    "Merge2": {
+      "main": [
+        [
+          {
+            "node": "SummarizeV1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "SummarizeV1": {
+      "main": [
+        [
+          {
+            "node": "Telefones",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Split Out": {
+      "main": [
+        [
+          {
+            "node": "Mensagem",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Telefones": {
+      "main": [
+        [
+          {
+            "node": "Split Out",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Token": {
+      "main": [
+        [
+          {
+            "node": "Guardian1",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Vivix1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Webhook": {
+      "main": [
+        [
+          {
+            "node": "Token",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "5d7f9207-5fb3-4ee3-bb12-e42a9d607d96",
+  "meta": {
+    "instanceId": "a5e8675e548a032fda81ee9dc775b4fc0a1b2003aee794fb0b37064013276a0f"
+  },
+  "id": "FbRlBNb6U3pILnrv",
+  "tags": [
+    {
+      "updatedAt": "2025-03-21T11:52:53.040Z",
+      "createdAt": "2025-03-21T11:52:53.040Z",
+      "id": "9sBc8DYqQwfJKaa4",
+      "name": "Setor - Data Science"
+    },
+    {
+      "updatedAt": "2025-03-24T14:35:52.840Z",
+      "createdAt": "2025-03-24T14:35:52.840Z",
+      "id": "sPkE8K1cDKi4JAee",
+      "name": "Diretoria"
+    },
+    {
+      "updatedAt": "2025-03-21T11:52:03.823Z",
+      "createdAt": "2025-03-21T11:52:03.823Z",
+      "id": "VQmA23kx6h1wy92X",
+      "name": "GUIS"
+    }
+  ]
+}

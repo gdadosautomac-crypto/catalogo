@@ -1,0 +1,146 @@
+{
+  "name": "Webhook GUIS",
+  "nodes": [
+    {
+      "parameters": {
+        "workflowId": "OAWhTdUTCjf6wHRY",
+        "options": {}
+      },
+      "id": "89145637-66cf-4fb4-afff-5df724b5c789",
+      "name": "CHATS GUIS",
+      "type": "n8n-nodes-base.executeWorkflow",
+      "typeVersion": 1,
+      "position": [
+        0,
+        0
+      ],
+      "onError": "continueRegularOutput"
+    },
+    {
+      "parameters": {
+        "workflowId": "FgxAMuCab6eFwxvK",
+        "options": {}
+      },
+      "id": "f7c39a46-0ab5-48de-bea9-66d90c20cb40",
+      "name": "CARGAS",
+      "type": "n8n-nodes-base.executeWorkflow",
+      "typeVersion": 1,
+      "position": [
+        0,
+        192
+      ],
+      "onError": "continueRegularOutput"
+    },
+    {
+      "parameters": {
+        "workflowId": "BflK0M4fnGmzogoW",
+        "options": {}
+      },
+      "id": "23902c65-5291-4e3d-9964-582557f4eb82",
+      "name": "Consultar Producao",
+      "type": "n8n-nodes-base.executeWorkflow",
+      "typeVersion": 1,
+      "position": [
+        0,
+        368
+      ],
+      "onError": "continueRegularOutput"
+    },
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "7ab824bc-c595-4e47-8e57-cfb66f37e6b2",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "position": [
+        -256,
+        208
+      ],
+      "id": "52746989-bb1a-41d2-a504-50b06302fdfd",
+      "name": "Webhook",
+      "webhookId": "7ab824bc-c595-4e47-8e57-cfb66f37e6b2"
+    },
+    {
+      "parameters": {
+        "workflowId": {
+          "__rl": true,
+          "value": "bwTtUqQReGB3skSb",
+          "mode": "list",
+          "cachedResultUrl": "/workflow/bwTtUqQReGB3skSb",
+          "cachedResultName": "Teste Guilherme"
+        },
+        "workflowInputs": {
+          "mappingMode": "defineBelow",
+          "value": {},
+          "matchingColumns": [],
+          "schema": [],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": true
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.executeWorkflow",
+      "typeVersion": 1.3,
+      "position": [
+        -224,
+        784
+      ],
+      "id": "2da14c02-dd07-4df2-9e0f-ccd8b670be0d",
+      "name": "Call 'Teste Guilherme'"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Webhook": {
+      "main": [
+        [
+          {
+            "node": "CARGAS",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "CHATS GUIS",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Consultar Producao",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Call 'Teste Guilherme'",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": true,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "624586d4-750c-4c84-a280-ec4bede3db8e",
+  "meta": {
+    "instanceId": "a5e8675e548a032fda81ee9dc775b4fc0a1b2003aee794fb0b37064013276a0f"
+  },
+  "id": "4rrDDOx0RP5JXn7j",
+  "tags": [
+    {
+      "updatedAt": "2025-03-21T11:52:03.823Z",
+      "createdAt": "2025-03-21T11:52:03.823Z",
+      "id": "VQmA23kx6h1wy92X",
+      "name": "GUIS"
+    },
+    {
+      "updatedAt": "2025-03-21T11:52:53.040Z",
+      "createdAt": "2025-03-21T11:52:53.040Z",
+      "id": "9sBc8DYqQwfJKaa4",
+      "name": "Setor - Data Science"
+    }
+  ]
+}

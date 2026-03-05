@@ -1,0 +1,368 @@
+{
+  "name": "Total Expedido no Mês",
+  "nodes": [
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "triggerAtHour": 19
+            },
+            {
+              "field": "months",
+              "triggerAtMinute": 10
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.2,
+      "position": [
+        -768,
+        -128
+      ],
+      "id": "ea40fb99-2982-490d-b41f-e4b6d7ecc66d",
+      "name": "Schedule Trigger"
+    },
+    {
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "select unidade, TO_CHAR(Entregue, 'L 99G999G999D99') as Total, CONCAT(unidade, ': ', TO_CHAR(Entregue, 'L 99G999G999D99')) as Formatado, Entregue  from (\nselect \neg.unidade,\nround(sum(valor_entregue + coalesce(acrescimo,0))::numeric,2) as Entregue\nfrom entregas_geral eg \nleft join unidades u on u.unidade = eg.unidade \nwhere data_hora_entregue::date >= TO_CHAR(NOW()::DATE, 'YYYY-MM-01')::DATE and u.ativo = 'S'\ngroup by eg.unidade\norder by round(sum(valor_entregue + coalesce(acrescimo,0))::numeric,2) desc ) x ",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 2.6,
+      "position": [
+        -496,
+        -128
+      ],
+      "id": "5f804043-7d7c-4d6a-9628-70d0f1059cb5",
+      "name": "Postgres",
+      "credentials": {
+        "postgres": {
+          "id": "G50fA6A0L90xaBIe",
+          "name": "Postgres account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "e961a749-87c0-47b7-8de4-ec816a6ed3ff",
+              "name": "ValorUnidade",
+              "value": "=__________________________________\n{{ $json.unidade }}: {{ $json.total }}",
+              "type": "string"
+            },
+            {
+              "id": "89f4ad37-d7e6-4882-9a5a-df68881d6c4a",
+              "name": "Vendido",
+              "value": "={{ $json.entregue }}",
+              "type": "number"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        -256,
+        -128
+      ],
+      "id": "4f7ed64a-c405-4cde-a206-cb8e56bf1a89",
+      "name": "Edit Fields"
+    },
+    {
+      "parameters": {
+        "fieldsToSummarize": {
+          "values": [
+            {
+              "aggregation": "concatenate",
+              "field": "ValorUnidade",
+              "separateBy": "\n"
+            },
+            {
+              "aggregation": "sum",
+              "field": "Vendido"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.summarize",
+      "typeVersion": 1.1,
+      "position": [
+        32,
+        -128
+      ],
+      "id": "109f3947-cd29-4900-8221-778ef82f920b",
+      "name": "Summarize"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "1d69195c-0a57-470a-a86b-68f1674100ec",
+              "leftValue": "={{ $json.Ativo }}",
+              "rightValue": "S",
+              "operator": {
+                "type": "string",
+                "operation": "equals",
+                "name": "filter.operator.equals"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        784,
+        -256
+      ],
+      "id": "7425085e-b09d-45e1-890b-23d920aff88a",
+      "name": "If"
+    },
+    {
+      "parameters": {
+        "documentId": {
+          "__rl": true,
+          "value": "15HPki5ZkSM5rYB30tLEBEzLqD6gbcUyfPi_nisHSYGQ",
+          "mode": "list",
+          "cachedResultName": "TelefonesFaturamento",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/15HPki5ZkSM5rYB30tLEBEzLqD6gbcUyfPi_nisHSYGQ/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "FaturamentoGrupo",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/15HPki5ZkSM5rYB30tLEBEzLqD6gbcUyfPi_nisHSYGQ/edit#gid=0"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.5,
+      "position": [
+        592,
+        -256
+      ],
+      "id": "816f542d-64eb-440e-b3ca-8b48289fa595",
+      "name": "Telefones",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "8Ytd3zZKAOSyZNqC",
+          "name": "Sheets Andre"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "65c8f02d-4a53-4f7d-b482-09b4cf370bf7",
+              "name": "",
+              "value": "=*TOTAL EXPEDIDO NO MÊS*\n*{{ $json.Vendas }}*\n{{ $('Summarize').item.json.concatenated_ValorUnidade }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        368,
+        -256
+      ],
+      "id": "0aa33016-fb72-438c-8ac5-f9c8808207ed",
+      "name": "Texto Formatado"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "88c3f5b0-e656-472b-8982-6dc55144d04f",
+              "name": "Vendas",
+              "value": "={{ $json.sum_Vendido.toLocaleString(\"pt\", { style: \"currency\", currency: \"BRL\" }) }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        160,
+        -256
+      ],
+      "id": "a5768e38-815b-4edd-bf9d-d2ace2ad881f",
+      "name": "Total Formatado"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "=https://api.z-api.io/instances/3AD47F49CE9AF04B4D43CA225862B38B/token/6EE2B07CF6D61B0059AD2125/send-text",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Client-Token",
+              "value": "Fb834c77bdcad40999dcb28212a96a9a0S"
+            }
+          ]
+        },
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "phone",
+              "value": "={{ $json.Telefone }}"
+            },
+            {
+              "name": "message",
+              "value": "={{ $('Texto Formatado').item.json[''] }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "417facec-8168-4c6e-b3d0-61d08541eeb6",
+      "name": "Disparo de Mensagens",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.1,
+      "position": [
+        1072,
+        -288
+      ]
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Schedule Trigger": {
+      "main": [
+        [
+          {
+            "node": "Postgres",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Postgres": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Edit Fields": {
+      "main": [
+        [
+          {
+            "node": "Summarize",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Summarize": {
+      "main": [
+        [
+          {
+            "node": "Total Formatado",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If": {
+      "main": [
+        [
+          {
+            "node": "Disparo de Mensagens",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Telefones": {
+      "main": [
+        [
+          {
+            "node": "If",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Texto Formatado": {
+      "main": [
+        [
+          {
+            "node": "Telefones",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Total Formatado": {
+      "main": [
+        [
+          {
+            "node": "Texto Formatado",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Disparo de Mensagens": {
+      "main": [
+        []
+      ]
+    }
+  },
+  "active": true,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "8f74d0ae-a50a-4637-8ecd-baf965eb57ab",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "a5e8675e548a032fda81ee9dc775b4fc0a1b2003aee794fb0b37064013276a0f"
+  },
+  "id": "zTmvj4J9FENRqgzF",
+  "tags": [
+    {
+      "updatedAt": "2025-03-21T11:52:03.823Z",
+      "createdAt": "2025-03-21T11:52:03.823Z",
+      "id": "VQmA23kx6h1wy92X",
+      "name": "GUIS"
+    }
+  ]
+}

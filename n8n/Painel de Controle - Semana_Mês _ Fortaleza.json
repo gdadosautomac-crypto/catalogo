@@ -1,0 +1,412 @@
+{
+  "name": "Painel de Controle - Semana/Mês | Fortaleza",
+  "nodes": [
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "field": "weeks",
+              "triggerAtDay": [
+                1,
+                2,
+                3,
+                4,
+                5,
+                0
+              ],
+              "triggerAtHour": 7,
+              "triggerAtMinute": 7
+            }
+          ]
+        }
+      },
+      "id": "50a66bfd-fbd5-499b-a3ca-bab17eedf517",
+      "name": "Schedule Trigger1",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.1,
+      "position": [
+        -1472,
+        560
+      ]
+    },
+    {
+      "parameters": {
+        "documentId": {
+          "__rl": true,
+          "value": "https://docs.google.com/spreadsheets/d/1J9xHE08UPG2QnDrjFsiy3VU3Z8ziZT9aO9MF7ct5ruA/edit?usp=sharing",
+          "mode": "url"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 564051929,
+          "mode": "list",
+          "cachedResultName": "Token",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1J9xHE08UPG2QnDrjFsiy3VU3Z8ziZT9aO9MF7ct5ruA/edit#gid=564051929"
+        },
+        "options": {}
+      },
+      "id": "e2cea344-1244-40b3-9260-518402a872c9",
+      "name": "Token1",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.3,
+      "position": [
+        -1280,
+        560
+      ],
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "8Ytd3zZKAOSyZNqC",
+          "name": "Sheets Andre"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "select \n\t'MÊS'as Periodo, \n\tround(sum(eg.valor_entregue),2) as Faturado, \n\tto_char((sum(eg.valor_entregue)/2400000) * 100, 'FM999G990D00') || '%' as Margem_Bruta,\n\tround(sum(eg.custo_entregue),2) as Custo,\n\tto_char((sum(eg.custo_entregue)/sum(eg.valor_entregue)) * 100, 'FM999G990D00') || '%' as Custo_Direto,\n\tdesp.despesas,\n\tto_char((desp.despesas/sum(eg.valor_entregue)) * 100, 'FM999G990D00') || '%' as Desp_Oper\nfrom entregas_geral eg \n\tleft join (\n\t\tselect \n\t\t\tunidade, \n\t\t\tround(sum(replace(mf.vlr_pago,',','.')::numeric),2) as despesas\n\t\tfrom movimentacoes_financeiras mf\n\t\twhere \n\t\t\tunidade = 'FORTALEZA' \n\t\t\tand mf.data_pagamento::date between '2026-01-01' and NOW()\n\t\t\tand mf.tipo_de_lancamento = 'Saida'\n\t\t\tand classificacao in ('1. Pessoal', '2.Ocupação', '3. Gastos Operacionais')\n\t\tgroup by unidade\n\t) desp on eg.unidade = desp.unidade \nwhere \n\teg.unidade = 'FORTALEZA' \n\tand eg.data_hora_entregue::date between '2026-01-01' and NOW()\ngroup by eg.unidade, desp.despesas",
+        "options": {}
+      },
+      "id": "c2cc47bc-b877-4be4-b692-58359b1d014d",
+      "name": "Postgres",
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 2.3,
+      "position": [
+        -1088,
+        480
+      ],
+      "credentials": {
+        "postgres": {
+          "id": "G50fA6A0L90xaBIe",
+          "name": "Postgres account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "select \n\t'SEMANA' as Periodo1, \n\tround(sum(eg.valor_entregue),2) as Faturado1, \n\tto_char((sum(eg.valor_entregue)/2400000) * 100, 'FM999G990D00') || '%' as Margem_Bruta1,\n\tround(sum(eg.custo_entregue),2) as Custo1,\n\tto_char((sum(eg.custo_entregue)/sum(eg.valor_entregue)) * 100, 'FM999G990D00') || '%' as Custo_Direto1,\n\tdesp.despesas1,\n\tto_char((desp.despesas1/sum(eg.valor_entregue)) * 100, 'FM999G990D00') || '%' as Desp_Oper1\nfrom entregas_geral eg \n\tleft join (\n\t\tselect \n\t\t\tunidade, \n\t\t\tround(sum(replace(mf.vlr_pago,',','.')::numeric),2) as despesas1\n\t\tfrom movimentacoes_financeiras mf\n\t\twhere \n\t\t\tunidade = 'FORTALEZA' \n\t\t\tand mf.data_pagamento::date >= NOW() - '1 WEEK'::interval \n\t\t\tand mf.tipo_de_lancamento = 'Saida'\n\t\t\tand classificacao in ('1. Pessoal', '2.Ocupação', '3. Gastos Operacionais')\n\t\tgroup by unidade\n\t) desp on eg.unidade = desp.unidade \nwhere \n\teg.unidade = 'FORTALEZA' \n\tand eg.data_hora_entregue::date >= NOW() - '1 WEEK'::interval \ngroup by eg.unidade, desp.despesas1",
+        "options": {}
+      },
+      "id": "01f1d2fe-ecdc-4dff-be94-c0b8ca9c287b",
+      "name": "Postgres1",
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 2.3,
+      "position": [
+        -1088,
+        656
+      ],
+      "credentials": {
+        "postgres": {
+          "id": "G50fA6A0L90xaBIe",
+          "name": "Postgres account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "(\nselect \n\t'MÊS'as Periodo, \n\tround(sum(eg.valor_entregue),2) as Faturado, \n\tto_char((sum(eg.valor_entregue)/2400000) * 100, 'FM999G990D00') || '%' as Margem_Bruta,\n\tround(sum(eg.custo_entregue),2) as Custo,\n\tto_char((sum(eg.custo_entregue)/sum(eg.valor_entregue)) * 100, 'FM999G990D00') || '%' as Custo_Direto,\n\tdesp.despesas,\n\tto_char((desp.despesas/sum(eg.valor_entregue)) * 100, 'FM999G990D00') || '%' as Desp_Oper\nfrom entregas_geral eg \n\tleft join (\n\t\tselect \n\t\t\tunidade, \n\t\t\tround(sum(replace(mf.vlr_pago,',','.')::numeric),2) as despesas\n\t\tfrom movimentacoes_financeiras mf\n\t\twhere \n\t\t\tunidade = 'FORTALEZA' \n\t\t\tand mf.data_pagamento::date between '2026-01-01' and NOW()\n\t\t\tand mf.tipo_de_lancamento = 'Saida'\n\t\t\tand classificacao in ('1. Pessoal', '2.Ocupação', '3. Gastos Operacionais')\n\t\tgroup by unidade\n\t) desp on eg.unidade = desp.unidade \nwhere \n\teg.unidade = 'FORTALEZA' \n\tand eg.data_hora_entregue::date between '2026-01-01' and NOW()\ngroup by eg.unidade, desp.despesas\n) union all (\nselect \n\t'SEMANA' as PeriodoS, \n\tround(sum(eg.valor_entregue),2) as FaturadoS, \n\tto_char((sum(eg.valor_entregue)/2400000) * 100, 'FM999G990D00') || '%' as Margem_BrutaS,\n\tround(sum(eg.custo_entregue),2) as CustoS,\n\tto_char((sum(eg.custo_entregue)/sum(eg.valor_entregue)) * 100, 'FM999G990D00') || '%' as Custo_DiretoS,\n\tdesp.despesasS,\n\tto_char((desp.despesasS/sum(eg.valor_entregue)) * 100, 'FM999G990D00') || '%' as Desp_OperS\nfrom entregas_geral eg \n\tleft join (\n\t\tselect \n\t\t\tunidade, \n\t\t\tround(sum(replace(mf.vlr_pago,',','.')::numeric),2) as despesasS\n\t\tfrom movimentacoes_financeiras mf\n\t\twhere \n\t\t\tunidade = 'FORTALEZA' \n\t\t\tand mf.data_pagamento::date >= NOW() - '1 WEEK'::interval \n\t\t\tand mf.tipo_de_lancamento = 'Saida'\n\t\t\tand classificacao in ('1. Pessoal', '2.Ocupação', '3. Gastos Operacionais')\n\t\tgroup by unidade\n\t) desp on eg.unidade = desp.unidade \nwhere \n\teg.unidade = 'FORTALEZA' \n\tand eg.data_hora_entregue::date >= NOW() - '1 WEEK'::interval \ngroup by eg.unidade, desp.despesasS\n)",
+        "options": {}
+      },
+      "id": "a7930123-7ae2-48db-83ab-9c30ed424228",
+      "name": "Postgres2",
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 2.3,
+      "position": [
+        -880,
+        192
+      ],
+      "credentials": {
+        "postgres": {
+          "id": "G50fA6A0L90xaBIe",
+          "name": "Postgres account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "fieldsToSummarize": {
+          "values": [
+            {
+              "aggregation": "concatenate",
+              "field": "MÊS",
+              "separateBy": "\n"
+            },
+            {
+              "aggregation": "concatenate",
+              "field": "SEMANA",
+              "separateBy": "\n"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.summarize",
+      "typeVersion": 1.1,
+      "position": [
+        -496,
+        560
+      ],
+      "id": "732605c3-342d-455b-91c0-c354602d213f",
+      "name": "Summarize"
+    },
+    {
+      "parameters": {},
+      "id": "ce5ca9c8-fb24-4761-8886-96bbca707bb3",
+      "name": "Merge",
+      "type": "n8n-nodes-base.merge",
+      "typeVersion": 2.1,
+      "position": [
+        -688,
+        560
+      ]
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "c9777b34-96c3-49cb-9e8f-5171d677c039",
+              "name": "MÊS",
+              "value": "={{ $json.faturado }}\n{{ $json.margem_bruta }}\n{{ $json.custo }}\n{{ $json.custo_direto }}\n{{ $json.despesas }}\n{{ $json.desp_oper }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "7e2fd8be-2419-4884-9ed5-f5783b95f7c9",
+      "name": "ARQUIVO1",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.3,
+      "position": [
+        -880,
+        480
+      ]
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "c9777b34-96c3-49cb-9e8f-5171d677c039",
+              "name": "SEMANA",
+              "value": "={{ $json.faturado1 }}\n{{ $json.margem_bruta1 }}\n{{ $json.custo1 }}\n{{ $json.custo_direto1 }}\n{{ $json.despesas1 }}\n{{ $json.desp_oper1 }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "83cfe369-b32e-4371-ac18-c15c1df2dae7",
+      "name": "ARQUIVO2",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.3,
+      "position": [
+        -880,
+        656
+      ]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{ $('Token1').item.json.Link }}send-document/xlsx",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "={{ $('Token1').item.json.Name }}",
+              "value": "={{ $('Token1').item.json.Value }}"
+            }
+          ]
+        },
+        "sendBody": true,
+        "contentType": "form-urlencoded",
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "phone",
+              "value": "=5581981598765"
+            },
+            {
+              "name": "message",
+              "value": "=META: R$ 2.400.000,00\n\n              SEMANA                MÊS\nFat  -  R$ {{ $('Postgres1').item.json.faturado1 }}   R$ {{ $('Postgres').item.json.faturado }}\nCust -  R$ {{ $('Postgres1').item.json.custo1 }}   R$ {{ $('Postgres').item.json.custo }}\nDesp -  R$ {{ $('Postgres1').item.json.despesas1 }}   R$ {{ $('Postgres').item.json.despesas }}\n\n\n         SEMANA      MÊS\nMB% -   {{ $('Postgres1').item.json.margem_bruta1 }}     {{ $('Postgres').item.json.margem_bruta }}\nCD% -   {{ $('Postgres1').item.json.custo_direto1 }}     {{ $('Postgres').item.json.custo_direto }}\nDO% -   {{ $('Postgres1').item.json.desp_oper1 }}     {{ $('Postgres').item.json.desp_oper }}\n\n"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "64002753-6ca3-4408-b8d7-e194aed6f943",
+      "name": "TESTE JOÃO",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.1,
+      "position": [
+        -528,
+        192
+      ]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{ $('Token1').item.json.Link }}send-document/xlsx",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "={{ $('Token1').item.json.Name }}",
+              "value": "={{ $('Token1').item.json.Value }}"
+            }
+          ]
+        },
+        "sendBody": true,
+        "contentType": "form-urlencoded",
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "phone",
+              "value": "=5581987473570"
+            },
+            {
+              "name": "message",
+              "value": "=META: R$ 2.400.000,00\n\n              SEMANA                MÊS\nFat  -  R$ {{ $('Postgres1').item.json.faturado1 }}   R$ {{ $('Postgres').item.json.faturado }}\nCust -  R$ {{ $('Postgres1').item.json.custo1 }}   R$ {{ $('Postgres').item.json.custo }}\nDesp -  R$ {{ $('Postgres1').item.json.despesas1 }}   R$ {{ $('Postgres').item.json.despesas }}\n\n\n         SEMANA      MÊS\nMB% -   {{ $('Postgres1').item.json.margem_bruta1 }}     {{ $('Postgres').item.json.margem_bruta }}\nCD% -   {{ $('Postgres1').item.json.custo_direto1 }}     {{ $('Postgres').item.json.custo_direto }}\nDO% -   {{ $('Postgres1').item.json.desp_oper1 }}     {{ $('Postgres').item.json.desp_oper }}\n\n"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "4502ccda-a7d9-4c9d-88cf-2e91b285ff17",
+      "name": "TESTE ANDRÉ",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.1,
+      "position": [
+        -320,
+        560
+      ]
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Schedule Trigger1": {
+      "main": [
+        [
+          {
+            "node": "Token1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Token1": {
+      "main": [
+        [
+          {
+            "node": "Postgres1",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Postgres",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Postgres": {
+      "main": [
+        [
+          {
+            "node": "ARQUIVO1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Postgres1": {
+      "main": [
+        [
+          {
+            "node": "ARQUIVO2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Postgres2": {
+      "main": [
+        [
+          {
+            "node": "TESTE JOÃO",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Summarize": {
+      "main": [
+        [
+          {
+            "node": "TESTE ANDRÉ",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Merge": {
+      "main": [
+        [
+          {
+            "node": "Summarize",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "ARQUIVO1": {
+      "main": [
+        [
+          {
+            "node": "Merge",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "ARQUIVO2": {
+      "main": [
+        [
+          {
+            "node": "Merge",
+            "type": "main",
+            "index": 1
+          }
+        ]
+      ]
+    }
+  },
+  "active": true,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "a318aaed-02b9-4ad4-930b-3e9c55b92465",
+  "meta": {
+    "instanceId": "a5e8675e548a032fda81ee9dc775b4fc0a1b2003aee794fb0b37064013276a0f"
+  },
+  "id": "9q8fSkCUqIcJ2zKj",
+  "tags": [
+    {
+      "updatedAt": "2026-01-14T11:04:00.895Z",
+      "createdAt": "2025-03-21T11:47:30.374Z",
+      "id": "CvCy3KNJKyMxSQ3C",
+      "name": "GDA"
+    }
+  ]
+}

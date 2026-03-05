@@ -1,0 +1,280 @@
+{
+  "name": "Recebimento Mercadoria - Allglass Tempera",
+  "nodes": [
+    {
+      "parameters": {
+        "documentId": {
+          "__rl": true,
+          "value": "https://docs.google.com/spreadsheets/d/1avLuf5Qpu0lBIFVS-Ny0j-iIFZGkVqqufVGy-sfbqM4/edit?usp=sharing",
+          "mode": "url"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "Página1",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1avLuf5Qpu0lBIFVS-Ny0j-iIFZGkVqqufVGy-sfbqM4/edit#gid=0"
+        },
+        "options": {}
+      },
+      "id": "c63224ac-0f1e-4176-b76f-9406899f4d2d",
+      "name": "Google Sheets",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.3,
+      "position": [
+        -1088,
+        -128
+      ],
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "8Ytd3zZKAOSyZNqC",
+          "name": "Sheets Andre"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "c9777b34-96c3-49cb-9e8f-5171d677c039",
+              "name": "link",
+              "value": "={{ $json.Link }}",
+              "type": "string"
+            },
+            {
+              "id": "c29c9cfb-b76e-4088-b0ca-7748646d4779",
+              "name": "link1",
+              "value": "={{ $json.Value }}",
+              "type": "string"
+            },
+            {
+              "id": "a2465349-2aee-4dc2-8ce6-9a40bf305fa7",
+              "name": "link2",
+              "value": "={{ $json.Field }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "67ea3a6a-1c4a-42dc-a10f-2d544739b0b4",
+      "name": "AUTH",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.3,
+      "position": [
+        -864,
+        -128
+      ]
+    },
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "field": "hours",
+              "triggerAtMinute": 59
+            }
+          ]
+        }
+      },
+      "id": "ade2c99d-d78c-44ba-81d9-2b97f301f61a",
+      "name": "Schedule Trigger",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.1,
+      "position": [
+        -1296,
+        -128
+      ]
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "5d9a1bb1-60c6-4d0b-8564-0f9ca0263290",
+              "name": "cod_pedido",
+              "value": "={{ $json.cod_pedido }}",
+              "type": "string"
+            },
+            {
+              "id": "98b3dae1-6db6-4db8-9458-e5fb1e678f92",
+              "name": "cod_fornec",
+              "value": "={{ $json.cod_fornec }}",
+              "type": "string"
+            },
+            {
+              "id": "050564f5-ce52-4fc8-842d-8da247962904",
+              "name": "fornecedor",
+              "value": "={{ $json.fornecedor }}",
+              "type": "string"
+            },
+            {
+              "id": "dc5cec5b-3f0f-4335-b8fc-acd98a8fb808",
+              "name": "descricao_produto",
+              "value": "={{ $json.descricao_produto }}",
+              "type": "string"
+            },
+            {
+              "id": "cbac54a6-0780-45bd-b237-4a5868bfbee9",
+              "name": "qtd_produto",
+              "value": "={{ $json.qtd_produto }}",
+              "type": "string"
+            },
+            {
+              "id": "cd4b939f-d2b0-49da-ae8e-5f68ce09a4fb",
+              "name": "valor_produto",
+              "value": "={{ $json.valor_produto }}",
+              "type": "string"
+            },
+            {
+              "id": "9e8d4be5-8575-4fb5-88f1-5ee7c0c29ce1",
+              "name": "valor_recebido",
+              "value": "={{ $json.valor_recebido }}",
+              "type": "string"
+            },
+            {
+              "id": "b75c01f0-288f-4e07-99a8-d9b529404745",
+              "name": "data_entrega",
+              "value": "={{ $json.data_entrega }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "5123c807-2df5-442c-b668-f072f317665f",
+      "name": "formata_document",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.3,
+      "position": [
+        -448,
+        -128
+      ],
+      "onError": "continueRegularOutput"
+    },
+    {
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "SELECT  \n    m.NU_PCO as cod_pedido,\n    m3.ds_for AS fornecedor,\n    m.DS_PRO_FORNEC AS descricao_produto,\n    m3.NU_FOR as cod_fornec,\n    ROUND(m.QTDE_PCO) AS qtd_produto,\n    REPLACE(ROUND(m.VLR_PCO, 2), '.', ',') AS valor_produto,\n    m.NU_NF AS numero_nf_ROM,\n    n.DT_ENTREGA AS data_entrega,\n    n.NU_NF AS numero_nf_nfp,\n    m.QT_ALTURA,\n    m.QT_LARGURA,\n    m.QT_METRAG_COB,\n    CASE \n        WHEN m.QT_METRAG_COB = 0 \n        THEN REPLACE(ROUND(m.QTDE_PCO * m.VLR_PCO, 2), '.', ',') \n        ELSE REPLACE(ROUND(m.VLR_PCO * m.QT_METRAG_COB, 2), '.', ',')\n    END AS valor_recebido,\n    CASE \n        WHEN m.QT_METRAG_COB = 0 \n        THEN REPLACE(ROUND(m.QTDE_PCO * m.VLR_PCO, 2), '.', ',') \n        ELSE NULL\n    END AS valor_recebido_qtde,\n    CASE \n        WHEN m.QT_METRAG_COB != 0 \n        THEN REPLACE(ROUND(m.VLR_PCO * m.QT_METRAG_COB, 2), '.', ',')\n        ELSE NULL \n    END AS valor_recebido_metragem\nFROM\n    mgpco01013 m\nLEFT JOIN\n    mgpco01012 n ON m.NU_NFP = n.NU_NFP\nJOIN\n    mgpco01011 p ON m.NU_DPC = p.NU_DPC\nJOIN\n    mgpco01010 m2 ON m.NU_PCO = m2.NU_PCO\nJOIN\n    mgfor01010 m3 ON m2.NU_FOR = m3.NU_FOR\nWHERE \n    n.DT_ENTREGA >= DATE_SUB(NOW(), INTERVAL 1 HOUR);",
+        "options": {
+          "connectionTimeoutMillis": 10
+        }
+      },
+      "id": "c560c1dd-8334-4283-b857-5f564d999cef",
+      "name": "MySQL1",
+      "type": "n8n-nodes-base.mySql",
+      "typeVersion": 2.2,
+      "position": [
+        -656,
+        -128
+      ],
+      "executeOnce": false,
+      "retryOnFail": false,
+      "alwaysOutputData": false,
+      "credentials": {
+        "mySql": {
+          "id": "9Fm6ts2icBmo69Z3",
+          "name": "MySQL - AllGlass Tempera"
+        }
+      },
+      "onError": "continueRegularOutput"
+    },
+    {
+      "parameters": {
+        "phone": "558198130-8564",
+        "text": "=-------- Auditoria Recebimento de Mercadoria --------\nUnidade: *Allglass Tempera*\nCod Pedido: *{{ $json.cod_pedido }}*\nFornecedor: *{{ $json.fornecedor }}*\nDescricao Produto: *{{ $json.descricao_produto }}*\nQtde: *{{ $json.qtd_produto }}*\nValor Produto: *R$ {{ $json.valor_produto }}*\nValor Recebido: *R$ {{ $json.valor_recebido }}*\nData Recebimento: *{{ $json.data_entrega }}*",
+        "additionalFields": {}
+      },
+      "type": "n8n-nodes-zapi.zapi",
+      "typeVersion": 1,
+      "position": [
+        -240,
+        -128
+      ],
+      "id": "ba66b8ab-3db7-48e1-a586-1757fa60d6a4",
+      "name": "Z-API",
+      "credentials": {
+        "zapiApi": {
+          "id": "cGI15AvSkFAV8Qrr",
+          "name": "Z-API account"
+        }
+      }
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Google Sheets": {
+      "main": [
+        [
+          {
+            "node": "AUTH",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "AUTH": {
+      "main": [
+        [
+          {
+            "node": "MySQL1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Schedule Trigger": {
+      "main": [
+        [
+          {
+            "node": "Google Sheets",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "formata_document": {
+      "main": [
+        [
+          {
+            "node": "Z-API",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "MySQL1": {
+      "main": [
+        [
+          {
+            "node": "formata_document",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "7b1d01b0-8e5c-4eaf-957a-2f09c00c146e",
+  "meta": {
+    "instanceId": "a5e8675e548a032fda81ee9dc775b4fc0a1b2003aee794fb0b37064013276a0f"
+  },
+  "id": "pG5YZ82gaCoqOST0",
+  "tags": [
+    {
+      "updatedAt": "2026-01-14T11:04:00.895Z",
+      "createdAt": "2025-03-21T11:47:30.374Z",
+      "id": "CvCy3KNJKyMxSQ3C",
+      "name": "GDA"
+    }
+  ]
+}

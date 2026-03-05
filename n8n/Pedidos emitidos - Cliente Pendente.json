@@ -1,0 +1,940 @@
+{
+  "name": "Pedidos emitidos - Cliente Pendente",
+  "nodes": [
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "field": "minutes",
+              "minutesInterval": 32
+            }
+          ]
+        }
+      },
+      "id": "1ccee14c-42bf-4af7-ae0f-c652cccdbadd",
+      "name": "Schedule Trigger",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.1,
+      "position": [
+        -240,
+        368
+      ]
+    },
+    {
+      "parameters": {
+        "documentId": {
+          "__rl": true,
+          "value": "https://docs.google.com/spreadsheets/d/1avLuf5Qpu0lBIFVS-Ny0j-iIFZGkVqqufVGy-sfbqM4/edit?gid=0#gid=0",
+          "mode": "url"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "Página1",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1avLuf5Qpu0lBIFVS-Ny0j-iIFZGkVqqufVGy-sfbqM4/edit#gid=0"
+        },
+        "options": {}
+      },
+      "id": "3377b69f-9932-474b-a146-fd977ac54b50",
+      "name": "Google Sheets",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.3,
+      "position": [
+        -48,
+        368
+      ],
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "8Ytd3zZKAOSyZNqC",
+          "name": "Sheets Andre"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "c9777b34-96c3-49cb-9e8f-5171d677c039",
+              "name": "link",
+              "value": "={{ $json.Link }}",
+              "type": "string"
+            },
+            {
+              "id": "c29c9cfb-b76e-4088-b0ca-7748646d4779",
+              "name": "link1",
+              "value": "={{ $json.Value }}",
+              "type": "string"
+            },
+            {
+              "id": "a2465349-2aee-4dc2-8ce6-9a40bf305fa7",
+              "name": "link2",
+              "value": "={{ $json.Field }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "23335fb9-c72a-4fae-a895-22efcf6fdf19",
+      "name": "AUTH",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.3,
+      "position": [
+        160,
+        368
+      ]
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "c9777b34-96c3-49cb-9e8f-5171d677c039",
+              "name": "arq",
+              "value": "=pedidos_pendentes",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {
+          "includeBinary": "={{ data }}"
+        }
+      },
+      "id": "684c9627-987c-480e-92c1-8eb65c2e66f7",
+      "name": "ARQUIVO",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.3,
+      "position": [
+        352,
+        368
+      ]
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "190552bf-997d-429c-a0fd-4b3d49dd3f01",
+              "name": "unidade_novo_pedido",
+              "value": "={{ $json.unidade_novo_pedido }}",
+              "type": "string"
+            },
+            {
+              "id": "4cf11985-1615-4dc6-a944-910b9a98007d",
+              "name": "cod_cliente",
+              "value": "={{ $json.cod_cliente }}",
+              "type": "string"
+            },
+            {
+              "id": "896e4fc6-cd28-4735-88d7-9acfc71b95a2",
+              "name": "nome_cliente",
+              "value": "={{ $json.nome_cliente }}",
+              "type": "string"
+            },
+            {
+              "id": "0da8e76b-c4c3-4bbb-9568-e9ff4bf82950",
+              "name": "Tipo_unidade",
+              "value": "={{ $json.tipo_unidade }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "f0e050e6-429d-4ca3-9214-014661f06bf5",
+      "name": "formata texto",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.3,
+      "position": [
+        1408,
+        80
+      ]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{ $('AUTH').item.json.link }}",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "={{ $('AUTH').item.json.link2 }}",
+              "value": "={{ $('AUTH').item.json.link1 }}"
+            }
+          ]
+        },
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "phone",
+              "value": "5581987473570"
+            },
+            {
+              "name": "=message",
+              "value": "=---- *PEDIDO EMITIDO PARA CLIENTE PENDENTE*\n\nUnidade: *{{ $json.unidade_novo_pedido }}*\nCod Cliente: *{{ $json.cod_cliente }}*\nNome Cliente: *{{ $json.nome_cliente }}*\n\n-------------------------------------------"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "561336f0-1150-4eb3-b51f-9b32b228df28",
+      "name": "André1",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.1,
+      "position": [
+        1584,
+        -16
+      ],
+      "disabled": true
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{ $('AUTH').item.json.link }}",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "={{ $('AUTH').item.json.link2 }}",
+              "value": "={{ $('AUTH').item.json.link1 }}"
+            }
+          ]
+        },
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "phone",
+              "value": "5581981308564"
+            },
+            {
+              "name": "message",
+              "value": "=---- *PEDIDO EMITIDO PARA CLIENTE PENDENTE*\n\nUnidade: *{{ $json.unidade_novo_pedido }}*\nCod Cliente: *{{ $json.cod_cliente }}*\nNome Cliente: *{{ $json.nome_cliente }}*\n\n-------------------------------------------"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "c1714b32-d64b-4c42-81c7-38db6b1f74ea",
+      "name": "Diego Marcolan",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.1,
+      "position": [
+        1584,
+        160
+      ],
+      "disabled": true
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict"
+          },
+          "conditions": [
+            {
+              "id": "eb81ce75-1eb7-46bf-bb93-3918ad8fcc0c",
+              "leftValue": "={{ $json.unidade_novo_pedido }}",
+              "rightValue": "={{ $json.unidade_pendente }}",
+              "operator": {
+                "type": "string",
+                "operation": "equals",
+                "name": "filter.operator.equals"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "id": "d23c3671-20f9-49b5-8311-fc920611dbc3",
+      "name": "If1",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2,
+      "position": [
+        1168,
+        368
+      ]
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "68659065-319c-45eb-af83-33d851914230",
+              "name": "unidade_novo_pedido",
+              "value": "={{ $json.unidade_novo_pedido }}",
+              "type": "string"
+            },
+            {
+              "id": "229df34e-147d-4fbe-99e0-87e5d4c3d852",
+              "name": "cod_cliente",
+              "value": "={{ $json.cod_cliente }}",
+              "type": "string"
+            },
+            {
+              "id": "ceeabfb4-93e7-4e4e-bddb-8bf8ed63d84c",
+              "name": "nome_cliente",
+              "value": "={{ $json.nome_cliente }}",
+              "type": "string"
+            },
+            {
+              "id": "64e3dcc6-23a7-4275-a966-bd3e2d9eb993",
+              "name": "unidade_pendente",
+              "value": "={{ $json.unidade_pendente }}",
+              "type": "string"
+            },
+            {
+              "id": "0c27301e-37af-4cda-81f5-06fb63e771e3",
+              "name": "Tipo_unidade",
+              "value": "={{ $json.tipo_unidade }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "b396397b-d6a9-4463-a796-dc59649669d4",
+      "name": "formata texto1",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.3,
+      "position": [
+        1408,
+        640
+      ]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{ $('AUTH').item.json.link }}",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "={{ $('AUTH').item.json.link2 }}",
+              "value": "={{ $('AUTH').item.json.link1 }}"
+            }
+          ]
+        },
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "phone",
+              "value": "5581987473570"
+            },
+            {
+              "name": "=message",
+              "value": "=---- *PEDIDO EMITIDO PARA CLIENTE PENDENTE*\n\nUnidade: *{{ $json.unidade_novo_pedido }}*\nCod Cliente: *{{ $json.cod_cliente }}*\nNome Cliente: *{{ $json.nome_cliente }}*\nUnidade da Pendência: *{{ $json.unidade_pendente }}*\n\n-------------------------------------------"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "2274be17-da7a-4af3-968b-8f6c81fcebd9",
+      "name": "André",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.1,
+      "position": [
+        1600,
+        544
+      ],
+      "disabled": true
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{ $('AUTH').item.json.link }}",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "={{ $('AUTH').item.json.link2 }}",
+              "value": "={{ $('AUTH').item.json.link1 }}"
+            }
+          ]
+        },
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "phone",
+              "value": "5581981308564"
+            },
+            {
+              "name": "message",
+              "value": "=---- *PEDIDO EMITIDO PARA CLIENTE PENDENTE*\n\nUnidade: *{{ $json.unidade_novo_pedido }}*\nCod Cliente: *{{ $json.cod_cliente }}*\nNome Cliente: *{{ $json.nome_cliente }}*\nUnidade da Pendência: *{{ $json.unidade_pendente }}*\n\n-------------------------------------------"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "0ff3d282-1e7c-4450-8eb4-a1188d3841f4",
+      "name": "Diego Marcolan1",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.1,
+      "position": [
+        1600,
+        752
+      ],
+      "disabled": true
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict"
+          },
+          "conditions": [
+            {
+              "id": "28b3f63d-a0bc-49d1-be7c-673be8e7bc3b",
+              "leftValue": "={{ $('Postgres').item.json.ramo_atividade }}",
+              "rightValue": "=INTERCOMPANY",
+              "operator": {
+                "type": "string",
+                "operation": "notEquals"
+              }
+            }
+          ],
+          "combinator": "or"
+        },
+        "options": {}
+      },
+      "id": "0976770d-1aeb-455d-b4b5-166cdb3a2807",
+      "name": "If2",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2,
+      "position": [
+        944,
+        368
+      ]
+    },
+    {
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "WITH pedidos_pendentes AS (\n    SELECT \n        p.cod_pedido,\n        p.tipo_unidade,\n        p.unidade AS unidade_pendente,\n        p.cod_cliente,\n        p.nome_cliente,\n        p.data_pedido,\n        pp.status_pagamento\n    FROM pedidos p\n    LEFT JOIN pagamentos_pedidos pp\n        ON pp.cod_pedido = p.cod_pedido AND pp.unidade = p.unidade\n    WHERE p.tipo_pedido = 'Engenharia'\n      AND p.status_pedido = 'Aberto'\n      AND p.data_pedido <= NOW() - INTERVAL '50 days'\n),\npedidos_recentes AS (\n    SELECT DISTINCT\n        nome_cliente,\n        unidade AS unidade_novo_pedido\n    FROM pedidos\n    WHERE TO_TIMESTAMP(last_updated, 'YYYY-MM-DD HH24:MI:SS') >= NOW() - INTERVAL '30 minutes'\n)\nSELECT DISTINCT ON (pp.cod_cliente)\n    pp.cod_pedido,\n    pp.tipo_unidade,\n    pp.unidade_pendente,\n    pr.unidade_novo_pedido, \n    pp.cod_cliente,\n    pp.nome_cliente,\n    pp.data_pedido,\n    pp.status_pagamento,\n    CASE\n        WHEN pr.nome_cliente IS NOT NULL THEN 'Sim'\n        ELSE 'Não'\n    END AS emitiu_recentes,\n    mc.ramo_atividade\nFROM pedidos_pendentes pp\nLEFT JOIN pedidos_recentes pr\n    ON pp.nome_cliente = pr.nome_cliente\nLEFT JOIN mapeamento_clientes mc\n    ON pp.cod_cliente = mc.codcliente\n    AND pp.unidade_pendente = mc.unidade\nWHERE pp.status_pagamento = 'Pendente'\n    and pp.unidade_pendente not in ('CAUCAIA', 'CODO')\n  AND CASE\n        WHEN pr.nome_cliente IS NOT NULL THEN 'Sim'\n        ELSE 'Não'\n    END = 'Sim'\nORDER BY pp.cod_cliente, pp.data_pedido DESC;",
+        "options": {}
+      },
+      "id": "c3f178f5-b929-4511-8919-401fdb38f3a0",
+      "name": "Postgres",
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 2.3,
+      "position": [
+        544,
+        368
+      ],
+      "alwaysOutputData": false,
+      "credentials": {
+        "postgres": {
+          "id": "G50fA6A0L90xaBIe",
+          "name": "Postgres account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict"
+          },
+          "conditions": [
+            {
+              "id": "eb81ce75-1eb7-46bf-bb93-3918ad8fcc0c",
+              "leftValue": "={{ $json.success }}",
+              "rightValue": "=",
+              "operator": {
+                "type": "boolean",
+                "operation": "false",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "id": "24092676-1444-404e-b3fc-f71bd7e18213",
+      "name": "If",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2,
+      "position": [
+        752,
+        368
+      ]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{ $('AUTH').item.json.link }}",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "={{ $('AUTH').item.json.link2 }}",
+              "value": "={{ $('AUTH').item.json.link1 }}"
+            }
+          ]
+        },
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "phone",
+              "value": "5581986945032"
+            },
+            {
+              "name": "=message",
+              "value": "=---- *PEDIDO EMITIDO PARA CLIENTE PENDENTE*\n\nUnidade: *{{ $json.unidade_novo_pedido }}*\nCod Cliente: *{{ $json.cod_cliente }}*\nNome Cliente: *{{ $json.nome_cliente }}*\n\n-------------------------------------------"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "3f5b349e-39ba-4a1f-92e2-b0cd670ce640",
+      "name": "Bianca",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.1,
+      "position": [
+        1984,
+        144
+      ]
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict"
+          },
+          "conditions": [
+            {
+              "id": "113ea10b-4fcd-4526-9cb5-c35f6c68d5d3",
+              "leftValue": "={{ $json.tipo_unidade }}",
+              "rightValue": "=Bodinho",
+              "operator": {
+                "type": "string",
+                "operation": "equals",
+                "name": "filter.operator.equals"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "id": "f6cd3f7b-e768-4c13-b1c4-a5eadf801f90",
+      "name": "If4",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2,
+      "position": [
+        1792,
+        640
+      ]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{ $('AUTH').item.json.link }}",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "={{ $('AUTH').item.json.link2 }}",
+              "value": "={{ $('AUTH').item.json.link1 }}"
+            }
+          ]
+        },
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "phone",
+              "value": "5581986945032"
+            },
+            {
+              "name": "=message",
+              "value": "=---- *PEDIDO EMITIDO PARA CLIENTE PENDENTE*\n\nUnidade: *{{ $json.unidade_novo_pedido }}*\nCod Cliente: *{{ $json.cod_cliente }}*\nNome Cliente: *{{ $json.nome_cliente }}*\nUnidade da Pendência: *{{ $json.unidade_pendente }}*\n\n-------------------------------------------"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "f0fcfc9b-c989-4f34-a510-568cb570283e",
+      "name": "Bianca2",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.1,
+      "position": [
+        1984,
+        544
+      ]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.pipefy.com/graphql",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Authorization",
+              "value": "Bearer eyJhbGciOiJIUzUxMiJ9.eyJpc3MiOiJQaXBlZnkiLCJpYXQiOjE3MzY0NDc3OTMsImp0aSI6IjgyMWZhZjBkLWMyMDUtNDRjOC05YTU2LWFmYmIxMzI3OTdkYSIsInN1YiI6ODAyNzIsInVzZXIiOnsiaWQiOjgwMjcyLCJlbWFpbCI6Im1hcmNvbGFuZGllZ29AZ21haWwuY29tIn19.czyBeR45RrwDXqnq-TjN7CgM6zmMgR8KB6oeBujazuO1assBjhTFZVyqLw3LB-yT1xDTnJaQS4aIS7_iRhWz4Q"
+            },
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"query\": \"mutation { createCard(input: {pipe_id: 305619354, phase_id: 333525857, title: \\\"PEDIDO EMITIDO PARA CLIENTE PENDENTE\\\", fields_attributes: [{field_id: \\\"cod_cliente\\\", field_value: \\\"{{ $json.cod_cliente }}\\\"}, {field_id: \\\"unidade\\\", field_value: \\\"{{ $('formata texto').item.json.unidade_novo_pedido }}\\\"}, {field_id: \\\"nome_cliente\\\", field_value: \\\"{{ $json.nome_cliente }}\\\"}]}) { card { id } } }\"\n}",
+        "options": {}
+      },
+      "id": "67e40f8f-5668-4e02-b724-2b31298894e4",
+      "name": "PIPEFY",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.1,
+      "position": [
+        1984,
+        -64
+      ]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.pipefy.com/graphql",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Authorization",
+              "value": "Bearer eyJhbGciOiJIUzUxMiJ9.eyJpc3MiOiJQaXBlZnkiLCJpYXQiOjE3MzY0NDc3OTMsImp0aSI6IjgyMWZhZjBkLWMyMDUtNDRjOC05YTU2LWFmYmIxMzI3OTdkYSIsInN1YiI6ODAyNzIsInVzZXIiOnsiaWQiOjgwMjcyLCJlbWFpbCI6Im1hcmNvbGFuZGllZ29AZ21haWwuY29tIn19.czyBeR45RrwDXqnq-TjN7CgM6zmMgR8KB6oeBujazuO1assBjhTFZVyqLw3LB-yT1xDTnJaQS4aIS7_iRhWz4Q"
+            },
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"query\": \"mutation { createCard(input: {pipe_id: 305619354, phase_id: 333525857, fields_attributes: [{field_id: \\\"classificacao\\\", field_value: \\\"{{ $json.classificacao }}\\\"}, {field_id: \\\"unidade\\\", field_value: \\\"{{ $json.unidade }}\\\"}, {field_id: \\\"descricao\\\", field_value: \\\"{{ $json.descricao }}\\\"}, {field_id: \\\"chave\\\", field_value: \\\"{{ $json.chave }}\\\"}, {field_id: \\\"valor\\\", field_value: \\\"{{ $json.valor }}\\\"}, {field_id: \\\"data_pagamento\\\", field_value: \\\"{{ $json.data_pagamento }}\\\"}]}) { card { id } } }\"\n}",
+        "options": {}
+      },
+      "id": "f5b3ac6e-4dc3-4921-94da-5cf23ced8648",
+      "name": "PIPEFY1",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.1,
+      "position": [
+        1984,
+        720
+      ]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.pipefy.com/graphql",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Authorization",
+              "value": "Bearer eyJhbGciOiJIUzUxMiJ9.eyJpc3MiOiJQaXBlZnkiLCJpYXQiOjE3MzY0NDc3OTMsImp0aSI6IjgyMWZhZjBkLWMyMDUtNDRjOC05YTU2LWFmYmIxMzI3OTdkYSIsInN1YiI6ODAyNzIsInVzZXIiOnsiaWQiOjgwMjcyLCJlbWFpbCI6Im1hcmNvbGFuZGllZ29AZ21haWwuY29tIn19.czyBeR45RrwDXqnq-TjN7CgM6zmMgR8KB6oeBujazuO1assBjhTFZVyqLw3LB-yT1xDTnJaQS4aIS7_iRhWz4Q"
+            },
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"query\": \"mutation { updateCard(input: {id: \\\"{{ $json.data.createCard.card.id }}\\\", label_ids: [\\\"314483768\\\"]}) { card { id } } }\"\n}",
+        "options": {}
+      },
+      "id": "15cb8e08-d1ce-4e1a-9a66-c2f9fee141bb",
+      "name": "PIPEFY - etiqueta",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.1,
+      "position": [
+        2192,
+        -64
+      ]
+    },
+    {
+      "parameters": {
+        "rules": {
+          "values": [
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 1
+                },
+                "conditions": [
+                  {
+                    "leftValue": "={{ $json.Tipo_unidade }}",
+                    "rightValue": "Bodinho",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    },
+                    "id": "1d31ad49-5d1d-427e-8508-f4a33d8e4f40"
+                  }
+                ],
+                "combinator": "and"
+              }
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 1
+                },
+                "conditions": [
+                  {
+                    "id": "444be950-d9bc-4f3a-bb00-6eb1acee3e34",
+                    "leftValue": "={{ $json.Tipo_unidade }}",
+                    "rightValue": "=Loja",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals",
+                      "name": "filter.operator.equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              }
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "9c81b41b-de8b-4414-ad28-5b3ff7b631c7",
+      "name": "Switch",
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 3,
+      "position": [
+        1744,
+        80
+      ]
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Google Sheets": {
+      "main": [
+        [
+          {
+            "node": "AUTH",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "AUTH": {
+      "main": [
+        [
+          {
+            "node": "ARQUIVO",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "ARQUIVO": {
+      "main": [
+        [
+          {
+            "node": "Postgres",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Schedule Trigger": {
+      "main": [
+        [
+          {
+            "node": "Google Sheets",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "formata texto": {
+      "main": [
+        [
+          {
+            "node": "Switch",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Diego Marcolan",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "André1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If1": {
+      "main": [
+        [
+          {
+            "node": "formata texto",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "formata texto1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "formata texto1": {
+      "main": [
+        [
+          {
+            "node": "André",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Diego Marcolan1",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "If4",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If2": {
+      "main": [
+        [
+          {
+            "node": "If1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Postgres": {
+      "main": [
+        [
+          {
+            "node": "If",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If": {
+      "main": [
+        [
+          {
+            "node": "If2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If4": {
+      "main": [
+        [
+          {
+            "node": "Bianca2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "PIPEFY": {
+      "main": [
+        [
+          {
+            "node": "PIPEFY - etiqueta",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Switch": {
+      "main": [
+        [
+          {
+            "node": "PIPEFY",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Bianca",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "PIPEFY",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": true,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "605d7f7c-a72a-42a2-a06b-811c286a81bf",
+  "meta": {
+    "instanceId": "a5e8675e548a032fda81ee9dc775b4fc0a1b2003aee794fb0b37064013276a0f"
+  },
+  "id": "rJUAymzlDs2JEJBi",
+  "tags": [
+    {
+      "updatedAt": "2026-01-14T11:04:00.895Z",
+      "createdAt": "2025-03-21T11:47:30.374Z",
+      "id": "CvCy3KNJKyMxSQ3C",
+      "name": "GDA"
+    }
+  ]
+}

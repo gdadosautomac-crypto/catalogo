@@ -1,0 +1,574 @@
+{
+  "name": "Auditoria Cancelamento de Título",
+  "nodes": [
+    {
+      "parameters": {
+        "documentId": {
+          "__rl": true,
+          "value": "https://docs.google.com/spreadsheets/d/1avLuf5Qpu0lBIFVS-Ny0j-iIFZGkVqqufVGy-sfbqM4/edit?usp=sharing",
+          "mode": "url"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "Página1",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1avLuf5Qpu0lBIFVS-Ny0j-iIFZGkVqqufVGy-sfbqM4/edit#gid=0"
+        },
+        "options": {}
+      },
+      "id": "c15ff130-2459-464f-ae69-073b3fe9ca2a",
+      "name": "Google Sheets",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.3,
+      "position": [
+        -1520,
+        128
+      ],
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "8Ytd3zZKAOSyZNqC",
+          "name": "Sheets Andre"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "c9777b34-96c3-49cb-9e8f-5171d677c039",
+              "name": "link",
+              "value": "={{ $json.Link }}",
+              "type": "string"
+            },
+            {
+              "id": "c29c9cfb-b76e-4088-b0ca-7748646d4779",
+              "name": "link1",
+              "value": "={{ $json.Value }}",
+              "type": "string"
+            },
+            {
+              "id": "a2465349-2aee-4dc2-8ce6-9a40bf305fa7",
+              "name": "link2",
+              "value": "={{ $json.Field }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "deac0bff-0055-4337-bd01-e0c913f898dc",
+      "name": "AUTH",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.3,
+      "position": [
+        -1328,
+        128
+      ]
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "c9777b34-96c3-49cb-9e8f-5171d677c039",
+              "name": "arq",
+              "value": "=estorno - d{{ $now.day }}-{{ $now.hour }}h{{ $now.minute }}m{{ $now.second }}s",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {
+          "includeBinary": "={{ data }}"
+        }
+      },
+      "id": "696cb829-09d6-4a72-82a7-71abb0e3eaf2",
+      "name": "ARQUIVO",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.3,
+      "position": [
+        -1168,
+        128
+      ]
+    },
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "field": "hours",
+              "triggerAtMinute": 59
+            }
+          ]
+        }
+      },
+      "id": "61983ce0-1347-40ff-9338-3a1777c7d787",
+      "name": "Schedule Trigger",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.1,
+      "position": [
+        -1696,
+        128
+      ]
+    },
+    {
+      "parameters": {
+        "documentId": {
+          "__rl": true,
+          "value": "https://docs.google.com/spreadsheets/d/1-POicyrzt3pF737lETypFKUwZu1wf9iQwqYqQnse5bk/edit?hl=pt-br&gid=0#gid=0",
+          "mode": "url"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "Página1",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1-POicyrzt3pF737lETypFKUwZu1wf9iQwqYqQnse5bk/edit#gid=0"
+        },
+        "options": {}
+      },
+      "id": "f88f49dc-28a2-459c-8b49-f21077f973dd",
+      "name": "Google Sheets1",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.3,
+      "position": [
+        -976,
+        128
+      ],
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "8Ytd3zZKAOSyZNqC",
+          "name": "Sheets Andre"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "SELECT \n    '{{ $json[\"tipo_unidade\"] }}' as tipo_unidade,\n    '{{ $json[\"unidade\"] }}' as unidade,\n    m.VLR_TIT_ORIG,\n    m.NU_FOR as cod_fornecedor,\n    m.NU_CLI as cod_cliente,\n    m.nu_cta as titulo,\n    m.DS_CPG,\n    m.ds_obs,\n    m.DT_CANC,\n    m.DT_EMISSAO,\n    m.DT_PAGTO,\n    usu.DS_LOGIN as usuario_cancel,\n    usu.NOM_USU,\n    fornec.DS_FOR as fornecedor,\n    cli.DS_CLI as cliente,\n    COALESCE(fornec.DS_FOR, cli.DS_CLI) as cliente_fornec\nfrom mgcta01014 m\nleft join mgusu01010 usu on m.NU_USU_CANC = usu.NU_USU\nleft join mgfor01010 fornec on m.NU_FOR  = fornec.NU_FOR\nleft join mgcli01010 cli on m.NU_CLI = cli.NU_CLI\nwhere m.ID_STAT_LANCTO = '4'\nand m.DT_CANC >= DATE_SUB(NOW(), INTERVAL 1 HOUR)",
+        "options": {
+          "connectionTimeoutMillis": 10
+        }
+      },
+      "id": "dc19122f-2f27-4549-a944-4a96a828e3db",
+      "name": "MySQL",
+      "type": "n8n-nodes-base.mySql",
+      "typeVersion": 2.2,
+      "position": [
+        -528,
+        272
+      ],
+      "executeOnce": false,
+      "retryOnFail": false,
+      "alwaysOutputData": true,
+      "credentials": {
+        "mySql": {
+          "id": "INDKBtYNaYfBC3it",
+          "name": "MySQL Connection"
+        }
+      },
+      "onError": "continueRegularOutput"
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "id": "132b5903-3a8b-421d-909e-751c0d39f7a4",
+      "name": "Loop Over Items",
+      "type": "n8n-nodes-base.splitInBatches",
+      "typeVersion": 3,
+      "position": [
+        -640,
+        128
+      ]
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "2bae94fc-16e6-422b-a70d-b488666e0510",
+              "name": "tipo_unidade",
+              "value": "={{ $json.tipo_unidade }}",
+              "type": "string"
+            },
+            {
+              "id": "674a349e-fc00-4c9b-ada6-0d216d0a80db",
+              "name": "unidade",
+              "value": "={{ $json.unidade }}",
+              "type": "string"
+            },
+            {
+              "id": "67ac34de-fd36-4b6c-b797-f6837ea7d981",
+              "name": "host",
+              "value": "={{ $json.host }}",
+              "type": "string"
+            },
+            {
+              "id": "f022d193-0473-4fbc-9a48-3f29487dd5fa",
+              "name": "name",
+              "value": "={{ $json.name }}",
+              "type": "string"
+            },
+            {
+              "id": "4146a9c6-c7a0-4231-adea-914085fef4f6",
+              "name": "port",
+              "value": "={{ $json.port }}",
+              "type": "number"
+            },
+            {
+              "id": "e9f4fa0c-455b-4366-9988-b45c6a53615d",
+              "name": "user",
+              "value": "={{ $json.user }}",
+              "type": "string"
+            },
+            {
+              "id": "e973f1f7-c07d-4409-8617-4d8e9735a819",
+              "name": "senha",
+              "value": "={{ $json.senha }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "24ad5a05-462a-44b9-a68c-ee9c9e0171a8",
+      "name": "Edit Fields",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.3,
+      "position": [
+        -816,
+        128
+      ]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{ $('AUTH').item.json.link }}",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "={{ $('AUTH').item.json.link2 }}",
+              "value": "={{ $('AUTH').item.json.link1 }}"
+            }
+          ]
+        },
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "phone",
+              "value": "=5581987473570"
+            },
+            {
+              "name": "=message",
+              "value": "=---- ALERTA TÍTULO CANCELADO ----\n\nTipo_unidade:  *{{ $json.tipo_unidade }}*\nUnidadE:  *{{ $json.unidade }}*\nTitulo:  *{{ $json.titulo }}*\nValor:  *{{ $json.valor }}*\nCliente/fornec: *{{ $json.cliente_fornec }}*\nData Cancelamento:  *{{ $json.data_cancelamento }}*\nData Pagamento: *{{ $json.data_pagamento }}*\nDescrição: *{{ $json.descricao }}*\nObs: *{{ $json.obs }}*\nUsuario: *{{ $json.usuario_cancel }}*"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "c15d812c-de4d-49d8-b26f-381d7626a523",
+      "name": "Andre",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.1,
+      "position": [
+        0,
+        160
+      ]
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "c5ad8db9-d6b0-463c-adb5-8e6a61f3d21d",
+              "name": "tipo_unidade",
+              "value": "={{ $json.tipo_unidade }}",
+              "type": "string"
+            },
+            {
+              "id": "5182a5d6-c3eb-49c7-ab29-1181c3d60049",
+              "name": "unidade",
+              "value": "={{ $json.unidade }}",
+              "type": "string"
+            },
+            {
+              "id": "76471b06-8b9d-4a62-a9fb-69823c24e18b",
+              "name": "titulo",
+              "value": "={{ $json.titulo }}",
+              "type": "string"
+            },
+            {
+              "id": "f1f6ebf9-c887-4988-b5b3-ae6bbc456ecc",
+              "name": "descricao",
+              "value": "={{ $json.DS_CPG }}",
+              "type": "string"
+            },
+            {
+              "id": "7545b99d-4cb1-4a45-bfa5-31b0a9aec648",
+              "name": "obs",
+              "value": "={{ $json.ds_obs }}",
+              "type": "string"
+            },
+            {
+              "id": "492ef8a1-6380-48f4-8b18-81dea4f6ad37",
+              "name": "valor",
+              "value": "={{ $json.VLR_TIT_ORIG }}",
+              "type": "string"
+            },
+            {
+              "id": "2cddaa0b-11a6-4fe8-a4d6-549db7bdc4f0",
+              "name": "data_pagamento",
+              "value": "={{ $json.DT_PAGTO }}",
+              "type": "string"
+            },
+            {
+              "id": "983dc0ad-bc6d-4fa2-a656-b84e78471b0f",
+              "name": "data_cancelamento",
+              "value": "={{ $json.DT_CANC }}",
+              "type": "string"
+            },
+            {
+              "id": "3d08d245-f962-4eb6-afef-b0846fd02466",
+              "name": "usuario_cancel",
+              "value": "={{ $json.usuario_cancel }}",
+              "type": "string"
+            },
+            {
+              "id": "798a30bd-1b16-47e2-b413-ba2c3d64bdce",
+              "name": "cliente_fornec",
+              "value": "={{ $json.cliente_fornec }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "5b33de2a-d373-4516-a51e-78b5ddea6058",
+      "name": "formata_document",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.3,
+      "position": [
+        -400,
+        112
+      ]
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 1
+          },
+          "conditions": [
+            {
+              "id": "725d8318-c86e-41bf-aaae-95b69b37f410",
+              "leftValue": "={{ $json.titulo }}",
+              "rightValue": "=null",
+              "operator": {
+                "type": "string",
+                "operation": "notEmpty",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "id": "3e4771b2-be2e-4986-a04a-105414cc9c73",
+      "name": "If",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2,
+      "position": [
+        -176,
+        112
+      ]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{ $('AUTH').item.json.link }}",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "={{ $('AUTH').item.json.link2 }}",
+              "value": "={{ $('AUTH').item.json.link1 }}"
+            }
+          ]
+        },
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "phone",
+              "value": "5581981308564"
+            },
+            {
+              "name": "message",
+              "value": "=---- ALERTA TÍTULO CANCELADO ----\n\nTipo_unidade:  *{{ $json.tipo_unidade }}*\nUnidadE:  *{{ $json.unidade }}*\nTitulo:  *{{ $json.titulo }}*\nValor:  *{{ $json.valor }}*\nCliente/fornec: *{{ $json.cliente_fornec }}*\nData Cancelamento:  *{{ $json.data_cancelamento }}*\nData Pagamento: *{{ $json.data_pagamento }}*\nDescrição: *{{ $json.descricao }}*\nObs: *{{ $json.obs }}*\nUsuario: *{{ $json.usuario_cancel }}*\n"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "abc18568-cb6b-443a-be2b-c5016f70d002",
+      "name": "Diego Marcolan1",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.1,
+      "position": [
+        0,
+        0
+      ],
+      "disabled": true
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Google Sheets": {
+      "main": [
+        [
+          {
+            "node": "AUTH",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "AUTH": {
+      "main": [
+        [
+          {
+            "node": "ARQUIVO",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "ARQUIVO": {
+      "main": [
+        [
+          {
+            "node": "Google Sheets1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Schedule Trigger": {
+      "main": [
+        [
+          {
+            "node": "Google Sheets",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Google Sheets1": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "MySQL": {
+      "main": [
+        [
+          {
+            "node": "Loop Over Items",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Loop Over Items": {
+      "main": [
+        [
+          {
+            "node": "formata_document",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "MySQL",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Edit Fields": {
+      "main": [
+        [
+          {
+            "node": "Loop Over Items",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "formata_document": {
+      "main": [
+        [
+          {
+            "node": "If",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If": {
+      "main": [
+        [
+          {
+            "node": "Diego Marcolan1",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Andre",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "4131b5b6-cfec-4360-a8f2-71dadfb6424a",
+  "meta": {
+    "instanceId": "a5e8675e548a032fda81ee9dc775b4fc0a1b2003aee794fb0b37064013276a0f"
+  },
+  "id": "6Ov9bqq8LtFPYxiv",
+  "tags": [
+    {
+      "updatedAt": "2026-01-14T11:04:00.895Z",
+      "createdAt": "2025-03-21T11:47:30.374Z",
+      "id": "CvCy3KNJKyMxSQ3C",
+      "name": "GDA"
+    }
+  ]
+}

@@ -1,0 +1,395 @@
+{
+  "name": "Contas a Receber - Fortaleza",
+  "nodes": [
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "field": "weeks",
+              "triggerAtDay": [
+                1,
+                2,
+                3,
+                4,
+                5,
+                0
+              ],
+              "triggerAtHour": 7,
+              "triggerAtMinute": 7
+            }
+          ]
+        }
+      },
+      "id": "198411c2-8480-4e74-b26f-b03c71c92c6f",
+      "name": "Schedule Trigger",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.1,
+      "position": [
+        -1296,
+        -80
+      ]
+    },
+    {
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "select \n\t-- 'ELA' as coluna, \n    mb.tipo_unidade, \n\tmb.unidade, \n\tmb.nome_cliente, \n\tmb.cod_pedido, \n    mb.coes, \n\tmc.ramo_atividade, \n\tmb.status_pedido, \n\tROUND(mb.valor_final_pedido::numeric,2) as valor_final_pedido, \n\tROUND(mb.valor_entregue::numeric,2) as valor_entregue, \n\tROUND(\ncase  \t\nwhen status_pedido = 'Finalizado' then total_titulo\t\nwhen \n(mb.status_pedido = 'Em Separacao' and cs.tipotitulo = 'VENDA')\nthen  total_titulo - (mb.valor_final_pedido - mb.valor_entregue)\t\nwhen (mb.status_pedido = 'Em Separacao' and cs.tipotitulo = 'ESTOQUE') \nthen total_titulo\nend::NUMERIC,2) as total_devido, \n\t(saldo.saldo) as Saldo, \n\trota_entrega ,\t\nmc.nome_fantasia,\t\nmb.cod_romaneios,\t\nmb.datas_entregas,\nmb.pedido_cliente\nfrom main_balanco mb \nleft join (select unidade, coes, tipotitulo, ativo  from coes_sistema cs group by  unidade, coes, tipotitulo, ativo) cs on mb.unidade = cs.unidade and mb.coes = cs.coes \nleft join mapeamento_clientes mc on \n(\nmb.cod_cliente = mc.codcliente \nand mb.unidade = mc.unidade \n)\nleft join \n(\nselect unidade, id, sum(replace(total,',','.')::numeric) as saldo \nfrom saldo where tipo <> 'FORNECEDOR' \ngroup by unidade, id \n) saldo on saldo.unidade = mc.unidade and saldo.id::numeric = mc.codcliente::numeric \nwhere  status_pedido in ('Em Separacao', 'Finalizado') and cs.ativo = 'S'\nand mb.unidade = 'FORTALEZA'\nand status_pagamento = 'Pendente' and mb.datas_entregas not like '%2021%'",
+        "options": {}
+      },
+      "id": "b826f589-8b52-432a-b319-e7c7c29d4a24",
+      "name": "Postgres",
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 2.3,
+      "position": [
+        -768,
+        -80
+      ],
+      "credentials": {
+        "postgres": {
+          "id": "G50fA6A0L90xaBIe",
+          "name": "Postgres account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "xlsx",
+        "options": {}
+      },
+      "id": "1e6f1e87-ed34-4465-82dd-37f279d25435",
+      "name": "Convert to File",
+      "type": "n8n-nodes-base.convertToFile",
+      "typeVersion": 1.1,
+      "position": [
+        -576,
+        -80
+      ]
+    },
+    {
+      "parameters": {},
+      "id": "1d864b0b-a164-4502-97e2-c7fd1f01d2b8",
+      "name": "Wait",
+      "type": "n8n-nodes-base.wait",
+      "typeVersion": 1.1,
+      "position": [
+        -48,
+        -80
+      ],
+      "webhookId": "40659397-da0a-4ab4-8e93-823ffd00a4e4"
+    },
+    {
+      "parameters": {
+        "operation": "upload",
+        "bucketName": "marcolanoperacoes",
+        "fileName": "={{ $('ARQUIVO').item.json.arq }}",
+        "additionalFields": {
+          "acl": "publicReadWrite"
+        }
+      },
+      "id": "4cb30c93-bf61-4b54-936d-cfca441b6ecb",
+      "name": "AWS S31",
+      "type": "n8n-nodes-base.awsS3",
+      "typeVersion": 2,
+      "position": [
+        -400,
+        -80
+      ],
+      "credentials": {
+        "aws": {
+          "id": "wojq9Jq4bZgupPjh",
+          "name": "AWS account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "delete",
+        "bucketName": "marcolanoperacoes",
+        "fileKey": "={{ $('ARQUIVO').item.json.arq }}",
+        "options": {}
+      },
+      "id": "a505eb68-bcc6-47ce-aa2d-3753a60473dc",
+      "name": "AWS S33",
+      "type": "n8n-nodes-base.awsS3",
+      "typeVersion": 2,
+      "position": [
+        144,
+        -80
+      ],
+      "credentials": {
+        "aws": {
+          "id": "wojq9Jq4bZgupPjh",
+          "name": "AWS account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "c9777b34-96c3-49cb-9e8f-5171d677c039",
+              "name": "arq",
+              "value": "=Contas a Receber - Financeiro - d{{ $now.day }}-{{ $now.hour }}h{{ $now.minute }}m{{ $now.second }}s",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "868e5452-915c-4158-b8a3-2cba3d072e4c",
+      "name": "ARQUIVO",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.3,
+      "position": [
+        -944,
+        -80
+      ]
+    },
+    {
+      "parameters": {
+        "documentId": {
+          "__rl": true,
+          "value": "https://docs.google.com/spreadsheets/d/1J9xHE08UPG2QnDrjFsiy3VU3Z8ziZT9aO9MF7ct5ruA/edit?usp=sharing",
+          "mode": "url"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 564051929,
+          "mode": "list",
+          "cachedResultName": "Token",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1J9xHE08UPG2QnDrjFsiy3VU3Z8ziZT9aO9MF7ct5ruA/edit#gid=564051929"
+        },
+        "options": {}
+      },
+      "id": "a5bf058f-e755-4d77-a9df-464642661f00",
+      "name": "Token",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.3,
+      "position": [
+        -1120,
+        -80
+      ],
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "8Ytd3zZKAOSyZNqC",
+          "name": "Sheets Andre"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{ $('Token').item.json.Link }}send-document/xlsx",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "={{ $('Token').item.json.Name }}",
+              "value": "={{ $('Token').item.json.Value }}"
+            }
+          ]
+        },
+        "sendBody": true,
+        "contentType": "form-urlencoded",
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "phone",
+              "value": "=5581988410072"
+            },
+            {
+              "name": "fileName",
+              "value": "=Contas a Receber - Fortaleza"
+            },
+            {
+              "name": "document",
+              "value": "=https://marcolanoperacoes.s3.amazonaws.com/{{ $('ARQUIVO').item.json.arq }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "d735f6ad-c4f6-4d72-a56e-0b5e34f891a0",
+      "name": "Marcello",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.1,
+      "position": [
+        -224,
+        -160
+      ]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{ $('Token').item.json.Link }}send-document/xlsx",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "={{ $('Token').item.json.Name }}",
+              "value": "={{ $('Token').item.json.Value }}"
+            }
+          ]
+        },
+        "sendBody": true,
+        "contentType": "form-urlencoded",
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "phone",
+              "value": "=5585997731607"
+            },
+            {
+              "name": "fileName",
+              "value": "=Contas a Receber - Fortaleza"
+            },
+            {
+              "name": "document",
+              "value": "=https://marcolanoperacoes.s3.amazonaws.com/{{ $('ARQUIVO').item.json.arq }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "6277e240-6600-4e06-860c-43df6e75f980",
+      "name": "Elaine",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.1,
+      "position": [
+        -224,
+        0
+      ]
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Schedule Trigger": {
+      "main": [
+        [
+          {
+            "node": "Token",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Postgres": {
+      "main": [
+        [
+          {
+            "node": "Convert to File",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Convert to File": {
+      "main": [
+        [
+          {
+            "node": "AWS S31",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Wait": {
+      "main": [
+        [
+          {
+            "node": "AWS S33",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "AWS S31": {
+      "main": [
+        [
+          {
+            "node": "Elaine",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Marcello",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "ARQUIVO": {
+      "main": [
+        [
+          {
+            "node": "Postgres",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Token": {
+      "main": [
+        [
+          {
+            "node": "ARQUIVO",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Marcello": {
+      "main": [
+        [
+          {
+            "node": "Wait",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Elaine": {
+      "main": [
+        [
+          {
+            "node": "Wait",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": true,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "9d10de0a-5693-4b54-90f4-93cdc2668c20",
+  "meta": {
+    "instanceId": "a5e8675e548a032fda81ee9dc775b4fc0a1b2003aee794fb0b37064013276a0f"
+  },
+  "id": "HZFAP3gf9aoDn4fh",
+  "tags": [
+    {
+      "updatedAt": "2025-03-24T11:52:02.582Z",
+      "createdAt": "2025-03-24T11:52:02.582Z",
+      "id": "uPLi4lJcaKHP324Z",
+      "name": "Setor - Financeiro"
+    },
+    {
+      "updatedAt": "2026-01-14T11:04:00.895Z",
+      "createdAt": "2025-03-21T11:47:30.374Z",
+      "id": "CvCy3KNJKyMxSQ3C",
+      "name": "GDA"
+    }
+  ]
+}
