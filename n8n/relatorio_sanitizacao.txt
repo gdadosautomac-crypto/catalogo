@@ -1,0 +1,620 @@
+RELATORIO DE SANITIZACAO - 06/03/2026 12:58
+Pasta: C:/repo/catalogo/n8n
+Total de arquivos: 158
+============================================================
+
+ACOMPANHAMENTO COMERCIAL.json (1 substituicao(oes)):
+   * meta.instanceId -> {{INSTANCE_ID}}  [campo sensivel 'instanceId']
+
+Acompanhamento de metragem.json (4 substituicao(oes)):
+   * nodes[3].webhookId -> {{WEBHOOK_ID}}  [campo sensivel 'webhookId']
+   * nodes[11].webhookId -> {{WEBHOOK_ID}}  [campo sensivel 'webhookId']
+   * nodes[17].webhookId -> {{WEBHOOK_ID}}  [campo sensivel 'webhookId']
+   * meta.instanceId -> {{INSTANCE_ID}}  [campo sensivel 'instanceId']
+
+Acumulado Descontos e Devoluções ( PERFILUX).json (1 substituicao(oes)):
+   * meta.instanceId -> {{INSTANCE_ID}}  [campo sensivel 'instanceId']
+
+ALERTA BOLETOS E CHEQUES - CPF.json (1 substituicao(oes)):
+   * meta.instanceId -> {{INSTANCE_ID}}  [campo sensivel 'instanceId']
+
+Alerta Novo Cliente.json (1 substituicao(oes)):
+   * meta.instanceId -> {{INSTANCE_ID}}  [campo sensivel 'instanceId']
+
+Alerta Preço BDS (VITORIA).json (1 substituicao(oes)):
+   * meta.instanceId -> {{INSTANCE_ID}}  [campo sensivel 'instanceId']
+
+ALERTA REMOCAO MARCA.json (1 substituicao(oes)):
+   * meta.instanceId -> {{INSTANCE_ID}}  [campo sensivel 'instanceId']
+
+Alteração Custo - Belga.json (1 substituicao(oes)):
+   * meta.instanceId -> {{INSTANCE_ID}}  [campo sensivel 'instanceId']
+
+ANALISE PRAZOS INDUSTRIAIS.json (1 substituicao(oes)):
+   * meta.instanceId -> {{INSTANCE_ID}}  [campo sensivel 'instanceId']
+
+ANALISE PRECOS MINIMOS.json (1 substituicao(oes)):
+   * meta.instanceId -> {{INSTANCE_ID}}  [campo sensivel 'instanceId']
+
+Auditoria Cancelamento de Título.json (1 substituicao(oes)):
+   * meta.instanceId -> {{INSTANCE_ID}}  [campo sensivel 'instanceId']
+
+Auditoria Compras.json (2 substituicao(oes)):
+   * nodes[9].webhookId -> {{WEBHOOK_ID}}  [campo sensivel 'webhookId']
+   * meta.instanceId -> {{INSTANCE_ID}}  [campo sensivel 'instanceId']
+
+Auditoria Condição de Pagamento.json (1 substituicao(oes)):
+   * meta.instanceId -> {{INSTANCE_ID}}  [campo sensivel 'instanceId']
+
+Auditoria de Carga.json (4 substituicao(oes)):
+   * nodes[3].webhookId -> {{WEBHOOK_ID}}  [campo sensivel 'webhookId']
+   * nodes[24].parameters.headerParameters.parameters[0].value -> {{JWT_TOKEN}}  [padrao de token detectado (JWT_TOKEN)]
+   * nodes[25].parameters.headerParameters.parameters[0].value -> {{JWT_TOKEN}}  [padrao de token detectado (JWT_TOKEN)]
+   * meta.instanceId -> {{INSTANCE_ID}}  [campo sensivel 'instanceId']
+
+Auditoria Margem _ 30.json (1 substituicao(oes)):
+   * meta.instanceId -> {{INSTANCE_ID}}  [campo sensivel 'instanceId']
+
+Auditoria Pagamento de Adiantamento.json (2 substituicao(oes)):
+   * nodes[6].parameters.headerParameters.parameters[0].value -> {{JWT_TOKEN}}  [padrao de token detectado (JWT_TOKEN)]
+   * meta.instanceId -> {{INSTANCE_ID}}  [campo sensivel 'instanceId']
+
+Auditoria taxa DSF.json (4 substituicao(oes)):
+   * nodes[10].webhookId -> {{WEBHOOK_ID}}  [campo sensivel 'webhookId']
+   * nodes[13].parameters.headerParameters.parameters[0].value -> {{JWT_TOKEN}}  [padrao de token detectado (JWT_TOKEN)]
+   * nodes[14].parameters.headerParameters.parameters[0].value -> {{JWT_TOKEN}}  [padrao de token detectado (JWT_TOKEN)]
+   * meta.instanceId -> {{INSTANCE_ID}}  [campo sensivel 'instanceId']
+
+Auditoria_despesa.json (2 substituicao(oes)):
+   * nodes[17].webhookId -> {{WEBHOOK_ID}}  [campo sensivel 'webhookId']
+   * meta.instanceId -> {{INSTANCE_ID}}  [campo sensivel 'instanceId']
+
+Belga Polímeros - Clientes há mais de 90 dias sem comprar.json (2 substituicao(oes)):
+   * nodes[3].webhookId -> {{WEBHOOK_ID}}  [campo sensivel 'webhookId']
+   * meta.instanceId -> {{INSTANCE_ID}}  [campo sensivel 'instanceId']
+
+Belga_ Margem _ 40%.json (2 substituicao(oes)):
+   * nodes[5].webhookId -> {{WEBHOOK_ID}}  [campo sensivel 'webhookId']
+   * meta.instanceId -> {{INSTANCE_ID}}  [campo sensivel 'instanceId']
+
+Boletos Belga.json (1 substituicao(oes)):
+   * meta.instanceId -> {{INSTANCE_ID}}  [campo sensivel 'instanceId']
+
+Boletos Perfilux.json (2 substituicao(oes)):
+   * nodes[9].webhookId -> {{WEBHOOK_ID}}  [campo sensivel 'webhookId']
+   * meta.instanceId -> {{INSTANCE_ID}}  [campo sensivel 'instanceId']
+
+BOX PERDIDO SHEETS.json (2 substituicao(oes)):
+   * nodes[19].webhookId -> {{WEBHOOK_ID}}  [campo sensivel 'webhookId']
+   * meta.instanceId -> {{INSTANCE_ID}}  [campo sensivel 'instanceId']
+
+Cargas TESTE.json (3 substituicao(oes)):
+   * nodes[1].webhookId -> {{WEBHOOK_ID}}  [campo sensivel 'webhookId']
+   * nodes[9].webhookId -> {{WEBHOOK_ID}}  [campo sensivel 'webhookId']
+   * meta.instanceId -> {{INSTANCE_ID}}  [campo sensivel 'instanceId']
+
+Cargas.json (3 substituicao(oes)):
+   * nodes[1].webhookId -> {{WEBHOOK_ID}}  [campo sensivel 'webhookId']
+   * nodes[9].webhookId -> {{WEBHOOK_ID}}  [campo sensivel 'webhookId']
+   * meta.instanceId -> {{INSTANCE_ID}}  [campo sensivel 'instanceId']
+
+Cartões no painel.json (2 substituicao(oes)):
+   * nodes[3].webhookId -> {{WEBHOOK_ID}}  [campo sensivel 'webhookId']
+   * meta.instanceId -> {{INSTANCE_ID}}  [campo sensivel 'instanceId']
+
+Cheques e Boletos - Financeiro.json (2 substituicao(oes)):
+   * nodes[3].webhookId -> {{WEBHOOK_ID}}  [campo sensivel 'webhookId']
+   * meta.instanceId -> {{INSTANCE_ID}}  [campo sensivel 'instanceId']
+
+Cheques e Boletos no Painel - Financeiro.json (2 substituicao(oes)):
+   * nodes[3].webhookId -> {{WEBHOOK_ID}}  [campo sensivel 'webhookId']
+   * meta.instanceId -> {{INSTANCE_ID}}  [campo sensivel 'instanceId']
+
+Clientes sem comprar Espelho e Temperado.json (2 substituicao(oes)):
+   * nodes[2].webhookId -> {{WEBHOOK_ID}}  [campo sensivel 'webhookId']
+   * meta.instanceId -> {{INSTANCE_ID}}  [campo sensivel 'instanceId']
+
+Clientes sem comprar no mês anterior.json (2 substituicao(oes)):
+   * nodes[2].webhookId -> {{WEBHOOK_ID}}  [campo sensivel 'webhookId']
+   * meta.instanceId -> {{INSTANCE_ID}}  [campo sensivel 'instanceId']
+
+COBRA ESTORNO BOX PERDIDO.json (1 substituicao(oes)):
+   * meta.instanceId -> {{INSTANCE_ID}}  [campo sensivel 'instanceId']
+
+COBRAR ARQUIVOS DE META COMERCIAL.json (2 substituicao(oes)):
+   * nodes[9].webhookId -> {{WEBHOOK_ID}}  [campo sensivel 'webhookId']
+   * meta.instanceId -> {{INSTANCE_ID}}  [campo sensivel 'instanceId']
+
+COBRAR ARQUIVOS DE META INDUSTRIAL.json (2 substituicao(oes)):
+   * nodes[10].webhookId -> {{WEBHOOK_ID}}  [campo sensivel 'webhookId']
+   * meta.instanceId -> {{INSTANCE_ID}}  [campo sensivel 'instanceId']
+
+COBRAR ARQUIVOS DE META TRIMESTRE.json (3 substituicao(oes)):
+   * nodes[11].webhookId -> {{WEBHOOK_ID}}  [campo sensivel 'webhookId']
+   * nodes[37].webhookId -> {{WEBHOOK_ID}}  [campo sensivel 'webhookId']
+   * meta.instanceId -> {{INSTANCE_ID}}  [campo sensivel 'instanceId']
+
+Comissão Bodinhos.json (2 substituicao(oes)):
+   * nodes[1].webhookId -> {{WEBHOOK_ID}}  [campo sensivel 'webhookId']
+   * meta.instanceId -> {{INSTANCE_ID}}  [campo sensivel 'instanceId']
+
+CONCILIAÇÃO MERCADORIA.json (3 substituicao(oes)):
+   * nodes[6].webhookId -> {{WEBHOOK_ID}}  [campo sensivel 'webhookId']
+   * nodes[18].webhookId -> {{WEBHOOK_ID}}  [campo sensivel 'webhookId']
+   * meta.instanceId -> {{INSTANCE_ID}}  [campo sensivel 'instanceId']
+
+Consulta Cargas.json (3 substituicao(oes)):
+   * nodes[11].webhookId -> {{WEBHOOK_ID}}  [campo sensivel 'webhookId']
+   * nodes[23].webhookId -> {{WEBHOOK_ID}}  [campo sensivel 'webhookId']
+   * meta.instanceId -> {{INSTANCE_ID}}  [campo sensivel 'instanceId']
+
+Consulta Chats JOAO GUI.json (1 substituicao(oes)):
+   * meta.instanceId -> {{INSTANCE_ID}}  [campo sensivel 'instanceId']
+
+CONSULTA VENDA (AUTO).json (1 substituicao(oes)):
+   * meta.instanceId -> {{INSTANCE_ID}}  [campo sensivel 'instanceId']
+
+Contas a Receber - AllGlass Tempera.json (2 substituicao(oes)):
+   * nodes[5].webhookId -> {{WEBHOOK_ID}}  [campo sensivel 'webhookId']
+   * meta.instanceId -> {{INSTANCE_ID}}  [campo sensivel 'instanceId']
+
+Contas a Receber - Alumiaço Recife.json (2 substituicao(oes)):
+   * nodes[3].webhookId -> {{WEBHOOK_ID}}  [campo sensivel 'webhookId']
+   * meta.instanceId -> {{INSTANCE_ID}}  [campo sensivel 'instanceId']
+
+Contas a Receber - Completo.json (2 substituicao(oes)):
+   * nodes[3].webhookId -> {{WEBHOOK_ID}}  [campo sensivel 'webhookId']
+   * meta.instanceId -> {{INSTANCE_ID}}  [campo sensivel 'instanceId']
+
+Contas a Receber - Fortaleza.json (2 substituicao(oes)):
+   * nodes[3].webhookId -> {{WEBHOOK_ID}}  [campo sensivel 'webhookId']
+   * meta.instanceId -> {{INSTANCE_ID}}  [campo sensivel 'instanceId']
+
+Contas a Receber - GM Maceio.json (2 substituicao(oes)):
+   * nodes[3].webhookId -> {{WEBHOOK_ID}}  [campo sensivel 'webhookId']
+   * meta.instanceId -> {{INSTANCE_ID}}  [campo sensivel 'instanceId']
+
+Contas a Receber - Imbravidros.json (2 substituicao(oes)):
+   * nodes[3].webhookId -> {{WEBHOOK_ID}}  [campo sensivel 'webhookId']
+   * meta.instanceId -> {{INSTANCE_ID}}  [campo sensivel 'instanceId']
+
+Contas a Receber - Oazem.json (2 substituicao(oes)):
+   * nodes[3].webhookId -> {{WEBHOOK_ID}}  [campo sensivel 'webhookId']
+   * meta.instanceId -> {{INSTANCE_ID}}  [campo sensivel 'instanceId']
+
+Contas a Receber - Vitória.json (2 substituicao(oes)):
+   * nodes[3].webhookId -> {{WEBHOOK_ID}}  [campo sensivel 'webhookId']
+   * meta.instanceId -> {{INSTANCE_ID}}  [campo sensivel 'instanceId']
+
+Contas a Receber Bodinhos _ 15 dias.json (2 substituicao(oes)):
+   * nodes[3].webhookId -> {{WEBHOOK_ID}}  [campo sensivel 'webhookId']
+   * meta.instanceId -> {{INSTANCE_ID}}  [campo sensivel 'instanceId']
+
+desbloqueio_cliente.json (2 substituicao(oes)):
+   * nodes[10].webhookId -> {{WEBHOOK_ID}}  [campo sensivel 'webhookId']
+   * meta.instanceId -> {{INSTANCE_ID}}  [campo sensivel 'instanceId']
+
+despesas.json (2 substituicao(oes)):
+   * nodes[10].webhookId -> {{WEBHOOK_ID}}  [campo sensivel 'webhookId']
+   * meta.instanceId -> {{INSTANCE_ID}}  [campo sensivel 'instanceId']
+
+devolução_pedido.json (7 substituicao(oes)):
+   * nodes[10].webhookId -> {{WEBHOOK_ID}}  [campo sensivel 'webhookId']
+   * nodes[13].parameters.headerParameters.parameters[0].value -> {{JWT_TOKEN}}  [padrao de token detectado (JWT_TOKEN)]
+   * nodes[14].parameters.headerParameters.parameters[0].value -> {{JWT_TOKEN}}  [padrao de token detectado (JWT_TOKEN)]
+   * nodes[16].parameters.headerParameters.parameters[0].value -> {{JWT_TOKEN}}  [padrao de token detectado (JWT_TOKEN)]
+   * nodes[17].parameters.headerParameters.parameters[0].value -> {{JWT_TOKEN}}  [padrao de token detectado (JWT_TOKEN)]
+   * nodes[18].parameters.headerParameters.parameters[0].value -> {{JWT_TOKEN}}  [padrao de token detectado (JWT_TOKEN)]
+   * meta.instanceId -> {{INSTANCE_ID}}  [campo sensivel 'instanceId']
+
+Documentos Devolvidos Atualizado.json (2 substituicao(oes)):
+   * nodes[15].webhookId -> {{WEBHOOK_ID}}  [campo sensivel 'webhookId']
+   * meta.instanceId -> {{INSTANCE_ID}}  [campo sensivel 'instanceId']
+
+Documentos em Depósito.json (2 substituicao(oes)):
+   * nodes[15].webhookId -> {{WEBHOOK_ID}}  [campo sensivel 'webhookId']
+   * meta.instanceId -> {{INSTANCE_ID}}  [campo sensivel 'instanceId']
+
+Entregue mês anterior - Valor, M2 e KG.json (2 substituicao(oes)):
+   * nodes[6].webhookId -> {{WEBHOOK_ID}}  [campo sensivel 'webhookId']
+   * meta.instanceId -> {{INSTANCE_ID}}  [campo sensivel 'instanceId']
+
+Entregues e Pendentes BI - 12Meses.json (2 substituicao(oes)):
+   * nodes[8].webhookId -> {{WEBHOOK_ID}}  [campo sensivel 'webhookId']
+   * meta.instanceId -> {{INSTANCE_ID}}  [campo sensivel 'instanceId']
+
+Envio de Comunicados.json (1 substituicao(oes)):
+   * meta.instanceId -> {{INSTANCE_ID}}  [campo sensivel 'instanceId']
+
+ESTOQUE 7h.json (1 substituicao(oes)):
+   * meta.instanceId -> {{INSTANCE_ID}}  [campo sensivel 'instanceId']
+
+ESTOQUE CD VITORIA.json (2 substituicao(oes)):
+   * nodes[14].webhookId -> {{WEBHOOK_ID}}  [campo sensivel 'webhookId']
+   * meta.instanceId -> {{INSTANCE_ID}}  [campo sensivel 'instanceId']
+
+Estoque e Vendas Mensal de Ferragens.json (2 substituicao(oes)):
+   * nodes[2].webhookId -> {{WEBHOOK_ID}}  [campo sensivel 'webhookId']
+   * meta.instanceId -> {{INSTANCE_ID}}  [campo sensivel 'instanceId']
+
+ESTOQUE IMPORTACAO.json (1 substituicao(oes)):
+   * meta.instanceId -> {{INSTANCE_ID}}  [campo sensivel 'instanceId']
+
+ESTOQUE OUTROS ITENS.json (1 substituicao(oes)):
+   * meta.instanceId -> {{INSTANCE_ID}}  [campo sensivel 'instanceId']
+
+ESTORNO ONTEM.json (1 substituicao(oes)):
+   * meta.instanceId -> {{INSTANCE_ID}}  [campo sensivel 'instanceId']
+
+ESTORNOS.json (1 substituicao(oes)):
+   * meta.instanceId -> {{INSTANCE_ID}}  [campo sensivel 'instanceId']
+
+Expedido - Luana.json (2 substituicao(oes)):
+   * nodes[2].webhookId -> {{WEBHOOK_ID}}  [campo sensivel 'webhookId']
+   * meta.instanceId -> {{INSTANCE_ID}}  [campo sensivel 'instanceId']
+
+Expedido - Perfilux.json (3 substituicao(oes)):
+   * nodes[2].webhookId -> {{WEBHOOK_ID}}  [campo sensivel 'webhookId']
+   * nodes[11].webhookId -> {{WEBHOOK_ID}}  [campo sensivel 'webhookId']
+   * meta.instanceId -> {{INSTANCE_ID}}  [campo sensivel 'instanceId']
+
+Faturamento - Bodinhos VIT.json (2 substituicao(oes)):
+   * nodes[1].webhookId -> {{WEBHOOK_ID}}  [campo sensivel 'webhookId']
+   * meta.instanceId -> {{INSTANCE_ID}}  [campo sensivel 'instanceId']
+
+Faturamento dos bodinhos da 4D e Vitória.json (2 substituicao(oes)):
+   * nodes[8].webhookId -> {{WEBHOOK_ID}}  [campo sensivel 'webhookId']
+   * meta.instanceId -> {{INSTANCE_ID}}  [campo sensivel 'instanceId']
+
+Faturamentos diário dos Bodinho de Vitória.json (1 substituicao(oes)):
+   * meta.instanceId -> {{INSTANCE_ID}}  [campo sensivel 'instanceId']
+
+GERADOR HISTORICO COMPLETO.json (1 substituicao(oes)):
+   * meta.instanceId -> {{INSTANCE_ID}}  [campo sensivel 'instanceId']
+
+HISTORICO PROD.json (1 substituicao(oes)):
+   * meta.instanceId -> {{INSTANCE_ID}}  [campo sensivel 'instanceId']
+
+IMPRIME E ALERTA PRECO MINIMO.json (2 substituicao(oes)):
+   * nodes[4].webhookId -> {{WEBHOOK_ID}}  [campo sensivel 'webhookId']
+   * meta.instanceId -> {{INSTANCE_ID}}  [campo sensivel 'instanceId']
+
+IMPRIME PAINEL INDUSTRIA.json (4 substituicao(oes)):
+   * nodes[4].webhookId -> {{WEBHOOK_ID}}  [campo sensivel 'webhookId']
+   * nodes[15].webhookId -> {{WEBHOOK_ID}}  [campo sensivel 'webhookId']
+   * nodes[20].webhookId -> {{WEBHOOK_ID}}  [campo sensivel 'webhookId']
+   * meta.instanceId -> {{INSTANCE_ID}}  [campo sensivel 'instanceId']
+
+IMPRIME PAINEL PERDAS TODAS.json (2 substituicao(oes)):
+   * nodes[5].webhookId -> {{WEBHOOK_ID}}  [campo sensivel 'webhookId']
+   * meta.instanceId -> {{INSTANCE_ID}}  [campo sensivel 'instanceId']
+
+IMPRIME PAINEL PRAZOS.json (3 substituicao(oes)):
+   * nodes[4].webhookId -> {{WEBHOOK_ID}}  [campo sensivel 'webhookId']
+   * nodes[16].webhookId -> {{WEBHOOK_ID}}  [campo sensivel 'webhookId']
+   * meta.instanceId -> {{INSTANCE_ID}}  [campo sensivel 'instanceId']
+
+IMPRIME PAINEL RESUMO SEMANAL.json (2 substituicao(oes)):
+   * nodes[4].webhookId -> {{WEBHOOK_ID}}  [campo sensivel 'webhookId']
+   * meta.instanceId -> {{INSTANCE_ID}}  [campo sensivel 'instanceId']
+
+IMPRIME PAINEL VENDEDORES.json (2 substituicao(oes)):
+   * nodes[4].webhookId -> {{WEBHOOK_ID}}  [campo sensivel 'webhookId']
+   * meta.instanceId -> {{INSTANCE_ID}}  [campo sensivel 'instanceId']
+
+IMPRIME PAINEL VISAO FINANCEIRA.json (4 substituicao(oes)):
+   * nodes[4].webhookId -> {{WEBHOOK_ID}}  [campo sensivel 'webhookId']
+   * nodes[19].webhookId -> {{WEBHOOK_ID}}  [campo sensivel 'webhookId']
+   * nodes[25].webhookId -> {{WEBHOOK_ID}}  [campo sensivel 'webhookId']
+   * meta.instanceId -> {{INSTANCE_ID}}  [campo sensivel 'instanceId']
+
+IMPRIME TURNO EXTRA.json (3 substituicao(oes)):
+   * nodes[4].webhookId -> {{WEBHOOK_ID}}  [campo sensivel 'webhookId']
+   * nodes[11].webhookId -> {{WEBHOOK_ID}}  [campo sensivel 'webhookId']
+   * meta.instanceId -> {{INSTANCE_ID}}  [campo sensivel 'instanceId']
+
+LIBERAÇÃO RECEBIMENTO PENDENTE.json (2 substituicao(oes)):
+   * nodes[7].webhookId -> {{WEBHOOK_ID}}  [campo sensivel 'webhookId']
+   * meta.instanceId -> {{INSTANCE_ID}}  [campo sensivel 'instanceId']
+
+M2 EMITIDA POR VENDEDOR.json (1 substituicao(oes)):
+   * meta.instanceId -> {{INSTANCE_ID}}  [campo sensivel 'instanceId']
+
+Manu - Faturamento dos últimos 3 meses - Bodinhos.json (2 substituicao(oes)):
+   * nodes[2].webhookId -> {{WEBHOOK_ID}}  [campo sensivel 'webhookId']
+   * meta.instanceId -> {{INSTANCE_ID}}  [campo sensivel 'instanceId']
+
+Mapeamentos.json (2 substituicao(oes)):
+   * nodes[17].webhookId -> {{WEBHOOK_ID}}  [campo sensivel 'webhookId']
+   * meta.instanceId -> {{INSTANCE_ID}}  [campo sensivel 'instanceId']
+
+META 24hrs.json (1 substituicao(oes)):
+   * meta.instanceId -> {{INSTANCE_ID}}  [campo sensivel 'instanceId']
+
+MONITORAMENTO DE AUTENTICAÇÃO - GMAIL.json (2 substituicao(oes)):
+   * nodes[2].webhookId -> {{WEBHOOK_ID}}  [campo sensivel 'webhookId']
+   * meta.instanceId -> {{INSTANCE_ID}}  [campo sensivel 'instanceId']
+
+MONITORAMENTO DE AUTENTICAÇÃO - SHEETS.json (1 substituicao(oes)):
+   * meta.instanceId -> {{INSTANCE_ID}}  [campo sensivel 'instanceId']
+
+Movimentação Avulsa - Belga.json (2 substituicao(oes)):
+   * nodes[3].webhookId -> {{WEBHOOK_ID}}  [campo sensivel 'webhookId']
+   * meta.instanceId -> {{INSTANCE_ID}}  [campo sensivel 'instanceId']
+
+Movimentação em Contas Internas.json (2 substituicao(oes)):
+   * nodes[7].webhookId -> {{WEBHOOK_ID}}  [campo sensivel 'webhookId']
+   * meta.instanceId -> {{INSTANCE_ID}}  [campo sensivel 'instanceId']
+
+PAINEL CAIXA (1).json (1 substituicao(oes)):
+   * meta.instanceId -> {{INSTANCE_ID}}  [campo sensivel 'instanceId']
+
+PAINEL CAIXA (2).json (1 substituicao(oes)):
+   * meta.instanceId -> {{INSTANCE_ID}}  [campo sensivel 'instanceId']
+
+PAINEL CAIXA (3).json (1 substituicao(oes)):
+   * meta.instanceId -> {{INSTANCE_ID}}  [campo sensivel 'instanceId']
+
+PAINEL CAIXA (4).json (1 substituicao(oes)):
+   * meta.instanceId -> {{INSTANCE_ID}}  [campo sensivel 'instanceId']
+
+PAINEL CAIXA (5).json (1 substituicao(oes)):
+   * meta.instanceId -> {{INSTANCE_ID}}  [campo sensivel 'instanceId']
+
+Painel de Controle - Semana_Mês _ Fortaleza.json (1 substituicao(oes)):
+   * meta.instanceId -> {{INSTANCE_ID}}  [campo sensivel 'instanceId']
+
+PAINEL EI (1).json (1 substituicao(oes)):
+   * meta.instanceId -> {{INSTANCE_ID}}  [campo sensivel 'instanceId']
+
+PAINEL EI (2).json (1 substituicao(oes)):
+   * meta.instanceId -> {{INSTANCE_ID}}  [campo sensivel 'instanceId']
+
+PAINEL EI (3).json (1 substituicao(oes)):
+   * meta.instanceId -> {{INSTANCE_ID}}  [campo sensivel 'instanceId']
+
+PAINEL EI (NÃO ATIVAR).json (1 substituicao(oes)):
+   * meta.instanceId -> {{INSTANCE_ID}}  [campo sensivel 'instanceId']
+
+PAINEL WILL.json (1 substituicao(oes)):
+   * meta.instanceId -> {{INSTANCE_ID}}  [campo sensivel 'instanceId']
+
+PARALISACOES.json (1 substituicao(oes)):
+   * meta.instanceId -> {{INSTANCE_ID}}  [campo sensivel 'instanceId']
+
+ped_pendentes_bds.json (2 substituicao(oes)):
+   * nodes[10].webhookId -> {{WEBHOOK_ID}}  [campo sensivel 'webhookId']
+   * meta.instanceId -> {{INSTANCE_ID}}  [campo sensivel 'instanceId']
+
+pedido_entregue_pendenteBI _ 15 dias _ 6 Meses.json (2 substituicao(oes)):
+   * nodes[8].webhookId -> {{WEBHOOK_ID}}  [campo sensivel 'webhookId']
+   * meta.instanceId -> {{INSTANCE_ID}}  [campo sensivel 'instanceId']
+
+Pedidos com Custos Alterado - Alumiaco Recife.json (1 substituicao(oes)):
+   * meta.instanceId -> {{INSTANCE_ID}}  [campo sensivel 'instanceId']
+
+PEDIDOS COM PROJETO.json (1 substituicao(oes)):
+   * meta.instanceId -> {{INSTANCE_ID}}  [campo sensivel 'instanceId']
+
+Pedidos de Box e Temperado - Mês anterior.json (2 substituicao(oes)):
+   * nodes[8].webhookId -> {{WEBHOOK_ID}}  [campo sensivel 'webhookId']
+   * meta.instanceId -> {{INSTANCE_ID}}  [campo sensivel 'instanceId']
+
+Pedidos em atraso - Compras.json (2 substituicao(oes)):
+   * nodes[2].webhookId -> {{WEBHOOK_ID}}  [campo sensivel 'webhookId']
+   * meta.instanceId -> {{INSTANCE_ID}}  [campo sensivel 'instanceId']
+
+Pedidos emitidos - Cliente Pendente.json (4 substituicao(oes)):
+   * nodes[17].parameters.headerParameters.parameters[0].value -> {{JWT_TOKEN}}  [padrao de token detectado (JWT_TOKEN)]
+   * nodes[18].parameters.headerParameters.parameters[0].value -> {{JWT_TOKEN}}  [padrao de token detectado (JWT_TOKEN)]
+   * nodes[19].parameters.headerParameters.parameters[0].value -> {{JWT_TOKEN}}  [padrao de token detectado (JWT_TOKEN)]
+   * meta.instanceId -> {{INSTANCE_ID}}  [campo sensivel 'instanceId']
+
+PERDA PLANO.json (1 substituicao(oes)):
+   * meta.instanceId -> {{INSTANCE_ID}}  [campo sensivel 'instanceId']
+
+Peso Carregado - Consumo Vivix e Guardian.json (1 substituicao(oes)):
+   * meta.instanceId -> {{INSTANCE_ID}}  [campo sensivel 'instanceId']
+
+Peso disponível para Cargas.json (2 substituicao(oes)):
+   * nodes[1].webhookId -> {{WEBHOOK_ID}}  [campo sensivel 'webhookId']
+   * meta.instanceId -> {{INSTANCE_ID}}  [campo sensivel 'instanceId']
+
+Peças pendentes de entrega - Guilhermino.json (2 substituicao(oes)):
+   * nodes[1].webhookId -> {{WEBHOOK_ID}}  [campo sensivel 'webhookId']
+   * meta.instanceId -> {{INSTANCE_ID}}  [campo sensivel 'instanceId']
+
+Posição de dinheiro em bodinhos.json (2 substituicao(oes)):
+   * nodes[3].webhookId -> {{WEBHOOK_ID}}  [campo sensivel 'webhookId']
+   * meta.instanceId -> {{INSTANCE_ID}}  [campo sensivel 'instanceId']
+
+Posição em Dinheiro.json (2 substituicao(oes)):
+   * nodes[3].webhookId -> {{WEBHOOK_ID}}  [campo sensivel 'webhookId']
+   * meta.instanceId -> {{INSTANCE_ID}}  [campo sensivel 'instanceId']
+
+PowerBI Export - Importação.json (3 substituicao(oes)):
+   * nodes[6].webhookId -> {{WEBHOOK_ID}}  [campo sensivel 'webhookId']
+   * nodes[11].webhookId -> {{WEBHOOK_ID}}  [campo sensivel 'webhookId']
+   * meta.instanceId -> {{INSTANCE_ID}}  [campo sensivel 'instanceId']
+
+PREVISAO 12_17.json (1 substituicao(oes)):
+   * meta.instanceId -> {{INSTANCE_ID}}  [campo sensivel 'instanceId']
+
+Previsão de Entrega dos Pedidos - Alumiaço Recife.json (2 substituicao(oes)):
+   * nodes[2].webhookId -> {{WEBHOOK_ID}}  [campo sensivel 'webhookId']
+   * meta.instanceId -> {{INSTANCE_ID}}  [campo sensivel 'instanceId']
+
+PRONTAS NAO GUARDADAS.json (1 substituicao(oes)):
+   * meta.instanceId -> {{INSTANCE_ID}}  [campo sensivel 'instanceId']
+
+PROPORCAO GRUPO.json (1 substituicao(oes)):
+   * meta.instanceId -> {{INSTANCE_ID}}  [campo sensivel 'instanceId']
+
+QIVE - CT-e Belga.json (1 substituicao(oes)):
+   * meta.instanceId -> {{INSTANCE_ID}}  [campo sensivel 'instanceId']
+
+Quebra galho DRE - Manu.json (2 substituicao(oes)):
+   * nodes[2].webhookId -> {{WEBHOOK_ID}}  [campo sensivel 'webhookId']
+   * meta.instanceId -> {{INSTANCE_ID}}  [campo sensivel 'instanceId']
+
+Recebimento Mercadoria - Allglass Tempera.json (1 substituicao(oes)):
+   * meta.instanceId -> {{INSTANCE_ID}}  [campo sensivel 'instanceId']
+
+Relatórios GM Olinda.json (6 substituicao(oes)):
+   * nodes[2].webhookId -> {{WEBHOOK_ID}}  [campo sensivel 'webhookId']
+   * nodes[11].webhookId -> {{WEBHOOK_ID}}  [campo sensivel 'webhookId']
+   * nodes[16].webhookId -> {{WEBHOOK_ID}}  [campo sensivel 'webhookId']
+   * nodes[22].webhookId -> {{WEBHOOK_ID}}  [campo sensivel 'webhookId']
+   * nodes[33].webhookId -> {{WEBHOOK_ID}}  [campo sensivel 'webhookId']
+   * meta.instanceId -> {{INSTANCE_ID}}  [campo sensivel 'instanceId']
+
+Relatórios Guilhermino.json (4 substituicao(oes)):
+   * nodes[1].webhookId -> {{WEBHOOK_ID}}  [campo sensivel 'webhookId']
+   * nodes[9].webhookId -> {{WEBHOOK_ID}}  [campo sensivel 'webhookId']
+   * nodes[15].webhookId -> {{WEBHOOK_ID}}  [campo sensivel 'webhookId']
+   * meta.instanceId -> {{INSTANCE_ID}}  [campo sensivel 'instanceId']
+
+Relatórios Perfilux.json (3 substituicao(oes)):
+   * nodes[2].webhookId -> {{WEBHOOK_ID}}  [campo sensivel 'webhookId']
+   * nodes[11].webhookId -> {{WEBHOOK_ID}}  [campo sensivel 'webhookId']
+   * meta.instanceId -> {{INSTANCE_ID}}  [campo sensivel 'instanceId']
+
+REPOSICOES.json (1 substituicao(oes)):
+   * meta.instanceId -> {{INSTANCE_ID}}  [campo sensivel 'instanceId']
+
+RETALHO HORA.json (1 substituicao(oes)):
+   * meta.instanceId -> {{INSTANCE_ID}}  [campo sensivel 'instanceId']
+
+Retalhos.json (1 substituicao(oes)):
+   * meta.instanceId -> {{INSTANCE_ID}}  [campo sensivel 'instanceId']
+
+ROMANEIO.json (1 substituicao(oes)):
+   * meta.instanceId -> {{INSTANCE_ID}}  [campo sensivel 'instanceId']
+
+Saldo Intercompany.json (2 substituicao(oes)):
+   * nodes[3].webhookId -> {{WEBHOOK_ID}}  [campo sensivel 'webhookId']
+   * meta.instanceId -> {{INSTANCE_ID}}  [campo sensivel 'instanceId']
+
+Saídas Não Operacionais.json (2 substituicao(oes)):
+   * nodes[4].webhookId -> {{WEBHOOK_ID}}  [campo sensivel 'webhookId']
+   * meta.instanceId -> {{INSTANCE_ID}}  [campo sensivel 'instanceId']
+
+Script Auditoria Padronizado.json (1 substituicao(oes)):
+   * meta.instanceId -> {{INSTANCE_ID}}  [campo sensivel 'instanceId']
+
+SUGESTAO DIARIA BOX.json (1 substituicao(oes)):
+   * meta.instanceId -> {{INSTANCE_ID}}  [campo sensivel 'instanceId']
+
+Sugestão de Compras - Diário Alum. Recife.json (2 substituicao(oes)):
+   * nodes[2].webhookId -> {{WEBHOOK_ID}}  [campo sensivel 'webhookId']
+   * meta.instanceId -> {{INSTANCE_ID}}  [campo sensivel 'instanceId']
+
+Sugestão de Compras - Diário.json (3 substituicao(oes)):
+   * nodes[2].webhookId -> {{WEBHOOK_ID}}  [campo sensivel 'webhookId']
+   * nodes[10].webhookId -> {{WEBHOOK_ID}}  [campo sensivel 'webhookId']
+   * meta.instanceId -> {{INSTANCE_ID}}  [campo sensivel 'instanceId']
+
+Sugestão Kits e Puxadores - GM Olinda.json (2 substituicao(oes)):
+   * nodes[2].webhookId -> {{WEBHOOK_ID}}  [campo sensivel 'webhookId']
+   * meta.instanceId -> {{INSTANCE_ID}}  [campo sensivel 'instanceId']
+
+Sugestão Kits e Puxadores.json (2 substituicao(oes)):
+   * nodes[9].webhookId -> {{WEBHOOK_ID}}  [campo sensivel 'webhookId']
+   * meta.instanceId -> {{INSTANCE_ID}}  [campo sensivel 'instanceId']
+
+Titulos Pendentes.json (2 substituicao(oes)):
+   * nodes[10].webhookId -> {{WEBHOOK_ID}}  [campo sensivel 'webhookId']
+   * meta.instanceId -> {{INSTANCE_ID}}  [campo sensivel 'instanceId']
+
+Total Expedido no Dia.json (1 substituicao(oes)):
+   * meta.instanceId -> {{INSTANCE_ID}}  [campo sensivel 'instanceId']
+
+Total Expedido no Mês.json (1 substituicao(oes)):
+   * meta.instanceId -> {{INSTANCE_ID}}  [campo sensivel 'instanceId']
+
+Total Vendido no Dia.json (1 substituicao(oes)):
+   * meta.instanceId -> {{INSTANCE_ID}}  [campo sensivel 'instanceId']
+
+Total Vendido por Mês.json (1 substituicao(oes)):
+   * meta.instanceId -> {{INSTANCE_ID}}  [campo sensivel 'instanceId']
+
+Venda de ferragens no mês.json (2 substituicao(oes)):
+   * nodes[2].webhookId -> {{WEBHOOK_ID}}  [campo sensivel 'webhookId']
+   * meta.instanceId -> {{INSTANCE_ID}}  [campo sensivel 'instanceId']
+
+Vendas de ferragens por vendedor - Acumulado Mês.json (2 substituicao(oes)):
+   * nodes[2].webhookId -> {{WEBHOOK_ID}}  [campo sensivel 'webhookId']
+   * meta.instanceId -> {{INSTANCE_ID}}  [campo sensivel 'instanceId']
+
+Vendas Mês - GM Montese.json (2 substituicao(oes)):
+   * nodes[7].webhookId -> {{WEBHOOK_ID}}  [campo sensivel 'webhookId']
+   * meta.instanceId -> {{INSTANCE_ID}}  [campo sensivel 'instanceId']
+
+Vendas por cliente dos últimos 6 meses - GM Maceió.json (2 substituicao(oes)):
+   * nodes[2].webhookId -> {{WEBHOOK_ID}}  [campo sensivel 'webhookId']
+   * meta.instanceId -> {{INSTANCE_ID}}  [campo sensivel 'instanceId']
+
+VENDIDO (BODINHOS TEMP).json (1 substituicao(oes)):
+   * meta.instanceId -> {{INSTANCE_ID}}  [campo sensivel 'instanceId']
+
+Verifica Atualização - PowerBI.json (1 substituicao(oes)):
+   * meta.instanceId -> {{INSTANCE_ID}}  [campo sensivel 'instanceId']
+
+Webhook - Cargas Vivix e Guardian.json (2 substituicao(oes)):
+   * nodes[9].webhookId -> {{WEBHOOK_ID}}  [campo sensivel 'webhookId']
+   * meta.instanceId -> {{INSTANCE_ID}}  [campo sensivel 'instanceId']
+
+Webhook - CONTROLADORIA.json (2 substituicao(oes)):
+   * nodes[2].webhookId -> {{WEBHOOK_ID}}  [campo sensivel 'webhookId']
+   * meta.instanceId -> {{INSTANCE_ID}}  [campo sensivel 'instanceId']
+
+Webhook - DESPESAS NÃO PROGRAMADAS.json (2 substituicao(oes)):
+   * nodes[4].webhookId -> {{WEBHOOK_ID}}  [campo sensivel 'webhookId']
+   * meta.instanceId -> {{INSTANCE_ID}}  [campo sensivel 'instanceId']
+
+WEBHOOK CONTROLADORIA.json (2 substituicao(oes)):
+   * nodes[0].webhookId -> {{WEBHOOK_ID}}  [campo sensivel 'webhookId']
+   * meta.instanceId -> {{INSTANCE_ID}}  [campo sensivel 'instanceId']
+
+Webhook GUIS.json (2 substituicao(oes)):
+   * nodes[3].webhookId -> {{WEBHOOK_ID}}  [campo sensivel 'webhookId']
+   * meta.instanceId -> {{INSTANCE_ID}}  [campo sensivel 'instanceId']
+
+WebHook Painéis copy.json (2 substituicao(oes)):
+   * nodes[0].webhookId -> {{WEBHOOK_ID}}  [campo sensivel 'webhookId']
+   * meta.instanceId -> {{INSTANCE_ID}}  [campo sensivel 'instanceId']
+
+WebHook Painéis.json (2 substituicao(oes)):
+   * nodes[0].webhookId -> {{WEBHOOK_ID}}  [campo sensivel 'webhookId']
+   * meta.instanceId -> {{INSTANCE_ID}}  [campo sensivel 'instanceId']
+
+WEBHOOK Pipefy - Financeiro.json (2 substituicao(oes)):
+   * nodes[6].webhookId -> {{WEBHOOK_ID}}  [campo sensivel 'webhookId']
+   * meta.instanceId -> {{INSTANCE_ID}}  [campo sensivel 'instanceId']
+
+Webhook Pipefy - PAGAMENTO DE ADIANTAMENTO.json (2 substituicao(oes)):
+   * nodes[0].webhookId -> {{WEBHOOK_ID}}  [campo sensivel 'webhookId']
+   * meta.instanceId -> {{INSTANCE_ID}}  [campo sensivel 'instanceId']
+
+Webhook Pipefy - SAÍDA NÃO OPERACIONAL.json (2 substituicao(oes)):
+   * nodes[2].webhookId -> {{WEBHOOK_ID}}  [campo sensivel 'webhookId']
+   * meta.instanceId -> {{INSTANCE_ID}}  [campo sensivel 'instanceId']
+
+WHATSAPP-FILA-CONSUMIDOR.json (2 substituicao(oes)):
+   * nodes[4].webhookId -> {{WEBHOOK_ID}}  [campo sensivel 'webhookId']
+   * meta.instanceId -> {{INSTANCE_ID}}  [campo sensivel 'instanceId']
+
+WHATSAPP-FILA-PRODUTOR.json (2 substituicao(oes)):
+   * nodes[2].webhookId -> {{WEBHOOK_ID}}  [campo sensivel 'webhookId']
+   * meta.instanceId -> {{INSTANCE_ID}}  [campo sensivel 'instanceId']
+
+
+============================================================
+RESUMO
+  Arquivos processados:          158
+  Arquivos sem tokens:           0
+  Arquivos com substituicoes:    158
+  Total de substituicoes feitas: 289
+
+Arquivos sanitizados prontos para commit em:
+  C:\repo\catalogo\n8n\sanitizados

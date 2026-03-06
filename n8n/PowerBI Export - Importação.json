@@ -175,7 +175,7 @@
         2192,
         352
       ],
-      "webhookId": "a615421e-aab1-4c58-be55-b823934da59d"
+      "webhookId": "{{WEBHOOK_ID}}"
     },
     {
       "parameters": {
@@ -300,7 +300,7 @@
       ],
       "id": "ff328075-41b7-4810-b2d1-9c1050f99b40",
       "name": "Wait",
-      "webhookId": "88dea294-3dc6-4b38-99e6-6ca08f42a8b8"
+      "webhookId": "{{WEBHOOK_ID}}"
     },
     {
       "parameters": {
@@ -542,7 +542,7 @@
   },
   "versionId": "127e25fc-2c63-4195-afab-b2e10d2bb904",
   "meta": {
-    "instanceId": "a5e8675e548a032fda81ee9dc775b4fc0a1b2003aee794fb0b37064013276a0f"
+    "instanceId": "{{INSTANCE_ID}}"
   },
   "id": "bbJMID1rjPKvTg8U",
   "tags": [

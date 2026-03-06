@@ -560,7 +560,7 @@
   },
   "versionId": "4131b5b6-cfec-4360-a8f2-71dadfb6424a",
   "meta": {
-    "instanceId": "a5e8675e548a032fda81ee9dc775b4fc0a1b2003aee794fb0b37064013276a0f"
+    "instanceId": "{{INSTANCE_ID}}"
   },
   "id": "6Ov9bqq8LtFPYxiv",
   "tags": [

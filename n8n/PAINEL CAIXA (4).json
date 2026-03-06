@@ -1184,7 +1184,7 @@
   "versionId": "ead4bfd3-d38c-4da3-a35b-e9dda24463a9",
   "meta": {
     "templateCredsSetupCompleted": true,
-    "instanceId": "a5e8675e548a032fda81ee9dc775b4fc0a1b2003aee794fb0b37064013276a0f"
+    "instanceId": "{{INSTANCE_ID}}"
   },
   "id": "kppznJ8dnDUmuybQ",
   "tags": [

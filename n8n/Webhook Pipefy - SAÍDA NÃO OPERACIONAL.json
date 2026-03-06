@@ -130,7 +130,7 @@
       ],
       "id": "5dc4f8f3-6a87-4f0f-a2bb-8bb6fa77f363",
       "name": "Webhook1",
-      "webhookId": "78f9e14a-4b9c-45d6-97d3-8fad4beea86c"
+      "webhookId": "{{WEBHOOK_ID}}"
     },
     {
       "parameters": {
@@ -249,7 +249,7 @@
   "versionId": "6e45e792-346a-4cae-aa10-76b864b938df",
   "meta": {
     "templateCredsSetupCompleted": true,
-    "instanceId": "a5e8675e548a032fda81ee9dc775b4fc0a1b2003aee794fb0b37064013276a0f"
+    "instanceId": "{{INSTANCE_ID}}"
   },
   "id": "3ZAt4rb91W7lxmOf",
   "tags": [

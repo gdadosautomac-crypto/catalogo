@@ -76,7 +76,7 @@
         1728,
         368
       ],
-      "webhookId": "5298f6e0-db58-4094-b4cc-928e50e75d2c"
+      "webhookId": "{{WEBHOOK_ID}}"
     },
     {
       "parameters": {
@@ -362,7 +362,7 @@
   },
   "versionId": "8b488eb8-1182-43a8-bbf4-9be0c892c761",
   "meta": {
-    "instanceId": "a5e8675e548a032fda81ee9dc775b4fc0a1b2003aee794fb0b37064013276a0f"
+    "instanceId": "{{INSTANCE_ID}}"
   },
   "id": "FR2fbYUg4vS0kz7p",
   "tags": [

@@ -54,7 +54,7 @@
         -592,
         80
       ],
-      "webhookId": "48a02bc4-b3a9-438a-9053-00747949899a"
+      "webhookId": "{{WEBHOOK_ID}}"
     },
     {
       "parameters": {
@@ -403,7 +403,7 @@
   },
   "versionId": "52bad6ef-24e5-40d7-974f-8a1bb36064ee",
   "meta": {
-    "instanceId": "a5e8675e548a032fda81ee9dc775b4fc0a1b2003aee794fb0b37064013276a0f"
+    "instanceId": "{{INSTANCE_ID}}"
   },
   "id": "CAk4VWyufsFzwiiA",
   "tags": [

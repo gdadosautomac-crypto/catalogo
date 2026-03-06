@@ -217,7 +217,7 @@
       ],
       "id": "05881d2f-8dc6-4c55-b4c0-081d7d19f2d0",
       "name": "Webhook",
-      "webhookId": "82dafdaa-7eff-4c0a-a529-a6c6f061b53c"
+      "webhookId": "{{WEBHOOK_ID}}"
     }
   ],
   "pinData": {},
@@ -291,7 +291,7 @@
   },
   "versionId": "19d85430-97f4-4843-8314-74dab1babcb7",
   "meta": {
-    "instanceId": "a5e8675e548a032fda81ee9dc775b4fc0a1b2003aee794fb0b37064013276a0f"
+    "instanceId": "{{INSTANCE_ID}}"
   },
   "id": "xAopPeeeENMWbJCD",
   "tags": [

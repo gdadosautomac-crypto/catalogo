@@ -527,7 +527,7 @@
   "versionId": "0e3fc8fd-6887-443f-b131-e5e288f40b03",
   "meta": {
     "templateCredsSetupCompleted": true,
-    "instanceId": "a5e8675e548a032fda81ee9dc775b4fc0a1b2003aee794fb0b37064013276a0f"
+    "instanceId": "{{INSTANCE_ID}}"
   },
   "id": "mQIZlob3OPhFxRsw",
   "tags": [

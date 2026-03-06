@@ -72,7 +72,7 @@
       ],
       "id": "cbc849be-d813-4e03-bcb4-89f5530accba",
       "name": "Get many messages",
-      "webhookId": "d41f2dc5-0ba3-46b2-aa5f-5dd491033f7d",
+      "webhookId": "{{WEBHOOK_ID}}",
       "notesInFlow": false,
       "credentials": {
         "gmailOAuth2": {
@@ -153,7 +153,7 @@
   "versionId": "308bada0-f31d-4660-aeec-0709bba617ac",
   "meta": {
     "templateCredsSetupCompleted": true,
-    "instanceId": "a5e8675e548a032fda81ee9dc775b4fc0a1b2003aee794fb0b37064013276a0f"
+    "instanceId": "{{INSTANCE_ID}}"
   },
   "id": "q7l8TBMo7NLMl7Tl",
   "tags": [

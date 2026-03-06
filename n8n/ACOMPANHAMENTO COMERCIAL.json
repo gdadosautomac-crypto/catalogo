@@ -772,7 +772,7 @@
   "versionId": "4678377a-4c5d-46d1-889c-06e0881f5bf5",
   "meta": {
     "templateCredsSetupCompleted": true,
-    "instanceId": "a5e8675e548a032fda81ee9dc775b4fc0a1b2003aee794fb0b37064013276a0f"
+    "instanceId": "{{INSTANCE_ID}}"
   },
   "id": "ydvxHcI5tMRdKeHP",
   "tags": [

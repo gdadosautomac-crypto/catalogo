@@ -267,7 +267,7 @@
         1152,
         0
       ],
-      "webhookId": "444f1d71-8d8e-4ef0-afec-0a95067ba674"
+      "webhookId": "{{WEBHOOK_ID}}"
     },
     {
       "parameters": {
@@ -595,7 +595,7 @@
         1248,
         384
       ],
-      "webhookId": "444f1d71-8d8e-4ef0-afec-0a95067ba674"
+      "webhookId": "{{WEBHOOK_ID}}"
     },
     {
       "parameters": {
@@ -927,7 +927,7 @@
   "versionId": "7204508a-7700-4d79-b790-61373e302172",
   "meta": {
     "templateCredsSetupCompleted": true,
-    "instanceId": "a5e8675e548a032fda81ee9dc775b4fc0a1b2003aee794fb0b37064013276a0f"
+    "instanceId": "{{INSTANCE_ID}}"
   },
   "id": "FgxAMuCab6eFwxvK",
   "tags": [

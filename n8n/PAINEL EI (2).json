@@ -1410,7 +1410,7 @@
   "versionId": "89f0400c-6c49-4524-ab41-852c42c0f829",
   "meta": {
     "templateCredsSetupCompleted": true,
-    "instanceId": "a5e8675e548a032fda81ee9dc775b4fc0a1b2003aee794fb0b37064013276a0f"
+    "instanceId": "{{INSTANCE_ID}}"
   },
   "id": "BqwqExfPiqi5V3jI",
   "tags": [

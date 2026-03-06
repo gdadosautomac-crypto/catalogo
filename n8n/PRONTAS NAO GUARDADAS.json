@@ -410,7 +410,7 @@
   "versionId": "54a26003-2ec4-44d4-a85c-7756552d1ad2",
   "meta": {
     "templateCredsSetupCompleted": true,
-    "instanceId": "a5e8675e548a032fda81ee9dc775b4fc0a1b2003aee794fb0b37064013276a0f"
+    "instanceId": "{{INSTANCE_ID}}"
   },
   "id": "g5aaCvDBcVwq6Ken",
   "tags": [

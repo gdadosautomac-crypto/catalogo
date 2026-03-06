@@ -205,7 +205,7 @@
           "parameters": [
             {
               "name": "Authorization",
-              "value": "Bearer eyJhbGciOiJIUzUxMiJ9.eyJpc3MiOiJQaXBlZnkiLCJpYXQiOjE3MzY0NDc3OTMsImp0aSI6IjgyMWZhZjBkLWMyMDUtNDRjOC05YTU2LWFmYmIxMzI3OTdkYSIsInN1YiI6ODAyNzIsInVzZXIiOnsiaWQiOjgwMjcyLCJlbWFpbCI6Im1hcmNvbGFuZGllZ29AZ21haWwuY29tIn19.czyBeR45RrwDXqnq-TjN7CgM6zmMgR8KB6oeBujazuO1assBjhTFZVyqLw3LB-yT1xDTnJaQS4aIS7_iRhWz4Q"
+              "value": "{{JWT_TOKEN}}"
             },
             {
               "name": "Content-Type",
@@ -458,7 +458,7 @@
   },
   "versionId": "7231c9b1-def9-4d85-9ea2-8a95318c953f",
   "meta": {
-    "instanceId": "a5e8675e548a032fda81ee9dc775b4fc0a1b2003aee794fb0b37064013276a0f"
+    "instanceId": "{{INSTANCE_ID}}"
   },
   "id": "eUSlHnVY4kYCTtYF",
   "tags": [

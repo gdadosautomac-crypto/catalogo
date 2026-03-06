@@ -266,7 +266,7 @@
   },
   "versionId": "7b1d01b0-8e5c-4eaf-957a-2f09c00c146e",
   "meta": {
-    "instanceId": "a5e8675e548a032fda81ee9dc775b4fc0a1b2003aee794fb0b37064013276a0f"
+    "instanceId": "{{INSTANCE_ID}}"
   },
   "id": "pG5YZ82gaCoqOST0",
   "tags": [

@@ -60,7 +60,7 @@
         1824,
         1008
       ],
-      "webhookId": "81fc5e63-d5d1-4c4d-872c-a26b99c1ba86"
+      "webhookId": "{{WEBHOOK_ID}}"
     },
     {
       "parameters": {
@@ -274,7 +274,7 @@
         1824,
         608
       ],
-      "webhookId": "81fc5e63-d5d1-4c4d-872c-a26b99c1ba86"
+      "webhookId": "{{WEBHOOK_ID}}"
     },
     {
       "parameters": {
@@ -397,7 +397,7 @@
         1824,
         432
       ],
-      "webhookId": "1dd759c8-608b-45af-8bf1-bc5029eb8c00"
+      "webhookId": "{{WEBHOOK_ID}}"
     },
     {
       "parameters": {
@@ -536,7 +536,7 @@
         1824,
         832
       ],
-      "webhookId": "6adedeb6-dab2-46fa-8838-c474982bb143"
+      "webhookId": "{{WEBHOOK_ID}}"
     },
     {
       "parameters": {
@@ -775,7 +775,7 @@
         1824,
         144
       ],
-      "webhookId": "5561a743-e956-4314-a096-1f89352e69e1"
+      "webhookId": "{{WEBHOOK_ID}}"
     },
     {
       "parameters": {
@@ -1291,7 +1291,7 @@
   },
   "versionId": "bb0126bc-1160-416a-a285-b8e9c4af5bf4",
   "meta": {
-    "instanceId": "a5e8675e548a032fda81ee9dc775b4fc0a1b2003aee794fb0b37064013276a0f"
+    "instanceId": "{{INSTANCE_ID}}"
   },
   "id": "TC0Nudth7WYa6fBn",
   "tags": [
