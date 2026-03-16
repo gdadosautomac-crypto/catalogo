@@ -33,7 +33,7 @@
     {
       "parameters": {
         "operation": "executeQuery",
-        "query": "select \n\tmf.tipo_unidade, \n\tmf.unidade, \n\tdf.forma_pagamento, \n\tround(replace(mf.vlr_pago, ',','.')::numeric, 2) as Entrada\nfrom movimentacoes_financeiras mf \n\tleft join (\n\t\tselect \n\t\t\tdistinct unidade, \n\t\t\tchave, \n\t\t\tforma_pagamento\n\t\tfrom detalhamento_financeiro\n\t) df on mf.unidade = df.unidade and mf.chave_detalhamento = df.chave\nwhere\n\tmf.data_pagamento::date = current_date - 3 \n\tand df.forma_pagamento in ('Boleto', 'Cheque', 'Dinheiro', 'Deposito')\n\tand mf.tipo_de_lancamento = 'Entrada' \n\tand mf.unidade = 'Agreste Vidros'\ngroup by mf.tipo_unidade, mf.unidade, df.forma_pagamento, mf.vlr_pago\norder by mf.tipo_unidade desc, mf.unidade asc, df.forma_pagamento asc",
+        "query": "select \n\tmf.tipo_unidade, \n\tmf.unidade, \n\tdf.forma_pagamento, \n\tround(replace(mf.vlr_pago, ',','.')::numeric, 2) as Entrada\nfrom movimentacoes_financeiras mf \n\tleft join (\n\t\tselect \n\t\t\tdistinct unidade, \n\t\t\tchave, \n\t\t\tforma_pagamento\n\t\tfrom detalhamento_financeiro\n\t) df on mf.unidade = df.unidade and mf.chave_detalhamento = df.chave\nwhere\n\tmf.data_pagamento::date = current_date\n\tand df.forma_pagamento in ('Boleto', 'Cheque', 'Dinheiro', 'Deposito')\n\tand mf.tipo_de_lancamento = 'Entrada' \ngroup by mf.tipo_unidade, mf.unidade, df.forma_pagamento, mf.vlr_pago\norder by mf.tipo_unidade desc, mf.unidade asc, df.forma_pagamento asc",
         "options": {}
       },
       "id": "08afc157-dde1-4792-b591-ac61cd79ec1f",
@@ -315,7 +315,7 @@
   "settings": {
     "executionOrder": "v1"
   },
-  "versionId": "b8c32ec7-d276-4c4a-9dce-dbedd91eec18",
+  "versionId": "5c69f38e-fd46-45ca-9d87-b6353cf091a9",
   "meta": {
     "templateCredsSetupCompleted": true,
     "instanceId": "a5e8675e548a032fda81ee9dc775b4fc0a1b2003aee794fb0b37064013276a0f"

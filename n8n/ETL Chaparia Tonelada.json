@@ -1,0 +1,421 @@
+{
+  "name": "ETL Chaparia Tonelada - 15 Unidades",
+  "nodes": [
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "field": "cronExpression",
+              "expression": "0 6 * * *"
+            }
+          ]
+        }
+      },
+      "id": "2c5cafd7-56f3-4ec9-9eda-6a6acf72092a",
+      "name": "Trigger Diário 06h",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.1,
+      "position": [
+        -1280,
+        -96
+      ]
+    },
+    {
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "TRUNCATE TABLE public.chaparia_tonelada;",
+        "options": {}
+      },
+      "id": "0607ef77-c077-4fe9-923c-813f1030d352",
+      "name": "Truncate chaparia_tonelada",
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 2.3,
+      "position": [
+        -1056,
+        -96
+      ],
+      "credentials": {
+        "postgres": {
+          "id": "G50fA6A0L90xaBIe",
+          "name": "Postgres account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "id": "e39dc5c8-3c01-46b9-83d4-ffc5b049563d",
+      "name": "Loop Unidades",
+      "type": "n8n-nodes-base.splitInBatches",
+      "typeVersion": 3,
+      "position": [
+        -560,
+        -96
+      ]
+    },
+    {
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "SELECT\n    '{{ $json[\"tipo_unidade\"] }}' AS tipo_unidade,\n    '{{ $json[\"unidade\"] }}' AS unidade,\n    resumo.DS_OES AS ds_oes,\n    resumo.DS_CAT AS ds_cat,\n    resumo.DS_PRO AS ds_pro,\n    resumo.DS_SCP AS ds_scp,\n    SUM(resumo.MetragemEntregueSerie) AS m2,\n    SUM(resumo.ValorUnitario)                AS valorunitario,\n    SUM(resumo.CustoUnitario)                AS custounitario,\n    SUM(resumo.ValorVendaProdutoComDesconto) AS valorvendaprodutocomdesconto,\n    resumo.ANO AS ano,\n    resumo.MES AS mes\nFROM (\n    SELECT\n        pedidos.DS_OES,\n        pedidos.NU_PVE,\n        pedidos.DS_CAT,\n        CAST(\n            CASE\n                WHEN pedidos.tp_prod = 1\n                THEN (pro.qt_altura * pro.qt_largura * itens.QT_PRO) / 1000000\n                ELSE itens.qt_metragcob\n            END\n        AS DECIMAL(18,4)) AS MetragemEntregueSerie,\n        pedidos.DS_SCP,\n        pedidos.DS_PRO,\n        pedidos.ValorUnitario,\n        pedidos.CustoUnitario,\n        pedidos.ValorVendaProdutoComDesconto,\n        YEAR(rom.DT_ROM) AS ANO,\n        MONTH(rom.DT_ROM) AS MES\n    FROM mgrom01011 itens\n    INNER JOIN mgrom01010 rom ON itens.NU_ROM = rom.NU_ROM\n    INNER JOIN mgpro01010 pro ON pro.NU_PRO = itens.NU_PRO\n    LEFT JOIN (\n        SELECT\n            produtos.NU_PVE,\n            produtos.NU_DPV,\n            subclasse.DS_SCP,\n            prod.DS_PRO,\n            ROUND(\n                IF (\n                    produtos.qt_metragcob > 0,\n                    (((produtos.VLR_PRO * (100 - COALESCE(produtos.alq_desc,0))) / 100) * produtos.qt_metragcob * produtos.qt_pro),\n                    (((produtos.VLR_PRO * (100 - COALESCE(produtos.alq_desc,0))) / 100) * produtos.qt_pro)\n                ) / produtos.qt_pro,\n            2) AS ValorUnitario,\n            ROUND(\n                IF (\n                    produtos.qt_metragcob > 0,\n                    produtos.NU_CUSTO * produtos.qt_metragcob * produtos.qt_pro,\n                    produtos.NU_CUSTO * produtos.qt_pro\n                ) / produtos.qt_pro,\n            2) AS CustoUnitario,\n            prod.TP_PROD,\n            (((produtos.VLR_PRO * (100 - COALESCE(produtos.alq_desc,0))) / 100)) AS ValorVendaProdutoComDesconto,\n            coes.DS_OES,\n            categoria.DS_CAT\n        FROM mgpve01011 produtos\n        LEFT JOIN mgpve01010 ped ON produtos.NU_PVE = ped.NU_PVE\n        LEFT JOIN mgpro01010 prod ON prod.NU_PRO = produtos.NU_PRO\n        LEFT JOIN mgoes01010 coes ON coes.NU_OES = ped.NU_OES\n        LEFT JOIN mgcat01010 categoria ON categoria.NU_CAT = prod.NU_CAT\n        LEFT JOIN mgscp01010 subclasse ON prod.NU_SCP = subclasse.NU_SCP\n        WHERE ped.ID_STATUS IN (1,2,4,8,9)\n          AND ped.DT_PVE >= DATE_FORMAT(CURDATE(), '%Y-%m-01')\n    ) pedidos ON pedidos.NU_PVE = itens.NU_PVE AND pedidos.NU_DPV = itens.NU_DPV\n    WHERE rom.ID_TP_ROM = 2\n      AND pedidos.DS_CAT IN (\n          'CHAPARIA COMUM',\n          'CHAPARIA CORTADA',\n          'CHAPARIA ESPELHO',\n          'CHAPARIA FANTASIA',\n          'CHAPARIA LAMINADO',\n          'CHAPARIA LAMINADO REFLETIVO',\n          'CHAPARIA PINTADA',\n          'CHAPARIA REFLETIVO',\n          'LAMINADO',\n          'VIDRO CORTADO'\n      )\n      AND pedidos.DS_OES NOT LIKE '%REP%'\n      AND pedidos.DS_OES NOT LIKE '%inativo%'\n      AND rom.DT_ROM >= DATE_FORMAT(CURDATE(), '%Y-%m-01')\n) resumo\nGROUP BY\n    resumo.DS_OES,\n    resumo.DS_CAT,\n    resumo.DS_SCP,\n    resumo.DS_PRO,\n    resumo.ANO,\n    resumo.MES;",
+        "options": {}
+      },
+      "id": "bd81a146-ae0b-49ca-8047-813d4afbcc93",
+      "name": "MySQL - Chaparia",
+      "type": "n8n-nodes-base.mySql",
+      "typeVersion": 2.3,
+      "position": [
+        -352,
+        -16
+      ],
+      "credentials": {
+        "mySql": {
+          "id": "INDKBtYNaYfBC3it",
+          "name": "MySQL Connection"
+        }
+      },
+      "onError": "continueRegularOutput"
+    },
+    {
+      "parameters": {
+        "jsCode": "\nconst items = $input.all();\n\n// Pega nome da unidade do contexto do loop\nconst unidade = $('Loop Unidades').item.json.unidade || 'Desconhecida';\n\nif (items.length === 0) {\n  return [{\n    json: {\n      _status: 'sucesso',\n      _unidade: unidade,\n      _linhas: 0,\n      _msg: `✅ ${unidade} → 0 linhas`\n    }\n  }];\n}\n\nconst resultado = items.map(item => {\n  const row = item.json;\n  const scp = (row.ds_scp || '').toString().trim().toUpperCase();\n\n  // Calcula espessura\n  let espessura = 4; // default\n\n  if (scp === '' || scp === null) {\n    espessura = 4;\n  } else if (/3\\+3|03\\+03/.test(scp)) {\n    espessura = 6;\n  } else if (/4\\+4|04\\+04/.test(scp)) {\n    espessura = 8;\n  } else if (/04\\+06|06\\+04/.test(scp)) {\n    espessura = 10;\n  } else if (/05\\+05/.test(scp)) {\n    espessura = 10;\n  } else if (/8\\.38/.test(scp)) {\n    espessura = 8;\n  } else if (/6\\.38/.test(scp)) {\n    espessura = 6;\n  } else {\n    // Tenta extrair número do início (ex: \"6MM\" → 6, \"10MM\" → 10)\n    const match = scp.match(/^(\\d+(\\.\\d+)?)/);\n    if (match) {\n      espessura = parseFloat(match[1]);\n    }\n  }\n\n  const m2 = parseFloat(row.m2) || 0;\n  const tonelada = parseFloat((2.5 * espessura * m2 / 1000).toFixed(4));\n\n  return {\n    json: {\n      ...row,\n      espessura: espessura,\n      tonelada: tonelada,\n      _status: 'sucesso',\n      _unidade: unidade,\n      _linhas: items.length,\n      _msg: `✅ ${unidade} → ${items.length} linhas`\n    }\n  };\n});\n\nconst staticData = $getWorkflowStaticData('global');\nif (!staticData.resumo) staticData.resumo = [];\nstaticData.resumo.push(`✅ ${unidade} → ${items.length} linhas`);\nstaticData.totalLinhas = (staticData.totalLinhas || 0) + items.length;\n\nreturn resultado;\n"
+      },
+      "id": "af472c07-aa27-4347-8b61-b2179f6c4a5e",
+      "name": "Code - Espessura e Tonelada",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        0,
+        -16
+      ]
+    },
+    {
+      "parameters": {
+        "schema": {
+          "__rl": true,
+          "value": "public",
+          "mode": "list",
+          "cachedResultName": "public"
+        },
+        "table": {
+          "__rl": true,
+          "value": "chaparia_tonelada",
+          "mode": "list",
+          "cachedResultName": "chaparia_tonelada"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "tipo_unidade": "={{ $json.tipo_unidade }}",
+            "unidade": "={{ $json.unidade }}",
+            "ds_oes": "={{ $json.ds_oes }}",
+            "ds_cat": "={{ $json.ds_cat }}",
+            "ds_pro": "={{ $json.ds_pro }}",
+            "ds_scp": "={{ $json.ds_scp }}",
+            "m2": "={{ $json.m2 }}",
+            "valorunitario": "={{ $json.valorunitario }}",
+            "custounitario": "={{ $json.custounitario }}",
+            "valorvendaprodutocomdesconto": "={{ $json.valorvendaprodutocomdesconto }}",
+            "ano": "={{ $json.ano }}",
+            "mes": "={{ $json.mes }}",
+            "espessura": "={{ $json.espessura }}",
+            "tonelada": "={{ $json.tonelada }}"
+          },
+          "matchingColumns": [],
+          "schema": []
+        },
+        "options": {}
+      },
+      "id": "1b570fa5-289f-4714-a229-92c773cb4857",
+      "name": "Insert PostgreSQL",
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 2.3,
+      "position": [
+        144,
+        -16
+      ],
+      "credentials": {
+        "postgres": {
+          "id": "G50fA6A0L90xaBIe",
+          "name": "Postgres account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "\nconst items = $input.all();\nconst seen = new Set();\nconst result = [];\n\nfor (const item of items) {\n  const unidade = item.json._unidade;\n  if (!seen.has(unidade)) {\n    seen.add(unidade);\n    result.push({ json: { _status: item.json._status, _unidade: unidade, _linhas: item.json._linhas, _msg: item.json._msg } });\n  }\n}\n\nreturn result;\n"
+      },
+      "id": "18d0d233-3206-4bda-bfd4-9cea0af3a87c",
+      "name": "Dedup Sucesso",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        384,
+        -16
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "const staticData = $getWorkflowStaticData('global');\nconst linhas = staticData.resumo || [];\nconst total = staticData.totalLinhas || 0;\n\n// Limpa pra próxima execução\nstaticData.resumo = [];\nstaticData.totalLinhas = 0;\n\nconst agora = new Date().toLocaleString('pt-BR', { timeZone: 'America/Recife' });\nconst msg = `📊 *Chaparia Tonelada - Carga Diária*\\n🕐 ${agora}\\n\\n${linhas.join('\\n')}\\n\\n📦 Total: ${total} linhas inseridas`;\n\nreturn [{ json: { mensagem: msg } }];"
+      },
+      "id": "ea2ecc18-2b6b-4002-b96f-1ee2e6c8fe41",
+      "name": "Monta Mensagem WhatsApp",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        608,
+        -80
+      ]
+    },
+    {
+      "parameters": {
+        "documentId": {
+          "__rl": true,
+          "value": "https://docs.google.com/spreadsheets/d/11sbM3gNnBdVlfsXTqEFsmT_qe4hZtzT1KJY2_S2Iyjk/edit?usp=sharing",
+          "mode": "url"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "Página1",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/11sbM3gNnBdVlfsXTqEFsmT_qe4hZtzT1KJY2_S2Iyjk/edit#gid=0"
+        },
+        "options": {}
+      },
+      "id": "7f7dd75b-bb52-47e4-9023-71ea06cbc221",
+      "name": "Google Sheets1",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.3,
+      "position": [
+        -816,
+        -96
+      ],
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "8Ytd3zZKAOSyZNqC",
+          "name": "Sheets Andre"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "const unidade = $('Loop Unidades').item.json.unidade || 'Desconhecida';\nconst erro = $input.first()?.json?.error?.message \n          || $input.first()?.json?.message \n          || 'Erro de conexão';\n\n\nconst staticData = $getWorkflowStaticData('global');\nif (!staticData.resumo) staticData.resumo = [];\nstaticData.resumo.push(`❌ ${unidade} → ERRO: ${erro}`);\n\nreturn [{\n  json: {\n    _status: 'erro',\n    _unidade: unidade,\n    _linhas: 0,\n    _msg: `❌ ${unidade} → ERRO: ${erro}`\n  }\n}];"
+      },
+      "id": "5e0600c5-b3b5-4434-ae84-2ca03242d2b2",
+      "name": "Registra Erro",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -64,
+        208
+      ]
+    },
+    {
+      "parameters": {
+        "phone": "5581987473570",
+        "text": "={{ $json.mensagem }}",
+        "additionalFields": {}
+      },
+      "type": "n8n-nodes-zapi.zapi",
+      "typeVersion": 1,
+      "position": [
+        816,
+        -80
+      ],
+      "id": "46edd428-ff54-4ad6-8281-ff7ed9948f7a",
+      "name": "Send text",
+      "credentials": {
+        "zapiApi": {
+          "id": "cGI15AvSkFAV8Qrr",
+          "name": "Z-API account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "352cd6fe-c400-4f8f-bb9c-fbfac5222453",
+              "leftValue": "={{ $json.ds_cat }}",
+              "rightValue": "",
+              "operator": {
+                "type": "string",
+                "operation": "empty",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        -176,
+        -16
+      ],
+      "id": "f0dce600-6270-4096-a2a0-5dcb71807665",
+      "name": "If"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Trigger Diário 06h": {
+      "main": [
+        [
+          {
+            "node": "Truncate chaparia_tonelada",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Truncate chaparia_tonelada": {
+      "main": [
+        [
+          {
+            "node": "Google Sheets1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Loop Unidades": {
+      "main": [
+        [
+          {
+            "node": "Monta Mensagem WhatsApp",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "MySQL - Chaparia",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "MySQL - Chaparia": {
+      "main": [
+        [
+          {
+            "node": "If",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        []
+      ]
+    },
+    "Code - Espessura e Tonelada": {
+      "main": [
+        [
+          {
+            "node": "Insert PostgreSQL",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Insert PostgreSQL": {
+      "main": [
+        [
+          {
+            "node": "Dedup Sucesso",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Dedup Sucesso": {
+      "main": [
+        [
+          {
+            "node": "Loop Unidades",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Monta Mensagem WhatsApp": {
+      "main": [
+        [
+          {
+            "node": "Send text",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Google Sheets1": {
+      "main": [
+        [
+          {
+            "node": "Loop Unidades",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Registra Erro": {
+      "main": [
+        [
+          {
+            "node": "Loop Unidades",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If": {
+      "main": [
+        [
+          {
+            "node": "Registra Erro",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Code - Espessura e Tonelada",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": true,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "04838eaf-d7ed-4030-9375-b8e52fd29930",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "a5e8675e548a032fda81ee9dc775b4fc0a1b2003aee794fb0b37064013276a0f"
+  },
+  "id": "uPX2ADkH2xdClHIy",
+  "tags": []
+}
