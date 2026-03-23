@@ -1,7 +1,7 @@
 # 📊 TONELADA_VENDA_PRODUZIDA — Documentação Técnica
 
 > **Notion:** _[adicionar link da entrada no catálogo]_
-> **Power BI Service:** _[adicionar link do workspace após publicação]_
+> **Power BI Service:** https://app.powerbi.com/groups/b0090161-5335-49fa-a00c-68ff4b319e1f/reports/eac35970-68cb-4ca5-bbdf-ab4c8d34dce9/036491b6297c091961d1?experience=power-bi
 > **Última atualização:** 2026-03-23
 > **Responsável:** André
 
