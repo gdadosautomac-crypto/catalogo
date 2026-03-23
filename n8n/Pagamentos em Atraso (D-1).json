@@ -1,0 +1,779 @@
+{
+  "name": "Pagamentos em Atraso (D-1)",
+  "nodes": [
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "field": "cronExpression",
+              "expression": "0 7 * * *"
+            }
+          ]
+        }
+      },
+      "id": "257e31f2-f821-4cca-98e4-7b3304c1c0db",
+      "name": "Schedule Trigger",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.1,
+      "position": [
+        -2512,
+        112
+      ]
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "id": "f93e8913-de9c-44b4-8f63-9caaefaf4616",
+      "name": "Loop Over Items",
+      "type": "n8n-nodes-base.splitInBatches",
+      "typeVersion": 3,
+      "position": [
+        -1296,
+        80
+      ],
+      "alwaysOutputData": false,
+      "onError": "continueErrorOutput"
+    },
+    {
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "SELECT\n    '{{ $json[\"tipo_unidade\"] }}' as tipo_unidade,\n    '{{ $json[\"unidade\"] }}' as unidade, \n    titulos.nu_cta AS titulo,\n    'Despesa' AS tipo,\n    titulos.DT_EMISSAO AS data_emissao,\n    titulos.DT_VENCTO AS data_vencimento,\n    titulos.DT_PAGTO AS data_pagamento,\n    DATEDIFF(titulos.DT_PAGTO, titulos.DT_VENCTO) AS dias_em_atraso,\n    CASE\n        WHEN titulos.ID_STAT_LANCTO = 5 THEN 'PREVISAO MANUAL'\n        WHEN titulos.ID_STAT_LANCTO = 1 THEN 'PENDENTE'\n        WHEN titulos.ID_STAT_LANCTO = 2 THEN 'PAGO'\n        WHEN titulos.ID_STAT_LANCTO = 3 THEN 'CANCELADO'\n        WHEN titulos.ID_STAT_LANCTO = 6 THEN 'PREVISAO AUTOMATICA'\n    END AS situacao,\n    CASE\n        WHEN titulos.NU_FOR > 0 THEN fornecores.DS_FOR\n        WHEN titulos.NU_COL > 0 THEN colaborador.DS_COL\n    END AS fornecedor_colaborador,\n    titulos.DS_CPG AS descricao,\n    titulos.VLR_TIT_ORIG AS valor_titulo,\n    centrocusto.DS_CCU AS centro_custo,\n    planoconta.DS_CPC AS plano_conta,\n    classificacao.DS_TPD AS classificacao,\n    titulos.NU_DOCTO AS documento,\n    titulos.DS_OBS AS observacao,\n    usu.NOM_USU AS usuario,\n    CASE\n        WHEN formas.TP_PAGTO = 1 AND formas.NU_CON IS NULL THEN 'Dinheiro'\n        WHEN formas.TP_PAGTO = 1 AND formas.NU_CON IS NOT NULL THEN 'Conta Interna'\n        WHEN formas.TP_PAGTO = 2 THEN 'Cheque'\n        WHEN formas.TP_PAGTO = 3 THEN 'Cartao'\n        WHEN formas.TP_PAGTO = 4 THEN 'Saldo'\n        WHEN formas.TP_PAGTO = 5 THEN 'Outros'\n        WHEN formas.TP_PAGTO = 6 THEN 'Boleto'\n        WHEN formas.TP_PAGTO = 7 THEN 'Deposito'\n        WHEN formas.TP_PAGTO = 8 THEN 'Duplicata'\n        WHEN formas.TP_PAGTO = 9 THEN 'Saldo de Outro Cliente'\n        ELSE 'Nao Determinado'\n    END AS forma_pagamento\nFROM mgcta01014 titulos\nLEFT JOIN mgtxc01010 titConta ON titulos.NU_CTA = titConta.NU_CTA\nLEFT JOIN mgccu01010 centrocusto ON titConta.NU_CCU = centrocusto.NU_CCU\nLEFT JOIN mgcpc01010 planoconta ON titConta.NU_CPC = planoconta.NU_CPC\nLEFT JOIN mgfor01010 fornecores ON titulos.NU_FOR = fornecores.NU_FOR\nLEFT JOIN mgcol01010 colaborador ON colaborador.NU_COL = titulos.NU_COL\nLEFT JOIN mgtpd01010 classificacao ON classificacao.NU_TPD = titulos.NU_TPD\nLEFT JOIN mgusu01010 usu ON usu.NU_USU = titulos.NU_USU\nLEFT JOIN mgcta01017 pagamentos ON titulos.NU_CLT = pagamentos.NU_CLT\nLEFT JOIN mgcta01018 formas ON pagamentos.NU_CLT = formas.NU_CLT\nWHERE\n    titulos.ID_STAT_LANCTO = 2\n    AND titulos.COD_LANCTO = 2\n    AND titulos.DT_PAGTO > titulos.DT_VENCTO\n    AND DATE(titulos.DT_PAGTO) = CURDATE() - INTERVAL 1 DAY\nORDER BY dias_em_atraso DESC",
+        "options": {
+          "connectionTimeoutMillis": null
+        }
+      },
+      "id": "831c2b08-abe1-4885-b973-2e8177edd99f",
+      "name": "MySQL – Pagamentos Atraso",
+      "type": "n8n-nodes-base.mySql",
+      "typeVersion": 2.4,
+      "position": [
+        -960,
+        208
+      ],
+      "alwaysOutputData": true,
+      "credentials": {
+        "mySql": {
+          "id": "INDKBtYNaYfBC3it",
+          "name": "MySQL Connection"
+        }
+      },
+      "onError": "continueErrorOutput"
+    },
+    {
+      "parameters": {
+        "jsCode": "const state = $getWorkflowStaticData('global');\nconst unitName = $('Edit Fields').item.json.unidade;\nconst rows = $input.all();\n\nif (!rows || rows.length === 0) {\n  state.summary = [...(state.summary || []), { unit: unitName, count: 0 }];\n  return [{ json: { skipped: true } }];\n}\n\nstate.rows = [...(state.rows || []), ...rows.map(r => ({ json: r.json }))];\nstate.summary = [...(state.summary || []), { unit: unitName, count: rows.length }];\n\nreturn rows;"
+      },
+      "id": "bd6e5157-310e-40b5-bc8e-e6ef6ea72742",
+      "name": "Monta Mensagem",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -1104,
+        32
+      ]
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 1
+          },
+          "conditions": [
+            {
+              "id": "check-hasany",
+              "leftValue": "={{ $json.tipo }}",
+              "rightValue": true,
+              "operator": {
+                "type": "string",
+                "operation": "notEmpty",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "id": "4ca7865e-a7e4-4a02-96d7-e1d8c7cffaac",
+      "name": "IF – Tem Dados?",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2,
+      "position": [
+        -912,
+        32
+      ]
+    },
+    {
+      "parameters": {
+        "documentId": {
+          "__rl": true,
+          "value": "https://docs.google.com/spreadsheets/d/1-POicyrzt3pF737lETypFKUwZu1wf9iQwqYqQnse5bk/edit?hl=pt-br&gid=0#gid=0",
+          "mode": "url"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "Página1",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1-POicyrzt3pF737lETypFKUwZu1wf9iQwqYqQnse5bk/edit#gid=0"
+        },
+        "options": {}
+      },
+      "id": "a3d9e9e1-5487-4bfb-a03f-93240034c9d1",
+      "name": "Google Sheets1",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.3,
+      "position": [
+        -1760,
+        112
+      ],
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "8Ytd3zZKAOSyZNqC",
+          "name": "Sheets Andre"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "2bae94fc-16e6-422b-a70d-b488666e0510",
+              "name": "tipo_unidade",
+              "value": "={{ $json.tipo_unidade }}",
+              "type": "string"
+            },
+            {
+              "id": "674a349e-fc00-4c9b-ada6-0d216d0a80db",
+              "name": "unidade",
+              "value": "={{ $json.unidade }}",
+              "type": "string"
+            },
+            {
+              "id": "67ac34de-fd36-4b6c-b797-f6837ea7d981",
+              "name": "host",
+              "value": "={{ $json.host }}",
+              "type": "string"
+            },
+            {
+              "id": "f022d193-0473-4fbc-9a48-3f29487dd5fa",
+              "name": "name",
+              "value": "={{ $json.name }}",
+              "type": "string"
+            },
+            {
+              "id": "4146a9c6-c7a0-4231-adea-914085fef4f6",
+              "name": "port",
+              "value": "={{ $json.port }}",
+              "type": "number"
+            },
+            {
+              "id": "e9f4fa0c-455b-4366-9988-b45c6a53615d",
+              "name": "user",
+              "value": "={{ $json.user }}",
+              "type": "string"
+            },
+            {
+              "id": "e973f1f7-c07d-4409-8617-4d8e9735a819",
+              "name": "senha",
+              "value": "={{ $json.senha }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "89552cd8-64c7-4901-8769-0a8a7f0a2e50",
+      "name": "Edit Fields",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.3,
+      "position": [
+        -1120,
+        208
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "const state = $getWorkflowStaticData('global');\nstate.rows = [];\nstate.summary = [];\nreturn $input.all();"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -1536,
+        112
+      ],
+      "id": "94afa5c6-fd63-48d9-b9a9-2d3ecd5c72ec",
+      "name": "Init State"
+    },
+    {
+      "parameters": {
+        "jsCode": "const state = $getWorkflowStaticData('global');\nconst unitName = $('Edit Fields').item.json.unidade;\nconst rows = $input.all();\n\nif (!rows || rows.length === 0) {\n  state.summary = [...(state.summary || []), { unit: unitName, count: 0 }];\n  return [{ json: { skipped: true } }];\n}\n\nstate.rows = [...(state.rows || []), ...rows.map(r => ({ json: r.json }))];\nstate.summary = [...(state.summary || []), { unit: unitName, count: rows.length }];\n\nreturn rows;"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -736,
+        272
+      ],
+      "id": "c37fcee7-b305-4854-a5e7-cac7c953d991",
+      "name": "Acumula rows",
+      "alwaysOutputData": true
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "c9777b34-96c3-49cb-9e8f-5171d677c039",
+              "name": "arq",
+              "value": "=auditoria de pagamento - d{{ $now.day }}-{{ $now.hour }}h{{ $now.minute }}m{{ $now.second }}s",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {
+          "includeBinary": "={{ data }}"
+        }
+      },
+      "id": "d40e1abb-01d1-4f83-9109-762a55fe5687",
+      "name": "ARQUIVO",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.3,
+      "position": [
+        -1952,
+        112
+      ]
+    },
+    {
+      "parameters": {
+        "operation": "upload",
+        "bucketName": "marcolanoperacoes",
+        "fileName": "={{ $('ARQUIVO').item.json.arq }}",
+        "additionalFields": {
+          "acl": "publicReadWrite"
+        }
+      },
+      "id": "a2646513-9808-455e-8abc-a91adde067ae",
+      "name": "AWS S31",
+      "type": "n8n-nodes-base.awsS3",
+      "typeVersion": 2,
+      "position": [
+        -176,
+        32
+      ],
+      "credentials": {
+        "aws": {
+          "id": "wojq9Jq4bZgupPjh",
+          "name": "AWS account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "=https://api.z-api.io/instances/3AD47F49CE9AF04B4D43CA225862B38B/token/6EE2B07CF6D61B0059AD2125/send-document/xlsx",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "={{ $('AUTH').item.json.link2 }}",
+              "value": "={{ $('AUTH').item.json.link1 }}"
+            }
+          ]
+        },
+        "sendBody": true,
+        "contentType": "form-urlencoded",
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "phone",
+              "value": "=5581987473570"
+            },
+            {
+              "name": "fileName",
+              "value": "=Auditoria de Pagamentos - {{$today.format('MM-DD')}}"
+            },
+            {
+              "name": "document",
+              "value": "=https://marcolanoperacoes.s3.amazonaws.com/{{ $('ARQUIVO').item.json.arq }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "c4ffdbaf-65c3-4fa5-a8a1-fce9e2297f68",
+      "name": "Grupo Financeiro",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.1,
+      "position": [
+        0,
+        32
+      ]
+    },
+    {
+      "parameters": {
+        "operation": "xlsx",
+        "options": {
+          "fileName": "=auditoria de pagamento"
+        }
+      },
+      "id": "7cffb545-6bdd-4944-91f5-f4f8ef013860",
+      "name": "Convert to File1",
+      "type": "n8n-nodes-base.convertToFile",
+      "typeVersion": 1.1,
+      "position": [
+        -336,
+        16
+      ]
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "c9777b34-96c3-49cb-9e8f-5171d677c039",
+              "name": "link",
+              "value": "={{ $json.Link }}",
+              "type": "string"
+            },
+            {
+              "id": "c29c9cfb-b76e-4088-b0ca-7748646d4779",
+              "name": "link1",
+              "value": "={{ $json.Value }}",
+              "type": "string"
+            },
+            {
+              "id": "a2465349-2aee-4dc2-8ce6-9a40bf305fa7",
+              "name": "link2",
+              "value": "={{ $json.Field }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "559fe452-389b-4bca-8fd4-de79ef625b72",
+      "name": "AUTH",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.3,
+      "position": [
+        -2128,
+        112
+      ]
+    },
+    {
+      "parameters": {
+        "documentId": {
+          "__rl": true,
+          "value": "https://docs.google.com/spreadsheets/d/1avLuf5Qpu0lBIFVS-Ny0j-iIFZGkVqqufVGy-sfbqM4/edit?usp=sharing",
+          "mode": "url"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "Página1",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1avLuf5Qpu0lBIFVS-Ny0j-iIFZGkVqqufVGy-sfbqM4/edit#gid=0"
+        },
+        "options": {}
+      },
+      "id": "32ddae9d-8af0-4337-85ff-2776e4ee15b7",
+      "name": "Google Sheets",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.3,
+      "position": [
+        -2320,
+        112
+      ],
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "8Ytd3zZKAOSyZNqC",
+          "name": "Sheets Andre"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "50779ab0-d4c2-4506-8803-75105c4664f0",
+              "name": "tipo_unidade",
+              "value": "={{ $json.tipo_unidade }}",
+              "type": "string"
+            },
+            {
+              "id": "a6f52e4a-1d49-4ff2-8768-3e640859a602",
+              "name": "unidade",
+              "value": "={{ $json.unidade }}",
+              "type": "string"
+            },
+            {
+              "id": "354d27cb-e217-474c-a48b-0660f44692a5",
+              "name": "titulo",
+              "value": "={{ $json.titulo }}",
+              "type": "string"
+            },
+            {
+              "id": "032f955d-2d73-4e23-8cf8-a36b4df3f400",
+              "name": "tipo",
+              "value": "={{ $json.tipo }}",
+              "type": "string"
+            },
+            {
+              "id": "71ad5457-b773-4e87-9dc4-64aa36214f80",
+              "name": "data_emissao",
+              "value": "={{ $json.data_emissao }}",
+              "type": "string"
+            },
+            {
+              "id": "6fe8d6a0-2c3d-4f82-97a6-dff11ccca1d0",
+              "name": "data_vencimento",
+              "value": "={{ $json.data_vencimento }}",
+              "type": "string"
+            },
+            {
+              "id": "b1c8e7a0-ecd1-499e-8e52-aece2ac641c1",
+              "name": "data_pagamento",
+              "value": "={{ $json.data_pagamento }}",
+              "type": "string"
+            },
+            {
+              "id": "7d2cbbd7-129e-4661-961e-bc08929c96ee",
+              "name": "dias_em_atraso",
+              "value": "={{ $json.dias_em_atraso }}",
+              "type": "number"
+            },
+            {
+              "id": "c451a212-a4f3-49b0-905e-1157ed5bd983",
+              "name": "situacao",
+              "value": "={{ $json.situacao }}",
+              "type": "string"
+            },
+            {
+              "id": "21685d3e-956a-4874-8ba4-9ad4754cdfe0",
+              "name": "fornecedor_colaborador",
+              "value": "={{ $json.fornecedor_colaborador }}",
+              "type": "string"
+            },
+            {
+              "id": "8a89743f-b3c1-4311-820f-cb4eda55a8ae",
+              "name": "descricao",
+              "value": "={{ $json.descricao }}",
+              "type": "string"
+            },
+            {
+              "id": "05dab1eb-b5cd-4724-a20b-9a44bddefc75",
+              "name": "valor_titulo",
+              "value": "={{ $json.valor_titulo }}",
+              "type": "string"
+            },
+            {
+              "id": "0f4ea100-4605-4517-80b9-79ca1fd05476",
+              "name": "centro_custo",
+              "value": "={{ $json.centro_custo }}",
+              "type": "string"
+            },
+            {
+              "id": "160c6753-905e-425e-af99-5d6a8d836e5f",
+              "name": "plano_conta",
+              "value": "={{ $json.plano_conta }}",
+              "type": "string"
+            },
+            {
+              "id": "e3aee64d-05e8-4b52-acc3-cb7f1e443b57",
+              "name": "classificacao",
+              "value": "={{ $json.classificacao }}",
+              "type": "string"
+            },
+            {
+              "id": "7b4473aa-c3a8-4b9d-9f7a-1f774975d70e",
+              "name": "documento",
+              "value": "={{ $json.documento }}",
+              "type": "string"
+            },
+            {
+              "id": "474e44d3-2a35-4241-be20-efbfc9fd0c1a",
+              "name": "observacao",
+              "value": "={{ $json.observacao }}",
+              "type": "string"
+            },
+            {
+              "id": "82fe57aa-c7eb-4a75-9fa7-54e828aac291",
+              "name": "usuario",
+              "value": "={{ $json.usuario }}",
+              "type": "string"
+            },
+            {
+              "id": "27ddc2d2-ac67-4ab4-aed9-9426f2899df5",
+              "name": "forma_pagamento",
+              "value": "={{ $json.forma_pagamento }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        -704,
+        16
+      ],
+      "id": "02514dca-e85c-4def-a31d-c73e1046fa97",
+      "name": "Edit Fields1"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "7921165c-0da6-47e0-b5b8-46988a740805",
+              "leftValue": "={{ $json.situacao }}",
+              "rightValue": "",
+              "operator": {
+                "type": "string",
+                "operation": "notEmpty",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        -528,
+        32
+      ],
+      "id": "25421290-104f-4963-9cda-60da796a7c5b",
+      "name": "If"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Schedule Trigger": {
+      "main": [
+        [
+          {
+            "node": "Google Sheets",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Loop Over Items": {
+      "main": [
+        [
+          {
+            "node": "Monta Mensagem",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Edit Fields",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "MySQL – Pagamentos Atraso": {
+      "main": [
+        [
+          {
+            "node": "Acumula rows",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Loop Over Items",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Monta Mensagem": {
+      "main": [
+        [
+          {
+            "node": "IF – Tem Dados?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "IF – Tem Dados?": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields1",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        []
+      ]
+    },
+    "Google Sheets1": {
+      "main": [
+        [
+          {
+            "node": "Init State",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Edit Fields": {
+      "main": [
+        [
+          {
+            "node": "MySQL – Pagamentos Atraso",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Init State": {
+      "main": [
+        [
+          {
+            "node": "Loop Over Items",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Acumula rows": {
+      "main": [
+        [
+          {
+            "node": "Loop Over Items",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "AWS S31": {
+      "main": [
+        [
+          {
+            "node": "Grupo Financeiro",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Convert to File1": {
+      "main": [
+        [
+          {
+            "node": "AWS S31",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "AUTH": {
+      "main": [
+        [
+          {
+            "node": "ARQUIVO",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Google Sheets": {
+      "main": [
+        [
+          {
+            "node": "AUTH",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "ARQUIVO": {
+      "main": [
+        [
+          {
+            "node": "Google Sheets1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Edit Fields1": {
+      "main": [
+        [
+          {
+            "node": "If",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If": {
+      "main": [
+        [
+          {
+            "node": "Convert to File1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": true,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "72806076-4a2f-45f2-9170-9c84919975e1",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "a5e8675e548a032fda81ee9dc775b4fc0a1b2003aee794fb0b37064013276a0f"
+  },
+  "id": "usddHtxzRDkS8L5o",
+  "tags": [
+    {
+      "updatedAt": "2026-01-14T11:04:00.895Z",
+      "createdAt": "2025-03-21T11:47:30.374Z",
+      "id": "CvCy3KNJKyMxSQ3C",
+      "name": "GDA"
+    }
+  ]
+}
