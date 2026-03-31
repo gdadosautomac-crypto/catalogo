@@ -1,0 +1,176 @@
+{
+  "name": "MONITORAMENTO DE AUTENTICAÇÃO - SHEETS",
+  "nodes": [
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "field": "hours"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.2,
+      "position": [
+        -400,
+        112
+      ],
+      "id": "34d332ff-08f2-4e20-a668-924c38f609ce",
+      "name": "Schedule Trigger"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.z-api.io/instances/3AD47F49CE9AF04B4D43CA225862B38B/token/6EE2B07CF6D61B0059AD2125/send-text",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Client-Token",
+              "value": "Fb834c77bdcad40999dcb28212a96a9a0S"
+            }
+          ]
+        },
+        "sendBody": true,
+        "contentType": "form-urlencoded",
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "phone",
+              "value": "5581996730645"
+            },
+            {
+              "name": "message",
+              "value": "*ALERTA GRAVE N8N*\n\n*ERRO NA AUTENTICAÇÃO DO GOOGLE SHEETS:*\nFINCORPGM1@GMAIL.COM\n\nCONFERIR URGENTEMENTE!!!!"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "fe3fd637-a201-429d-a633-43156aa0ccf7",
+      "name": "Detalhamento",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.1,
+      "position": [
+        240,
+        128
+      ]
+    },
+    {
+      "parameters": {
+        "documentId": {
+          "__rl": true,
+          "value": "1rmT-U0wDsviqZdikQtKjSLSY6e9h8hx9TajppQl7w2A",
+          "mode": "list",
+          "cachedResultName": "Telefones Gestores",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1rmT-U0wDsviqZdikQtKjSLSY6e9h8hx9TajppQl7w2A/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "Sheet1",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1rmT-U0wDsviqZdikQtKjSLSY6e9h8hx9TajppQl7w2A/edit#gid=0"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        -128,
+        112
+      ],
+      "id": "30d4df15-011b-439d-ae30-27124171640e",
+      "name": "Get row(s) in sheet",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "HfbTEVMQHA5O66Ya",
+          "name": "Sheets JG e Japa"
+        }
+      },
+      "onError": "continueErrorOutput"
+    },
+    {
+      "parameters": {
+        "projectId": "692742c6ebbf5a0000000aec",
+        "title": "CONECTAR SHEETS - n8n",
+        "additionalFields": {
+          "isAllDay": true,
+          "priority": 5,
+          "startDate": "={{ $today }}"
+        }
+      },
+      "type": "n8n-nodes-ticktick.tickTick",
+      "typeVersion": 1,
+      "position": [
+        544,
+        128
+      ],
+      "id": "d3a35f41-b24e-41cc-8537-b2cd834b8e0b",
+      "name": "Create a task"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Schedule Trigger": {
+      "main": [
+        [
+          {
+            "node": "Get row(s) in sheet",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get row(s) in sheet": {
+      "main": [
+        [],
+        [
+          {
+            "node": "Detalhamento",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Detalhamento": {
+      "main": [
+        [
+          {
+            "node": "Create a task",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "4c4cae42-8976-4270-961f-3d1ad515ba5e",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "{{INSTANCE_ID}}"
+  },
+  "id": "rGVSeXCu6UDN5dZL",
+  "tags": [
+    {
+      "updatedAt": "2025-03-21T11:52:03.823Z",
+      "createdAt": "2025-03-21T11:52:03.823Z",
+      "id": "VQmA23kx6h1wy92X",
+      "name": "GUIS"
+    },
+    {
+      "updatedAt": "2025-11-26T12:35:03.400Z",
+      "createdAt": "2025-11-26T12:35:03.400Z",
+      "id": "K5I1ygKf1UlaIarm",
+      "name": "AUTENTICAÇÃO"
+    }
+  ]
+}

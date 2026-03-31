@@ -1,0 +1,947 @@
+{
+  "name": "Consulta Cargas",
+  "nodes": [
+    {
+      "parameters": {
+        "operation": "delete",
+        "bucketName": "marcolanoperacoes",
+        "fileKey": "={{ $json.Key }}",
+        "options": {}
+      },
+      "id": "63a4023c-21ee-4734-9a62-f4edba3cfc28",
+      "name": "AWS S37",
+      "type": "n8n-nodes-base.awsS3",
+      "typeVersion": 2,
+      "position": [
+        -976,
+        592
+      ],
+      "credentials": {
+        "aws": {
+          "id": "wojq9Jq4bZgupPjh",
+          "name": "AWS account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "getAll",
+        "bucketName": "marcolanoperacoes",
+        "returnAll": true,
+        "options": {}
+      },
+      "id": "407d811b-41ad-4277-b9ab-abcb336b1fe9",
+      "name": "AWS S3",
+      "type": "n8n-nodes-base.awsS3",
+      "typeVersion": 2,
+      "position": [
+        -1168,
+        592
+      ],
+      "credentials": {
+        "aws": {
+          "id": "wojq9Jq4bZgupPjh",
+          "name": "AWS account"
+        }
+      }
+    },
+    {
+      "parameters": {},
+      "id": "e06a4320-ba2c-4926-80fb-8ae05db9f767",
+      "name": "Execute Workflow Trigger",
+      "type": "n8n-nodes-base.executeWorkflowTrigger",
+      "typeVersion": 1,
+      "position": [
+        -1184,
+        320
+      ]
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": false,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 1
+          },
+          "conditions": [
+            {
+              "id": "c74f0a9f-bac5-492d-b212-45468374d762",
+              "leftValue": "={{ $json.body.text.message }}",
+              "rightValue": "=@CARGA",
+              "operator": {
+                "type": "string",
+                "operation": "startsWith"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {
+          "ignoreCase": true
+        }
+      },
+      "id": "cdbff964-bf28-47df-8fc0-21a7c7c817de",
+      "name": "If",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2,
+      "position": [
+        -1024,
+        320
+      ]
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "3024cd7b-0be4-4b4b-a3e3-cf41c6ea48ad",
+              "name": "contato",
+              "value": "={{ $json.body.phone }}",
+              "type": "string"
+            },
+            {
+              "id": "798e572c-5c70-4d02-8496-52f8d9f50352",
+              "name": "cargaIniMSG",
+              "value": "={{ $json.body.text.message.substring($json.body.text.message.indexOf(' ')+1,$json.body.text.message.indexOf('-')) }}",
+              "type": "string"
+            },
+            {
+              "id": "900431da-d034-4c8c-a5f4-8c29cb741cb7",
+              "name": "MSG",
+              "value": "={{ $json.body.text.message }}",
+              "type": "string"
+            },
+            {
+              "id": "14b07b5a-6689-42d1-934d-1c0f73f5cfe7",
+              "name": "unidade",
+              "value": "={{ $json.body.text.message.substring($json.body.text.message.indexOf('-')+1,200) }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "89b4c83e-893b-4b50-9cbb-fcc2c76364e6",
+      "name": "Solicitante1",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.3,
+      "position": [
+        -784,
+        304
+      ]
+    },
+    {
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "SELECT \n    concat(eg.unidade, '_', eg.carga) AS key,\n    eg.carga,\n    '{{ $('Solicitante1').item.json.contato }}' as contato, \n    eg.rota,\n    TO_CHAR(data_hora_entregue::DATE,'YYYY-MM-DD') as data, \n    eg.nome_produto, \n    CASE\n        WHEN eg.coes = 'ENGENHARIA PADRÃO'::text THEN 'ENGENHARIA PADRÃO'::text\n        ELSE eg.categoria_produto\n    END AS categoria,\n    round(sum(eg.metragem_entregue::numeric), 2) AS m2,\n    round(sum(eg.peso_entregue::numeric), 2) AS peso,\n    round(sum(eg.valor_entregue+COALESCE(acrescimo,0)), 2) AS valor,\n    round(sum(eg.custo_entregue), 2) AS custo\nFROM entregas_geral eg\nWHERE \n    eg.unidade::text = '{{ $('Solicitante1').item.json.unidade }}' AND eg.carga = '{{ $('Solicitante1').item.json.cargaIniMSG }}'\n    --and data_hora_entregue::date = '2024-09-23' \nGROUP BY (concat(eg.unidade, '_', eg.carga)), eg.carga, eg.coes, TO_CHAR(data_hora_entregue::DATE,'YYYY-MM-DD'), eg.categoria_produto, eg.rota, eg.nome_produto\norder by eg.carga desc",
+        "options": {}
+      },
+      "id": "c0255d33-c71c-4fc0-a7b6-f9c23def93fc",
+      "name": "Postgres1",
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 2.3,
+      "position": [
+        192,
+        0
+      ],
+      "credentials": {
+        "postgres": {
+          "id": "G50fA6A0L90xaBIe",
+          "name": "Postgres account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "delete",
+        "bucketName": "marcolanoperacoes",
+        "fileKey": "={{ $('ARQUIVO1').item.json.arq }}",
+        "options": {}
+      },
+      "id": "a538b684-af80-4188-99e1-194f80c2ed9a",
+      "name": "AWS S33",
+      "type": "n8n-nodes-base.awsS3",
+      "typeVersion": 2,
+      "position": [
+        1344,
+        0
+      ],
+      "credentials": {
+        "aws": {
+          "id": "wojq9Jq4bZgupPjh",
+          "name": "AWS account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "xlsx",
+        "options": {
+          "fileName": "={{ $('ARQUIVO1').item.json.arq }}"
+        }
+      },
+      "id": "2fc2fc55-83a2-45df-b39b-b8ba3a814c81",
+      "name": "Convert to File",
+      "type": "n8n-nodes-base.convertToFile",
+      "typeVersion": 1.1,
+      "position": [
+        560,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "operation": "upload",
+        "bucketName": "marcolanoperacoes",
+        "fileName": "={{ $('ARQUIVO1').item.json.arq }}",
+        "additionalFields": {
+          "acl": "publicReadWrite"
+        }
+      },
+      "id": "6c37813c-7235-4df4-bae6-cc96ac5c89aa",
+      "name": "AWS S31",
+      "type": "n8n-nodes-base.awsS3",
+      "typeVersion": 2,
+      "position": [
+        768,
+        0
+      ],
+      "credentials": {
+        "aws": {
+          "id": "wojq9Jq4bZgupPjh",
+          "name": "AWS account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": []
+        },
+        "includeOtherFields": true,
+        "include": "except",
+        "excludeFields": "contato",
+        "options": {}
+      },
+      "id": "b12e1384-b7e7-4b0a-baa6-d1f841d72b44",
+      "name": "ARQUIVO",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.3,
+      "position": [
+        368,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "c9777b34-96c3-49cb-9e8f-5171d677c039",
+              "name": "arq",
+              "value": "=CargasProds - d{{ $now.day }}-{{ $now.hour }}h{{ $now.minute }}m{{ $now.second }}s",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "b22305d9-eb64-4afc-8ce7-091c114fd58e",
+      "name": "ARQUIVO1",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.3,
+      "position": [
+        0,
+        0
+      ]
+    },
+    {
+      "parameters": {},
+      "id": "8f2a733e-a0d6-4b54-8b1a-6cc415c0ee43",
+      "name": "Wait",
+      "type": "n8n-nodes-base.wait",
+      "typeVersion": 1.1,
+      "position": [
+        1152,
+        0
+      ],
+      "webhookId": "{{WEBHOOK_ID}}"
+    },
+    {
+      "parameters": {
+        "documentId": {
+          "__rl": true,
+          "value": "https://docs.google.com/spreadsheets/d/1J9xHE08UPG2QnDrjFsiy3VU3Z8ziZT9aO9MF7ct5ruA/edit?usp=sharing",
+          "mode": "url"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 564051929,
+          "mode": "list",
+          "cachedResultName": "Token",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1J9xHE08UPG2QnDrjFsiy3VU3Z8ziZT9aO9MF7ct5ruA/edit#gid=564051929"
+        },
+        "options": {}
+      },
+      "id": "93c882d8-4f1f-42ef-89c6-5544d48bb52e",
+      "name": "Token",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.3,
+      "position": [
+        -176,
+        304
+      ],
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "HfbTEVMQHA5O66Ya",
+          "name": "Sheets JG e Japa"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "loose",
+            "version": 1
+          },
+          "conditions": [
+            {
+              "id": "d4c9de5d-0e0c-4501-852a-daac98935a83",
+              "leftValue": "={{ $('Solicitante1').item.json.contato }}",
+              "rightValue": "={{ $json.contato}}",
+              "operator": {
+                "type": "string",
+                "operation": "equals"
+              }
+            },
+            {
+              "id": "74b7cfb0-b3d3-484f-b219-26222a60e2ff",
+              "leftValue": "={{ $('Solicitante1').item.json.unidade }}",
+              "rightValue": "={{ $json.unidade}}",
+              "operator": {
+                "type": "string",
+                "operation": "equals"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {
+          "looseTypeValidation": true
+        }
+      },
+      "id": "52b9f3ff-79c7-47f0-a98c-e70a334156f8",
+      "name": "If1",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2,
+      "position": [
+        -416,
+        304
+      ]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "=https://api.z-api.io/instances/3AD47F49CE9AF04B4D43CA225862B38B/token/6EE2B07CF6D61B0059AD2125/send-text",
+        "sendQuery": true,
+        "queryParameters": {
+          "parameters": [
+            {
+              "name": "=Client-Token",
+              "value": "=Fb834c77bdcad40999dcb28212a96a9a0S"
+            }
+          ]
+        },
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "=Client-Token",
+              "value": "=Fb834c77bdcad40999dcb28212a96a9a0S"
+            }
+          ]
+        },
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "phone",
+              "value": "={{ $('Solicitante1').item.json.contato }}"
+            },
+            {
+              "name": "message",
+              "value": "=Você não possui acesso a esta unidade."
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "57d2d4d7-310b-4851-a86a-fa3c801b48ea",
+      "name": "ERRO1",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.1,
+      "position": [
+        -176,
+        480
+      ],
+      "executeOnce": true
+    },
+    {
+      "parameters": {
+        "documentId": {
+          "__rl": true,
+          "value": "https://docs.google.com/spreadsheets/d/1J9xHE08UPG2QnDrjFsiy3VU3Z8ziZT9aO9MF7ct5ruA/edit?usp=sharing",
+          "mode": "url"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 273364767,
+          "mode": "list",
+          "cachedResultName": "Consulta_Cargas",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1J9xHE08UPG2QnDrjFsiy3VU3Z8ziZT9aO9MF7ct5ruA/edit#gid=273364767"
+        },
+        "options": {}
+      },
+      "id": "031d0df9-1bf8-4902-94a0-4c6c0928b50a",
+      "name": "PHONE",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.3,
+      "position": [
+        -608,
+        304
+      ],
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "HfbTEVMQHA5O66Ya",
+          "name": "Sheets JG e Japa"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "=https://api.z-api.io/instances/3AD47F49CE9AF04B4D43CA225862B38B/token/6EE2B07CF6D61B0059AD2125/send-sticker",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "=Client-Token",
+              "value": "=Fb834c77bdcad40999dcb28212a96a9a0S"
+            }
+          ]
+        },
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "phone",
+              "value": "={{ $('Solicitante1').item.json.contato }}"
+            },
+            {
+              "name": "sticker",
+              "value": "=https://tempstorage.download/instances/3AD47F49CE9AF04B4D43CA225862B38B/003DFF8005417A8FDAFCA253ABCDB10D.webp"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "0c8047d4-7d40-4602-ab75-335f1317c7d9",
+      "name": "ERRO",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.1,
+      "position": [
+        -736,
+        592
+      ],
+      "executeOnce": true
+    },
+    {
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "SELECT \n    concat(eg.unidade, '_', eg.carga) AS key,\n    eg.carga,\n    '{{ $('Solicitante1').item.json.contato }}' as contato, \n    eg.rota,\n    TO_CHAR(data_hora_entregue::DATE,'YYYY-MM-DD') as data,\n    CASE\n        WHEN eg.coes = 'ENGENHARIA PADRÃO'::text THEN 'ENGENHARIA PADRÃO'::text\n        ELSE eg.categoria_produto\n    END AS categoria,\n    round(sum(eg.metragem_entregue::numeric), 2) AS m2,\n    round(sum(eg.peso_entregue::numeric), 2) AS peso,\n    round(sum(eg.valor_entregue+COALESCE(acrescimo,0)), 2) AS valor,\n    round(sum(eg.custo_entregue), 2) AS custo\nFROM entregas_geral eg\nWHERE \n    eg.unidade::text = '{{ $('Solicitante1').item.json.unidade }}' AND eg.carga = '{{ $('Solicitante1').item.json.cargaIniMSG }}' \nGROUP BY (concat(eg.unidade, '_', eg.carga)), eg.carga, eg.coes, TO_CHAR(data_hora_entregue::DATE,'YYYY-MM-DD'), eg.categoria_produto, eg.rota",
+        "options": {}
+      },
+      "id": "02b87776-28da-4d53-84d0-b49e8871a2cf",
+      "name": "Postgres",
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 2.3,
+      "position": [
+        288,
+        384
+      ],
+      "credentials": {
+        "postgres": {
+          "id": "G50fA6A0L90xaBIe",
+          "name": "Postgres account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "delete",
+        "bucketName": "marcolanoperacoes",
+        "fileKey": "={{ $('ARQUIVO3').item.json.arq }}",
+        "options": {}
+      },
+      "id": "be45f4a6-35cf-4e7e-8534-bcb1d1e9737b",
+      "name": "AWS S34",
+      "type": "n8n-nodes-base.awsS3",
+      "typeVersion": 2,
+      "position": [
+        1440,
+        384
+      ],
+      "credentials": {
+        "aws": {
+          "id": "wojq9Jq4bZgupPjh",
+          "name": "AWS account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "xlsx",
+        "options": {
+          "fileName": "={{ $('ARQUIVO3').item.json.arq }}"
+        }
+      },
+      "id": "af5fffd2-7d75-4fa2-8cb7-2c3938b4eea7",
+      "name": "Convert to File1",
+      "type": "n8n-nodes-base.convertToFile",
+      "typeVersion": 1.1,
+      "position": [
+        672,
+        384
+      ]
+    },
+    {
+      "parameters": {
+        "operation": "upload",
+        "bucketName": "marcolanoperacoes",
+        "fileName": "={{ $('ARQUIVO3').item.json.arq }}",
+        "additionalFields": {
+          "acl": "publicReadWrite"
+        }
+      },
+      "id": "e90e8959-3473-4461-b65d-30346f8da791",
+      "name": "AWS S32",
+      "type": "n8n-nodes-base.awsS3",
+      "typeVersion": 2,
+      "position": [
+        864,
+        384
+      ],
+      "credentials": {
+        "aws": {
+          "id": "wojq9Jq4bZgupPjh",
+          "name": "AWS account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": []
+        },
+        "includeOtherFields": true,
+        "include": "except",
+        "excludeFields": "contato",
+        "options": {}
+      },
+      "id": "d6bca62b-8105-4291-864a-979b72183f3a",
+      "name": "ARQUIVO2",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.3,
+      "position": [
+        464,
+        384
+      ]
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "c9777b34-96c3-49cb-9e8f-5171d677c039",
+              "name": "arq",
+              "value": "=CargasProds - d{{ $now.day }}-{{ $now.hour }}h{{ $now.minute }}m{{ $now.second }}s",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "bf303d40-ece7-49a8-abdf-e9d5c8c5d4dc",
+      "name": "ARQUIVO3",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.3,
+      "position": [
+        112,
+        384
+      ]
+    },
+    {
+      "parameters": {},
+      "id": "4d45196d-6164-4d27-aa26-fc2988d00252",
+      "name": "Wait1",
+      "type": "n8n-nodes-base.wait",
+      "typeVersion": 1.1,
+      "position": [
+        1248,
+        384
+      ],
+      "webhookId": "{{WEBHOOK_ID}}"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{ $('Token').item.json.Link }}send-document/xlsx",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "={{ $('Token').item.json.Name }}",
+              "value": "={{ $('Token').item.json.Value }}"
+            }
+          ]
+        },
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "phone",
+              "value": "={{ $('Postgres1').first().json.contato }}"
+            },
+            {
+              "name": "fileName",
+              "value": "={{ $('Postgres1').first().json.key }}_Produtos"
+            },
+            {
+              "name": "document",
+              "value": "=https://marcolanoperacoes.s3.amazonaws.com/{{ $('ARQUIVO1').item.json.arq }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "37768413-4879-4dd1-b99d-c5b573778a3c",
+      "name": "Carga_Produto",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.1,
+      "position": [
+        944,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{ $('Token').item.json.Link }}send-document/xlsx",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "={{ $('Token').item.json.Name }}",
+              "value": "={{ $('Token').item.json.Value }}"
+            }
+          ]
+        },
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "phone",
+              "value": "={{ $('Postgres').first().json.contato }}"
+            },
+            {
+              "name": "fileName",
+              "value": "={{ $('Postgres').first().json.key }}"
+            },
+            {
+              "name": "document",
+              "value": "=https://marcolanoperacoes.s3.amazonaws.com/{{ $('ARQUIVO3').item.json.arq }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "f14cbbb5-2d90-45cd-94c2-cdd951581525",
+      "name": "Carga",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.1,
+      "position": [
+        1040,
+        384
+      ]
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "AWS S3": {
+      "main": [
+        [
+          {
+            "node": "AWS S37",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Execute Workflow Trigger": {
+      "main": [
+        [
+          {
+            "node": "If",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If": {
+      "main": [
+        [
+          {
+            "node": "Solicitante1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Solicitante1": {
+      "main": [
+        [
+          {
+            "node": "PHONE",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "AWS S31": {
+      "main": [
+        [
+          {
+            "node": "Carga_Produto",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Convert to File": {
+      "main": [
+        [
+          {
+            "node": "AWS S31",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "ARQUIVO": {
+      "main": [
+        [
+          {
+            "node": "Convert to File",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Postgres1": {
+      "main": [
+        [
+          {
+            "node": "ARQUIVO",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "ARQUIVO1": {
+      "main": [
+        [
+          {
+            "node": "Postgres1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Wait": {
+      "main": [
+        [
+          {
+            "node": "AWS S33",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Token": {
+      "main": [
+        [
+          {
+            "node": "ARQUIVO1",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "ARQUIVO3",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If1": {
+      "main": [
+        [
+          {
+            "node": "Token",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        []
+      ]
+    },
+    "PHONE": {
+      "main": [
+        [
+          {
+            "node": "If1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Postgres": {
+      "main": [
+        [
+          {
+            "node": "ARQUIVO2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Convert to File1": {
+      "main": [
+        [
+          {
+            "node": "AWS S32",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "AWS S32": {
+      "main": [
+        [
+          {
+            "node": "Carga",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "ARQUIVO2": {
+      "main": [
+        [
+          {
+            "node": "Convert to File1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "ARQUIVO3": {
+      "main": [
+        [
+          {
+            "node": "Postgres",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Wait1": {
+      "main": [
+        [
+          {
+            "node": "AWS S34",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Carga_Produto": {
+      "main": [
+        [
+          {
+            "node": "Wait",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Carga": {
+      "main": [
+        [
+          {
+            "node": "Wait1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": true,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "7204508a-7700-4d79-b790-61373e302172",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "{{INSTANCE_ID}}"
+  },
+  "id": "FgxAMuCab6eFwxvK",
+  "tags": [
+    {
+      "updatedAt": "2025-03-21T11:52:03.823Z",
+      "createdAt": "2025-03-21T11:52:03.823Z",
+      "id": "VQmA23kx6h1wy92X",
+      "name": "GUIS"
+    },
+    {
+      "updatedAt": "2025-03-24T11:42:37.665Z",
+      "createdAt": "2025-03-24T11:42:37.665Z",
+      "id": "nDS88XDFC0HV8gKr",
+      "name": "Cargas"
+    }
+  ]
+}

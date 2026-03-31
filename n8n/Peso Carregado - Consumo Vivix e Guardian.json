@@ -1,0 +1,369 @@
+{
+  "name": "Peso Carregado - Consumo Vivix e Guardian",
+  "nodes": [
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "field": "weeks",
+              "triggerAtDay": [
+                1,
+                3,
+                2,
+                4,
+                5
+              ],
+              "triggerAtHour": 8,
+              "triggerAtMinute": 47
+            }
+          ]
+        }
+      },
+      "id": "5434824c-e83c-4b5e-bf7d-74291dd8df9e",
+      "name": "Schedule Trigger",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.1,
+      "position": [
+        80,
+        1488
+      ]
+    },
+    {
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "select \n    TO_CHAR(ROUND(SUM(replace(peso,',','.')::numeric),2), '9G999G999D99') AS peso_guardian_formatado,\n\tROUND(SUM(replace(peso,',','.')::numeric),2) as pesog \nfrom ( \n\tselect \n\t\temissor, \n\t\tdata_emissao::date, \n\t\tnfe, \n\t\tdestinario, \n\t\tpeso, \n\t\tnatureza_operacao \n\tfrom notas_fiscais nf \n\twhere \n\t\temissor like ('%GUARDIAN%') and natureza_operacao not like ('Rem%') \n\t\tand data_emissao::date >= TO_CHAR(NOW()::DATE, 'yyyy-mm-01')::date \n\tgroup by emissor, nfe, destinario, peso, natureza_operacao, data_emissao::date \n\torder by data_emissao::date desc \n) x",
+        "options": {}
+      },
+      "id": "5a4b65be-3292-49b8-80ea-4ad5b10ae947",
+      "name": "Guardian1",
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 2.3,
+      "position": [
+        528,
+        1344
+      ],
+      "credentials": {
+        "postgres": {
+          "id": "G50fA6A0L90xaBIe",
+          "name": "Postgres account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "select \n      TO_CHAR(ROUND(SUM(replace(peso,',','.')::numeric),2), '9G999G999D99') AS peso_vivix_formatado,\n\tROUND(SUM(replace(peso,',','.')::numeric),2) as pesov \nfrom ( \n\tselect \n\t\temissor, \n\t\tdata_emissao::date, \n\t\tnfe, \n\t\tdestinario, \n\t\tpeso, \n\t\tnatureza_operacao \n\tfrom notas_fiscais nf \n\twhere \n\t\temissor = 'COMPANHIA BRASILEIRA DE VIDROS PLAN - CBVP' \n\t\tand natureza_operacao not like ('Rem%') \n\t\tand data_emissao::date >= TO_CHAR(NOW()::DATE, 'yyyy-mm-01')::date \n\tgroup by emissor, nfe, destinario, peso, natureza_operacao, data_emissao::date \n\torder by data_emissao::date desc \n) x",
+        "options": {}
+      },
+      "id": "46088378-d88e-4f31-9a6d-0d4e0c8bffea",
+      "name": "Vivix1",
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 2.3,
+      "position": [
+        528,
+        1632
+      ],
+      "credentials": {
+        "postgres": {
+          "id": "G50fA6A0L90xaBIe",
+          "name": "Postgres account"
+        }
+      }
+    },
+    {
+      "parameters": {},
+      "id": "9696e20e-638d-4b33-b214-7db42633f441",
+      "name": "Merge2",
+      "type": "n8n-nodes-base.merge",
+      "typeVersion": 2.1,
+      "position": [
+        720,
+        1488
+      ]
+    },
+    {
+      "parameters": {
+        "fieldsToSummarize": {
+          "values": [
+            {
+              "aggregation": "concatenate",
+              "field": "pesog",
+              "separateBy": "\n"
+            },
+            {
+              "aggregation": "concatenate",
+              "field": "pesov",
+              "separateBy": "\n"
+            },
+            {
+              "aggregation": "sum"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "a4d2a695-0506-40cc-961e-6d4ab9dcb0e4",
+      "name": "SummarizeV1",
+      "type": "n8n-nodes-base.summarize",
+      "typeVersion": 1,
+      "position": [
+        912,
+        1488
+      ]
+    },
+    {
+      "parameters": {
+        "fieldToSplitOut": "numeros",
+        "options": {}
+      },
+      "id": "8922410c-093c-4b29-89e2-7142ace3f03b",
+      "name": "Split Out",
+      "type": "n8n-nodes-base.splitOut",
+      "typeVersion": 1,
+      "position": [
+        1264,
+        1488
+      ]
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "e7a9690f-2fa2-4093-b047-70ec59abc15c",
+              "name": "numeros",
+              "value": "=[\"5581981598765\",\"5581996730645\",\"5581981308564\",\"5581996177351\",\"5582999410447\"]",
+              "type": "array"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "ea3d2d8b-0118-41ee-ac14-f946deae743a",
+      "name": "Telefones",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.3,
+      "position": [
+        1088,
+        1488
+      ]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{ $('Token').item.json.Link }}send-text",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "={{ $('Token').item.json.Name }}",
+              "value": "={{ $('Token').item.json.Value }}"
+            }
+          ]
+        },
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "phone",
+              "value": "={{ $json.numeros }}"
+            },
+            {
+              "name": "message",
+              "value": "=----------------------------------------\nTOTAL CARREGADO ATÉ *{{ $now.day }}/{{ $now.month }}/{{ $now.year }}*\n\n*VIVIX:* {{ $('SummarizeV1').item.json[\"concatenated_pesov\"] }} KG\n*GUARDIAN:* {{ $('SummarizeV1').item.json[\"concatenated_pesog\"] }} KG\n-------------------------------------------"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "5799d67a-e2a1-4514-bd03-b45b5bde9e4b",
+      "name": "Mensagem",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.1,
+      "position": [
+        1472,
+        1488
+      ]
+    },
+    {
+      "parameters": {
+        "documentId": {
+          "__rl": true,
+          "value": "https://docs.google.com/spreadsheets/d/1J9xHE08UPG2QnDrjFsiy3VU3Z8ziZT9aO9MF7ct5ruA/edit?usp=sharing",
+          "mode": "url"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 564051929,
+          "mode": "list",
+          "cachedResultName": "Token",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1J9xHE08UPG2QnDrjFsiy3VU3Z8ziZT9aO9MF7ct5ruA/edit#gid=564051929"
+        },
+        "options": {}
+      },
+      "id": "3bc80490-e6a8-41a4-9fd5-5d84f70aa01d",
+      "name": "Token",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.3,
+      "position": [
+        272,
+        1488
+      ],
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "HfbTEVMQHA5O66Ya",
+          "name": "Sheets JG e Japa"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "e7a9690f-2fa2-4093-b047-70ec59abc15c",
+              "name": "numeros",
+              "value": "=[\"5581981598765\",\"5581996730645\",\"5581981308564\",\"5581996177351\",\"5582999410447\"]",
+              "type": "array"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "880d33b5-f358-42f1-afae-907d6797f54d",
+      "name": "NÚMEROS COMPLETOS",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.3,
+      "position": [
+        1072,
+        1760
+      ]
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Schedule Trigger": {
+      "main": [
+        [
+          {
+            "node": "Token",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Guardian1": {
+      "main": [
+        [
+          {
+            "node": "Merge2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Vivix1": {
+      "main": [
+        [
+          {
+            "node": "Merge2",
+            "type": "main",
+            "index": 1
+          }
+        ]
+      ]
+    },
+    "Merge2": {
+      "main": [
+        [
+          {
+            "node": "SummarizeV1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "SummarizeV1": {
+      "main": [
+        [
+          {
+            "node": "Telefones",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Split Out": {
+      "main": [
+        [
+          {
+            "node": "Mensagem",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Telefones": {
+      "main": [
+        [
+          {
+            "node": "Split Out",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Token": {
+      "main": [
+        [
+          {
+            "node": "Guardian1",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Vivix1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "c3649a9d-dcc7-490d-8e24-425ce3fc9645",
+  "meta": {
+    "instanceId": "{{INSTANCE_ID}}"
+  },
+  "id": "z4xM5T2jhfj9LMGa",
+  "tags": [
+    {
+      "updatedAt": "2025-03-21T11:52:03.823Z",
+      "createdAt": "2025-03-21T11:52:03.823Z",
+      "id": "VQmA23kx6h1wy92X",
+      "name": "GUIS"
+    },
+    {
+      "updatedAt": "2025-03-24T14:35:52.840Z",
+      "createdAt": "2025-03-24T14:35:52.840Z",
+      "id": "sPkE8K1cDKi4JAee",
+      "name": "Diretoria"
+    },
+    {
+      "updatedAt": "2025-03-21T11:52:53.040Z",
+      "createdAt": "2025-03-21T11:52:53.040Z",
+      "id": "9sBc8DYqQwfJKaa4",
+      "name": "Setor - Data Science"
+    }
+  ]
+}

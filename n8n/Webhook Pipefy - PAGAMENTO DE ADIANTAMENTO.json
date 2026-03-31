@@ -1,0 +1,400 @@
+{
+  "name": "Webhook Pipefy - PAGAMENTO DE ADIANTAMENTO",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "efa0fbfa-0176-49a3-abe5-93db0442ac1d",
+        "options": {}
+      },
+      "id": "8bff6f09-8c2d-4730-8659-eb2319f3ea39",
+      "name": "Webhook",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 1.1,
+      "position": [
+        -1104,
+        640
+      ],
+      "webhookId": "{{WEBHOOK_ID}}"
+    },
+    {
+      "parameters": {
+        "documentId": {
+          "__rl": true,
+          "value": "https://docs.google.com/spreadsheets/d/1avLuf5Qpu0lBIFVS-Ny0j-iIFZGkVqqufVGy-sfbqM4/edit?gid=0#gid=0",
+          "mode": "url"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "Página1",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1avLuf5Qpu0lBIFVS-Ny0j-iIFZGkVqqufVGy-sfbqM4/edit#gid=0"
+        },
+        "options": {}
+      },
+      "id": "e58f64a3-1cf9-46b7-9b5c-9f3ec622252c",
+      "name": "Google Sheets",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.3,
+      "position": [
+        -704,
+        640
+      ],
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "8Ytd3zZKAOSyZNqC",
+          "name": "Sheets Andre"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "c9777b34-96c3-49cb-9e8f-5171d677c039",
+              "name": "link",
+              "value": "={{ $json.Link }}",
+              "type": "string"
+            },
+            {
+              "id": "c29c9cfb-b76e-4088-b0ca-7748646d4779",
+              "name": "link1",
+              "value": "={{ $json.Value }}",
+              "type": "string"
+            },
+            {
+              "id": "a2465349-2aee-4dc2-8ce6-9a40bf305fa7",
+              "name": "link2",
+              "value": "={{ $json.Field }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "55fafff9-a926-4e64-b385-0d1ea94c41a7",
+      "name": "AUTH",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.3,
+      "position": [
+        -496,
+        640
+      ]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{ $('AUTH').item.json.link }}",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "={{ $('AUTH').item.json.link2 }}",
+              "value": "={{ $('AUTH').item.json.link1 }}"
+            }
+          ]
+        },
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "phone",
+              "value": "5581986945032"
+            },
+            {
+              "name": "=message",
+              "value": "=Bianca, um novo Card *URGENTE* foi criado no pipefy: *DESPESA - PAGAMENTO DE ADIANTAMENTO*\n\n*Unidade:*  {{ $('Edit Fields').item.json.unidade }},\n*Valor:*  {{ $('Edit Fields').item.json.valor }},\n*Fornecedor:*  {{ $('Edit Fields').item.json.fornecedor }},\n*Solicitante:*  {{ $('Edit Fields').item.json.solicitante }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "168e5f54-2460-46b6-9cb1-7d8169ca7c79",
+      "name": "Bianca",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.1,
+      "position": [
+        -96,
+        512
+      ]
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "897a9a1a-3870-4374-b539-3863e8d9a32d",
+              "name": "Alerta",
+              "value": "={{ $json.body.alerta }}",
+              "type": "string"
+            },
+            {
+              "id": "57d2fff4-f86a-44b9-a31d-d8fe6293feaa",
+              "name": "unidade",
+              "value": "={{ $json.body.Unidade }}",
+              "type": "string"
+            },
+            {
+              "id": "77c16ead-013f-4d7e-add0-7a0dbbdf0189",
+              "name": "solicitante",
+              "value": "={{ $json.body.Solicitante }}",
+              "type": "string"
+            },
+            {
+              "id": "6f82a10d-47e1-41ef-b301-e35f648991f8",
+              "name": "valor",
+              "value": "={{ $json.body.Valor }}",
+              "type": "string"
+            },
+            {
+              "id": "eeac81c1-84c1-45d1-bf5b-4aa055fa8455",
+              "name": "fornecedor",
+              "value": "={{ $json.body.Fornecedor }}",
+              "type": "string"
+            },
+            {
+              "id": "61bd6a55-fbc6-4ff5-869e-270a2075401a",
+              "name": "contato",
+              "value": "={{ $json.body.Contato }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "a857c8a3-03d4-45dc-a3fc-d05ac2835e6f",
+      "name": "Edit Fields",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.3,
+      "position": [
+        -880,
+        640
+      ]
+    },
+    {
+      "parameters": {
+        "rules": {
+          "values": [
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 1
+                },
+                "conditions": [
+                  {
+                    "leftValue": "={{ $('Webhook').item.json.body.alerta }}",
+                    "rightValue": "New_Card",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    },
+                    "id": "122c531a-15f4-48ca-9b8d-028cdd9f5d29"
+                  }
+                ],
+                "combinator": "and"
+              }
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 1
+                },
+                "conditions": [
+                  {
+                    "id": "6e6f0a06-1d3c-4b45-8f50-97079eca7f7e",
+                    "leftValue": "={{ $('Webhook').item.json.body.alerta }}",
+                    "rightValue": "=Move_Card",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals",
+                      "name": "filter.operator.equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              }
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "76000772-999b-4f11-b51d-7a45769eb258",
+      "name": "Switch",
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 3,
+      "position": [
+        -320,
+        640
+      ]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{ $('AUTH').item.json.link }}",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "={{ $('AUTH').item.json.link2 }}",
+              "value": "={{ $('AUTH').item.json.link1 }}"
+            }
+          ]
+        },
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "phone",
+              "value": "5581982669058"
+            },
+            {
+              "name": "=message",
+              "value": "=Wemille, um Card *URGENTE* foi adicionado a coluna *Liberação Financeira* no pipefy: *DESPESA - PAGAMENTO DE ADIANTAMENTO*\n\n*Unidade*:  {{ $('Edit Fields').item.json.unidade }},\n*Valor*:  {{ $('Edit Fields').item.json.valor }},\n*Fornecedor*:  {{ $('Edit Fields').item.json.fornecedor }},\n*Solicitante*:  {{ $('Edit Fields').item.json.solicitante }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "ecdb1a93-a484-4a4e-9254-38e5d0f200ef",
+      "name": "Wemille",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.1,
+      "position": [
+        -96,
+        752
+      ]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{ $('AUTH').item.json.link }}",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "={{ $('AUTH').item.json.link2 }}",
+              "value": "={{ $('AUTH').item.json.link1 }}"
+            }
+          ]
+        },
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "phone",
+              "value": "={{ $('Edit Fields').item.json.contato }}"
+            },
+            {
+              "name": "=message",
+              "value": "=Olá *{{ $('Edit Fields').item.json.solicitante }}*, seu Card de Solicitação *URGENTE* recebeu Liberação Financeira\n\n*Unidade*:  {{ $('Edit Fields').item.json.unidade }},\n*Valor*:  {{ $('Edit Fields').item.json.valor }},\n*Fornecedor*:  {{ $('Edit Fields').item.json.fornecedor }} "
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "b2ccaf70-c292-4f4d-ae91-4dbf8b62f32f",
+      "name": "ContatoDinamico",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.1,
+      "position": [
+        -96,
+        880
+      ]
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Webhook": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Edit Fields": {
+      "main": [
+        [
+          {
+            "node": "Google Sheets",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Google Sheets": {
+      "main": [
+        [
+          {
+            "node": "AUTH",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "AUTH": {
+      "main": [
+        [
+          {
+            "node": "Switch",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Switch": {
+      "main": [
+        [
+          {
+            "node": "Bianca",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "ContatoDinamico",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Wemille",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "c78fc4b7-53a0-4b8a-9144-fb96f1dd2afb",
+  "meta": {
+    "instanceId": "{{INSTANCE_ID}}"
+  },
+  "id": "EIXp2yOJcUqYKoj5",
+  "tags": [
+    {
+      "updatedAt": "2026-01-14T11:04:00.895Z",
+      "createdAt": "2025-03-21T11:47:30.374Z",
+      "id": "CvCy3KNJKyMxSQ3C",
+      "name": "GDA"
+    }
+  ]
+}

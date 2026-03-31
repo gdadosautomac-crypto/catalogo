@@ -1,0 +1,147 @@
+{
+  "name": "Alerta Novo Cliente",
+  "nodes": [
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "field": "hours",
+              "triggerAtMinute": 59
+            }
+          ]
+        }
+      },
+      "id": "37ee7d24-431a-411b-8883-182b50827071",
+      "name": "Schedule Trigger",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.1,
+      "position": [
+        -1408,
+        -176
+      ]
+    },
+    {
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "SELECT \n    'Belga' as Unidade,\n   \tcli.DS_CLI as nome_cliente,\n\tcli.APEL_FANT as nome_fantasia,\n\tcli.NU_CPF_CNPJ as CPF_CNPJ,\n\tcli.DT_INS\nfrom mgcli01010 cli\nWHERE cli.DT_INS >= NOW() - INTERVAL 1 HOUR\n",
+        "options": {
+          "connectionTimeoutMillis": 10
+        }
+      },
+      "id": "3433e9c4-1d68-497f-bc79-117b5ea3fa80",
+      "name": "MySQL1",
+      "type": "n8n-nodes-base.mySql",
+      "typeVersion": 2.2,
+      "position": [
+        -1248,
+        -176
+      ],
+      "executeOnce": false,
+      "retryOnFail": false,
+      "alwaysOutputData": false,
+      "credentials": {
+        "mySql": {
+          "id": "EY1CH7IcANXbiyVO",
+          "name": "MySQL belga"
+        }
+      },
+      "onError": "continueRegularOutput"
+    },
+    {
+      "parameters": {
+        "phone": "558198747-3570",
+        "text": "=---- *ALERTA CADASTRO CLIENTE* ----\n\nUnidade: *{{ $json.Unidade }}*\nNome Cliente: *{{ $json.nome_cliente }}*\nNome Fantasia: *{{ $json.nome_fantasia }}*\nCPF/CNPJ: *{{ $json.CPF_CNPJ }}*\n",
+        "additionalFields": {}
+      },
+      "type": "n8n-nodes-zapi.zapi",
+      "typeVersion": 1,
+      "position": [
+        -1072,
+        -256
+      ],
+      "id": "463340ed-f262-466c-b08f-ba17f3dc395f",
+      "name": "Z-API",
+      "credentials": {
+        "zapiApi": {
+          "id": "cGI15AvSkFAV8Qrr",
+          "name": "Z-API account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "phone": "558198130-8564",
+        "text": "=---- *ALERTA CADASTRO CLIENTE* ----\n\nUnidade: *{{ $json.Unidade }}*\nNome Cliente: *{{ $json.nome_cliente }}*\nNome Fantasia: *{{ $json.nome_fantasia }}*\nCPF/CNPJ: *{{ $json.CPF_CNPJ }}*\n",
+        "additionalFields": {}
+      },
+      "type": "n8n-nodes-zapi.zapi",
+      "typeVersion": 1,
+      "position": [
+        -1072,
+        -96
+      ],
+      "id": "c60f4ef1-cd10-400f-8d46-6c5994edc3b8",
+      "name": "Diego Marcolan",
+      "credentials": {
+        "zapiApi": {
+          "id": "cGI15AvSkFAV8Qrr",
+          "name": "Z-API account"
+        }
+      }
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Schedule Trigger": {
+      "main": [
+        [
+          {
+            "node": "MySQL1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "MySQL1": {
+      "main": [
+        [
+          {
+            "node": "Z-API",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Diego Marcolan",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": true,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "8d54d279-6f64-4f6b-838b-1e019c1fa0fa",
+  "meta": {
+    "instanceId": "{{INSTANCE_ID}}"
+  },
+  "id": "rqucgczdUoXxNS5I",
+  "tags": [
+    {
+      "updatedAt": "2025-03-24T14:40:59.830Z",
+      "createdAt": "2025-03-24T14:40:59.830Z",
+      "id": "vK8d40ObLmVSMtwq",
+      "name": "Belga Polímeros"
+    },
+    {
+      "updatedAt": "2026-01-14T11:04:00.895Z",
+      "createdAt": "2025-03-21T11:47:30.374Z",
+      "id": "CvCy3KNJKyMxSQ3C",
+      "name": "GDA"
+    }
+  ]
+}

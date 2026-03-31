@@ -1,0 +1,435 @@
+{
+  "name": "Venda de ferragens no mês",
+  "nodes": [
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "field": "weeks",
+              "triggerAtDay": [
+                1,
+                2,
+                3,
+                4,
+                6,
+                0
+              ],
+              "triggerAtHour": 18
+            }
+          ]
+        }
+      },
+      "id": "75845626-1c99-4556-a94a-1d04b4348717",
+      "name": "Schedule Trigger",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.1,
+      "position": [
+        128,
+        368
+      ]
+    },
+    {
+      "parameters": {
+        "operation": "xlsx",
+        "options": {
+          "fileName": "={{ $('ARQUIVO').item.json.arq }}"
+        }
+      },
+      "id": "e3fc2ebf-4b74-473e-9abb-ebe2eab0fcc2",
+      "name": "Convert to File",
+      "type": "n8n-nodes-base.convertToFile",
+      "typeVersion": 1.1,
+      "position": [
+        880,
+        368
+      ]
+    },
+    {
+      "parameters": {},
+      "id": "0d7c6576-700c-4f36-a4c7-f754ea6f85c0",
+      "name": "Wait",
+      "type": "n8n-nodes-base.wait",
+      "typeVersion": 1.1,
+      "position": [
+        1424,
+        368
+      ],
+      "webhookId": "{{WEBHOOK_ID}}"
+    },
+    {
+      "parameters": {
+        "operation": "upload",
+        "bucketName": "marcolanoperacoes",
+        "fileName": "={{ $('ARQUIVO').item.json.arq }}",
+        "additionalFields": {
+          "acl": "publicReadWrite"
+        }
+      },
+      "id": "61b60034-9571-405a-b7ea-5040056454fc",
+      "name": "AWS S31",
+      "type": "n8n-nodes-base.awsS3",
+      "typeVersion": 2,
+      "position": [
+        1072,
+        368
+      ],
+      "credentials": {
+        "aws": {
+          "id": "wojq9Jq4bZgupPjh",
+          "name": "AWS account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "delete",
+        "bucketName": "marcolanoperacoes",
+        "fileKey": "={{ $('ARQUIVO').item.json.arq }}",
+        "options": {}
+      },
+      "id": "0066a007-b623-4e1b-8086-b7c6d7388dc9",
+      "name": "AWS S33",
+      "type": "n8n-nodes-base.awsS3",
+      "typeVersion": 2,
+      "position": [
+        1600,
+        368
+      ],
+      "credentials": {
+        "aws": {
+          "id": "wojq9Jq4bZgupPjh",
+          "name": "AWS account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "delete",
+        "bucketName": "marcolanoperacoes",
+        "fileKey": "=LançamentosErrados2024-08-20T10:26:14.901-03:00\t",
+        "options": {}
+      },
+      "id": "4e983a4e-3b93-4082-8f6f-89f310ef4c0e",
+      "name": "AWS S37",
+      "type": "n8n-nodes-base.awsS3",
+      "typeVersion": 2,
+      "position": [
+        880,
+        720
+      ],
+      "credentials": {
+        "aws": {
+          "id": "wojq9Jq4bZgupPjh",
+          "name": "AWS account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "getAll",
+        "bucketName": "marcolanoperacoes",
+        "returnAll": true,
+        "options": {}
+      },
+      "id": "51fb684d-f5cd-44cb-a6e2-4aa1839eafd9",
+      "name": "AWS S3",
+      "type": "n8n-nodes-base.awsS3",
+      "typeVersion": 2,
+      "position": [
+        704,
+        720
+      ],
+      "credentials": {
+        "aws": {
+          "id": "wojq9Jq4bZgupPjh",
+          "name": "AWS account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "c9777b34-96c3-49cb-9e8f-5171d677c039",
+              "name": "arq",
+              "value": "=Venda de Ferragens - d{{ $now.day }}-{{ $now.hour }}h{{ $now.minute }}m{{ $now.second }}s",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "0430d63a-9554-4918-ba0c-d7b151a13fb2",
+      "name": "ARQUIVO",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.3,
+      "position": [
+        528,
+        368
+      ]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{ $('Token').item.json.Link }}send-document/xlsx",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "={{ $('Token').item.json.Name }}",
+              "value": "={{ $('Token').item.json.Value }}"
+            }
+          ]
+        },
+        "sendBody": true,
+        "contentType": "form-urlencoded",
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "phone",
+              "value": "=5581982111972"
+            },
+            {
+              "name": "fileName",
+              "value": "Acumulado de Ferragens por Vendedor"
+            },
+            {
+              "name": "document",
+              "value": "=https://marcolanoperacoes.s3.amazonaws.com/{{ $('ARQUIVO').item.json.arq }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "986ca085-bfb3-4c88-9273-3232f58068ee",
+      "name": "Guilhermino",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.1,
+      "position": [
+        1248,
+        240
+      ]
+    },
+    {
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "select \n\tunidade,\n\tvendedor,\n\tvendidopolimero,\n\tCONCAT(ROUND(\n\t\tcase \n\t\t\twhen custopolimero = 0 then 0\n\t\t\telse abs(custopolimero/vendidopolimero - 1)\n\t\tend * 100 , 2), ' %')   as margempolimero,\n\tvendidometal,\n\tCONCAT(ROUND(\n\t\tcase \n\t\t\twhen custometal = 0 then 0\n\t\t\telse abs(custometal/vendidometal - 1)\n\t\tend * 100 , 2), ' %')   as margemmetal\nfrom (\n\tselect \n\t\tunidade, \n\t\tvendedor,\n\t\tROUND(SUM(\n\t\t\tcase \n\t\t\t\twhen classe_produto like ('POL%') or classe_produto = 'ZAMAC' then replace(p.valor_unitario_total_com_desconto,',','.')::numeric \n\t\t\t\telse 0\n\t\t\tend),2) as VendidoPolimero,\n\t\tROUND(SUM(\n\t\t\tcase \n\t\t\t\twhen classe_produto like ('POL%') or classe_produto = 'ZAMAC' then replace(p.custo_unitario_total_produto,',','.')::numeric \n\t\t\t\telse 0\n\t\t\tend),2) as CustoPolimero,\n\t\tROUND(SUM(\n\t\t\tcase \n\t\t\t\twhen classe_produto like ('METAL%') then replace(p.valor_unitario_total_com_desconto,',','.')::numeric \n\t\t\t\telse 0\n\t\t\tend),2) as VendidoMetal,\n\t\tROUND(SUM(\n\t\t\tcase \n\t\t\t\twhen classe_produto like ('METAL%') then replace(p.custo_unitario_total_produto,',','.')::numeric \n\t\t\t\telse 0\n\t\t\tend),2) as CustoMetal,\n\t\tROUND(SUM(\n\t\t\tcase \n\t\t\t\twhen classe_produto like ('POL%') or classe_produto = 'ZAMAC' or classe_produto like ('METAL%') then replace(p.valor_unitario_total_com_desconto,',','.')::numeric \n\t\t\t\telse 0\n\t\t\tend),2) as VendidoTotal\n\tfrom pedidos p \n\t\tleft join coes c on p.coes = c.nome \n\twhere \n\t\tdata_pedido >= to_char(NOW()::dATE, 'yyyy-mm-01')::date and c.gerafaturamento = 'SIM' and categoria_produto = 'FERRAGEM' \n\tgroup by unidade, vendedor\n) x \norder by unidade, vendidototal desc ",
+        "options": {}
+      },
+      "id": "b1c378dd-f8df-4c04-a540-29929d780449",
+      "name": "Postgres",
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 2.3,
+      "position": [
+        704,
+        368
+      ],
+      "credentials": {
+        "postgres": {
+          "id": "G50fA6A0L90xaBIe",
+          "name": "Postgres account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{ $('Token').item.json.Link }}send-document/xlsx",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "={{ $('Token').item.json.Name }}",
+              "value": "={{ $('Token').item.json.Value }}"
+            }
+          ]
+        },
+        "sendBody": true,
+        "contentType": "form-urlencoded",
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "phone",
+              "value": "=5581991596203"
+            },
+            {
+              "name": "fileName",
+              "value": "Acumulado de Ferragens por Vendedor"
+            },
+            {
+              "name": "document",
+              "value": "=https://marcolanoperacoes.s3.amazonaws.com/{{ $('ARQUIVO').item.json.arq }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "0790e020-135b-4576-99a2-c28cc1b95ca5",
+      "name": "Thiago",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.1,
+      "position": [
+        1248,
+        480
+      ]
+    },
+    {
+      "parameters": {
+        "documentId": {
+          "__rl": true,
+          "value": "https://docs.google.com/spreadsheets/d/1J9xHE08UPG2QnDrjFsiy3VU3Z8ziZT9aO9MF7ct5ruA/edit?usp=sharing",
+          "mode": "url"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 564051929,
+          "mode": "list",
+          "cachedResultName": "Token",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1J9xHE08UPG2QnDrjFsiy3VU3Z8ziZT9aO9MF7ct5ruA/edit#gid=564051929"
+        },
+        "options": {}
+      },
+      "id": "04428e4f-a8e7-407d-a46b-246d485203f9",
+      "name": "Token",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.3,
+      "position": [
+        320,
+        368
+      ],
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "HfbTEVMQHA5O66Ya",
+          "name": "Sheets JG e Japa"
+        }
+      }
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Schedule Trigger": {
+      "main": [
+        [
+          {
+            "node": "Token",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Convert to File": {
+      "main": [
+        [
+          {
+            "node": "AWS S31",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Wait": {
+      "main": [
+        [
+          {
+            "node": "AWS S33",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "ARQUIVO": {
+      "main": [
+        [
+          {
+            "node": "Postgres",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Guilhermino": {
+      "main": [
+        [
+          {
+            "node": "Wait",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "AWS S31": {
+      "main": [
+        []
+      ]
+    },
+    "Postgres": {
+      "main": [
+        [
+          {
+            "node": "Convert to File",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Thiago": {
+      "main": [
+        [
+          {
+            "node": "Wait",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Token": {
+      "main": [
+        [
+          {
+            "node": "ARQUIVO",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "6444d875-c52c-421c-b953-96d4a47d6eb9",
+  "meta": {
+    "instanceId": "{{INSTANCE_ID}}"
+  },
+  "id": "Ujd2JUp9B2hntkHT",
+  "tags": [
+    {
+      "updatedAt": "2025-03-21T11:52:03.823Z",
+      "createdAt": "2025-03-21T11:52:03.823Z",
+      "id": "VQmA23kx6h1wy92X",
+      "name": "GUIS"
+    },
+    {
+      "updatedAt": "2025-03-24T14:40:59.830Z",
+      "createdAt": "2025-03-24T14:40:59.830Z",
+      "id": "vK8d40ObLmVSMtwq",
+      "name": "Belga Polímeros"
+    },
+    {
+      "updatedAt": "2025-03-24T14:24:48.667Z",
+      "createdAt": "2025-03-24T14:24:48.667Z",
+      "id": "DRs3JJesnD7xa1AS",
+      "name": "Setor - Comercial"
+    }
+  ]
+}

@@ -1,0 +1,1014 @@
+{
+  "name": "Auditoria de Carga",
+  "nodes": [
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "field": "weeks",
+              "triggerAtDay": [
+                2,
+                3,
+                4,
+                5,
+                6
+              ],
+              "triggerAtHour": 9,
+              "triggerAtMinute": 15
+            }
+          ]
+        }
+      },
+      "id": "5701061d-527f-4f5b-8e19-aab4fded241f",
+      "name": "Schedule Trigger",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.1,
+      "position": [
+        -1520,
+        -16
+      ]
+    },
+    {
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "-- auditoria de carga\nSELECT\n    tipo_unidade,\n    unidade, \n    tipo_entrega,\n    tipo_veiculo,\n    placa_veiculo,\n    round(sum(valor_entregue + coalesce(acrescimo, 0)), 2),\n    count(distinct(cod_romaneio)) AS total_romaneio,\n    rota,\n    data_hora_entregue,\n    nome_cliente,\n    cod_romaneio,\n    carga\nFROM\n    entregas_geral eg\nWHERE\n    data_hora_entregue::Date = current_date - 1 \n    AND carga IS NULL\n    AND tipo_entrega = 'ENTREGA'\nGROUP BY\n    tipo_unidade, unidade, tipo_entrega, tipo_veiculo, placa_veiculo, rota, nome_cliente, cod_romaneio, data_hora_entregue, carga\nUNION ALL\nSELECT\n    tipo_unidade,\n    unidade, \n    tipo_entrega,\n    tipo_veiculo,\n    placa_veiculo,\n    round(sum(valor_entregue + coalesce(acrescimo, 0)), 2),\n    count(distinct(cod_romaneio)) AS total_romaneio,\n    rota,\n    data_hora_entregue,\n    nome_cliente,\n    cod_romaneio,\n    carga\nFROM\n    entregas_geral eg\nWHERE\n    data_hora_entregue::Date = current_date - 1 \n    AND carga IS NOT NULL\n    AND tipo_entrega = 'ENTREGA'\nGROUP BY\n    tipo_unidade, unidade, tipo_entrega, tipo_veiculo, placa_veiculo, rota, nome_cliente, cod_romaneio, data_hora_entregue, carga",
+        "options": {}
+      },
+      "id": "87fa0206-9fcb-4ffa-ab10-452edfb5b326",
+      "name": "Postgres",
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 2.3,
+      "position": [
+        -768,
+        -128
+      ],
+      "credentials": {
+        "postgres": {
+          "id": "G50fA6A0L90xaBIe",
+          "name": "Postgres account"
+        }
+      },
+      "disabled": true
+    },
+    {
+      "parameters": {
+        "operation": "xlsx",
+        "options": {
+          "fileName": "={{ $('ARQUIVO').item.json.arq }}"
+        }
+      },
+      "id": "884c6d4c-d721-4569-a153-4b86d2d2e496",
+      "name": "Convert to File",
+      "type": "n8n-nodes-base.convertToFile",
+      "typeVersion": 1.1,
+      "position": [
+        -320,
+        -128
+      ],
+      "disabled": true
+    },
+    {
+      "parameters": {},
+      "id": "4b974f38-6299-4456-84c6-990468f4912e",
+      "name": "Wait",
+      "type": "n8n-nodes-base.wait",
+      "typeVersion": 1.1,
+      "position": [
+        288,
+        -128
+      ],
+      "webhookId": "{{WEBHOOK_ID}}",
+      "disabled": true
+    },
+    {
+      "parameters": {
+        "operation": "upload",
+        "bucketName": "marcolanoperacoes",
+        "fileName": "={{ $('ARQUIVO').item.json.arq }}",
+        "additionalFields": {
+          "acl": "publicReadWrite"
+        }
+      },
+      "id": "40272096-6a02-4125-bb95-d4aa2a161c0a",
+      "name": "AWS S31",
+      "type": "n8n-nodes-base.awsS3",
+      "typeVersion": 2,
+      "position": [
+        -128,
+        -128
+      ],
+      "credentials": {
+        "aws": {
+          "id": "wojq9Jq4bZgupPjh",
+          "name": "AWS account"
+        }
+      },
+      "disabled": true
+    },
+    {
+      "parameters": {
+        "operation": "delete",
+        "bucketName": "marcolanoperacoes",
+        "fileKey": "=RelFinFELIPE.xlsx",
+        "options": {}
+      },
+      "id": "f2370e74-0446-424f-b987-d8fe4c5874ce",
+      "name": "AWS S33",
+      "type": "n8n-nodes-base.awsS3",
+      "typeVersion": 2,
+      "position": [
+        464,
+        -128
+      ],
+      "credentials": {
+        "aws": {
+          "id": "wojq9Jq4bZgupPjh",
+          "name": "AWS account"
+        }
+      },
+      "disabled": true
+    },
+    {
+      "parameters": {
+        "documentId": {
+          "__rl": true,
+          "value": "https://docs.google.com/spreadsheets/d/1avLuf5Qpu0lBIFVS-Ny0j-iIFZGkVqqufVGy-sfbqM4/edit?usp=sharing",
+          "mode": "url"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "Página1",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1avLuf5Qpu0lBIFVS-Ny0j-iIFZGkVqqufVGy-sfbqM4/edit#gid=0"
+        },
+        "options": {}
+      },
+      "id": "a52673d6-9d24-484a-be16-1b3bf0b64c1a",
+      "name": "Google Sheets",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.3,
+      "position": [
+        -1344,
+        -16
+      ],
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "8Ytd3zZKAOSyZNqC",
+          "name": "Sheets Andre"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "c9777b34-96c3-49cb-9e8f-5171d677c039",
+              "name": "link",
+              "value": "={{ $json.Link }}",
+              "type": "string"
+            },
+            {
+              "id": "c29c9cfb-b76e-4088-b0ca-7748646d4779",
+              "name": "link1",
+              "value": "={{ $json.Value }}",
+              "type": "string"
+            },
+            {
+              "id": "a2465349-2aee-4dc2-8ce6-9a40bf305fa7",
+              "name": "link2",
+              "value": "={{ $json.Field }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "6b848131-44d0-43a6-9516-9389dc2dc1f5",
+      "name": "AUTH",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.3,
+      "position": [
+        -1168,
+        -128
+      ],
+      "disabled": true
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "c9777b34-96c3-49cb-9e8f-5171d677c039",
+              "name": "arq",
+              "value": "=Auditoria de Carga - d{{ $now.day }}-{{ $now.hour }}h{{ $now.minute }}m{{ $now.second }}s",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "63720e31-e535-466a-af4f-6ae2d058e6c2",
+      "name": "ARQUIVO",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.3,
+      "position": [
+        -960,
+        -128
+      ],
+      "disabled": true
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "=https://api.z-api.io/instances/3AD47F49CE9AF04B4D43CA225862B38B/token/6EE2B07CF6D61B0059AD2125/send-document/xlsx",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "={{ $('AUTH').item.json.link2 }}",
+              "value": "={{ $('AUTH').item.json.link1 }}"
+            }
+          ]
+        },
+        "sendBody": true,
+        "contentType": "form-urlencoded",
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "phone",
+              "value": "=5581987473570"
+            },
+            {
+              "name": "fileName",
+              "value": "=Auditoria de Carga {{$today.format('DD')}}"
+            },
+            {
+              "name": "document",
+              "value": "=https://marcolanoperacoes.s3.amazonaws.com/{{ $('ARQUIVO').item.json.arq }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "66232f34-9620-4abd-8b83-c0fa0033812f",
+      "name": "André",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.1,
+      "position": [
+        80,
+        -128
+      ],
+      "disabled": true
+    },
+    {
+      "parameters": {
+        "jsCode": "const items = $input.all();\n\n// Loop para formatar a data de cada item\nitems.forEach(item => {\n  if (item.json.data_hora_entregue) {\n    item.json.data_hora_entregue = new Date(item.json.data_hora_entregue).toISOString().split('T')[0];\n  }\n});\n\nreturn items;\n"
+      },
+      "id": "021aa99c-08ca-41ce-bd80-fd67db2c8b98",
+      "name": "Code",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -544,
+        -128
+      ],
+      "disabled": true
+    },
+    {
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "SELECT\n    tipo_unidade,\n    unidade, \n    tipo_entrega,\n    tipo_veiculo,\n    placa_veiculo,\n    round(sum(valor_entregue + coalesce(acrescimo, 0)), 2),\n    count(distinct(cod_romaneio)) AS total_romaneio,\n    rota,\n    data_hora_entregue,\n    nome_cliente,\n    cod_romaneio,\n    carga\nFROM\n    entregas_geral eg\nWHERE\n    data_hora_entregue::Date = current_date - 1 \n    AND carga IS NULL\n    AND tipo_entrega = 'ENTREGA'\nGROUP BY\n    tipo_unidade, unidade, tipo_entrega, tipo_veiculo, placa_veiculo, rota, nome_cliente, cod_romaneio, data_hora_entregue, carga",
+        "options": {}
+      },
+      "id": "fb2b1201-86a5-49a0-8414-9d4e2e940ea1",
+      "name": "Postgres1",
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 2.3,
+      "position": [
+        -944,
+        64
+      ],
+      "credentials": {
+        "postgres": {
+          "id": "G50fA6A0L90xaBIe",
+          "name": "Postgres account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "c9777b34-96c3-49cb-9e8f-5171d677c039",
+              "name": "link",
+              "value": "={{ $json.Link }}",
+              "type": "string"
+            },
+            {
+              "id": "c29c9cfb-b76e-4088-b0ca-7748646d4779",
+              "name": "link1",
+              "value": "={{ $json.Value }}",
+              "type": "string"
+            },
+            {
+              "id": "a2465349-2aee-4dc2-8ce6-9a40bf305fa7",
+              "name": "link2",
+              "value": "={{ $json.Field }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "192a2cab-8e21-443b-9fc6-c1a0ab4ad9db",
+      "name": "AUTH1",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.3,
+      "position": [
+        -1168,
+        64
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "const items = $input.all();\n\n// Loop para formatar a data de cada item\nitems.forEach(item => {\n  if (item.json.data_hora_entregue) {\n    item.json.data_hora_entregue = new Date(item.json.data_hora_entregue).toISOString().split('T')[0];\n  }\n});\n\nreturn items;\n"
+      },
+      "id": "83b35865-a05a-4a68-a112-204fea1ff2a2",
+      "name": "Code1",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -736,
+        64
+      ]
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "07860d31-8538-4c0f-8664-7123ea8dfef3",
+              "name": "message",
+              "value": "=*----- ALERTA - ENTREGA S/ CARGA*\n\n*Unidade:* {{ $json.unidade }}\n*condicao_entrega:* {{ $json.tipo_entrega }}\n*data_entrega:* {{ $json.data_hora_entregue }}\n*nome_cliente:* {{ $json.nome_cliente }}\n*cod_romaneio:* {{ $json.cod_romaneio }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "b8f53fe0-6bda-4161-bbe3-b85ba996d595",
+      "name": "Formata Texto",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.3,
+      "position": [
+        -544,
+        64
+      ]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{ $('AUTH1').item.json.link }}",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "={{ $('AUTH1').item.json.link2 }}",
+              "value": "={{ $('AUTH1').item.json.link1 }}"
+            }
+          ]
+        },
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "phone",
+              "value": "5581987473570"
+            },
+            {
+              "name": "message",
+              "value": "=---- {{ $json[\"message\"] }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "39e39f56-b41c-468a-9465-b75b90a27211",
+      "name": "André2",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.1,
+      "position": [
+        -176,
+        208
+      ],
+      "disabled": true
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{ $('AUTH1').item.json.link }}",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "={{ $('AUTH1').item.json.link2 }}",
+              "value": "={{ $('AUTH1').item.json.link1 }}"
+            }
+          ]
+        },
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "phone",
+              "value": "5581981308564"
+            },
+            {
+              "name": "message",
+              "value": "=---- {{ $json[\"message\"] }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "a8e9fee6-fe36-45c7-a85f-85def9fef2f5",
+      "name": "Diego Marcolan",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.1,
+      "position": [
+        -176,
+        64
+      ],
+      "disabled": true
+    },
+    {
+      "parameters": {
+        "options": {
+          "reset": false
+        }
+      },
+      "id": "5edac371-793d-4015-b2ec-9d107acbc688",
+      "name": "Loop Over Items",
+      "type": "n8n-nodes-base.splitInBatches",
+      "typeVersion": 3,
+      "position": [
+        208,
+        368
+      ]
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict"
+          },
+          "conditions": [
+            {
+              "id": "9b49a1ac-1835-4939-8865-6892ed376efa",
+              "leftValue": "={{ $('contatos').item.json.UNIDADE }}",
+              "rightValue": "={{ $('Postgres1').item.json.unidade }}",
+              "operator": {
+                "type": "string",
+                "operation": "equals",
+                "name": "filter.operator.equals"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "id": "83b82276-b5e9-4900-96f2-f61322287fc1",
+      "name": "If",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2,
+      "position": [
+        0,
+        368
+      ]
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "660387ba-bf3c-4b39-94ad-eb27433ebbe2",
+              "name": "gestor",
+              "value": "={{ $json.GESTOR }}",
+              "type": "string"
+            },
+            {
+              "id": "80df86a7-6066-4340-af40-128e4740aeac",
+              "name": "financeiro",
+              "value": "={{ $json.FINANCEIRO }}",
+              "type": "string"
+            },
+            {
+              "id": "e2bd8647-40c0-4366-8a36-70ba785d0ebc",
+              "name": "unidade",
+              "value": "={{ $json.UNIDADE }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "b61f04d3-8cc6-4a03-b897-7bfe8726c37e",
+      "name": "formata texto1",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.3,
+      "position": [
+        400,
+        368
+      ]
+    },
+    {
+      "parameters": {
+        "documentId": {
+          "__rl": true,
+          "value": "https://docs.google.com/spreadsheets/d/1L1L3OtyvsZRgPUbwOrrjvjxCsvSgYDigx7OI3A0ypNQ/edit?gid=0#gid=0",
+          "mode": "url"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "Página1",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1L1L3OtyvsZRgPUbwOrrjvjxCsvSgYDigx7OI3A0ypNQ/edit#gid=0"
+        },
+        "options": {}
+      },
+      "id": "70e37283-5d17-484f-b1c4-280945e23aea",
+      "name": "contatos",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.3,
+      "position": [
+        -176,
+        368
+      ],
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "8Ytd3zZKAOSyZNqC",
+          "name": "Sheets Andre"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{ $('AUTH1').item.json.link }}",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "={{ $('AUTH1').item.json.link2 }}",
+              "value": "={{ $('AUTH1').item.json.link1 }}"
+            }
+          ]
+        },
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "phone",
+              "value": "={{ $('formata texto1').item.json.gestor }}"
+            },
+            {
+              "name": "message",
+              "value": "={{ $('Formata Texto').item.json.message }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "90cfbd36-25c8-46ac-b94e-9fb97e5bfea3",
+      "name": "Gestores",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.1,
+      "position": [
+        624,
+        368
+      ],
+      "executeOnce": false
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{ $('AUTH').item.json.link }}",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "={{ $('AUTH').item.json.link2 }}",
+              "value": "={{ $('AUTH').item.json.link1 }}"
+            }
+          ]
+        },
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "phone",
+              "value": "={{ $json.financeiro }}"
+            },
+            {
+              "name": "message",
+              "value": "=---- *ALERTA PEDIDO EMITIDO PARA CLIENTE PENDENTE*\n\nTipo_unidade: *{{ $('formata texto').item.json.tipo_unidade }}*\nUnidade: *{{ $('formata texto').item.json.unidade_novo_pedido }}*\nCódigo_cliente: *{{ $('formata texto').item.json.cod_cliente }}*\nNome_cliente: *{{ $('formata texto').item.json.nome_cliente }}*\nUnidade da Pendência: *{{ $('formata texto').item.json.unidade_pendente }}*\n---------------------------------------------------"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "8032810b-a2ee-4639-ba72-b030e522e852",
+      "name": "Auxiliares",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.1,
+      "position": [
+        624,
+        512
+      ],
+      "executeOnce": false
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "ede53e75-55ad-405c-803e-e572936d81d2",
+              "name": "unidade",
+              "value": "={{ $json.unidade }}",
+              "type": "string"
+            },
+            {
+              "id": "d4979923-f697-44a6-bf34-26878014b3aa",
+              "name": "condicao_entrega",
+              "value": "={{ $json.tipo_entrega }}",
+              "type": "string"
+            },
+            {
+              "id": "515ff57c-1d5a-412f-bb4d-4347820f8de4",
+              "name": "data_entrega",
+              "value": "={{ $json.data_hora_entregue }}",
+              "type": "string"
+            },
+            {
+              "id": "d1120875-3a4b-4ebb-9a36-00a181491d9c",
+              "name": "nome_cliente",
+              "value": "={{ $json.nome_cliente }}",
+              "type": "string"
+            },
+            {
+              "id": "363848d9-0d84-4ad5-8dd6-f91ed22203af",
+              "name": "cod_romaneio",
+              "value": "={{ $json.cod_romaneio }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "4963b448-765d-42f3-a1bd-fcbfa7b9310b",
+      "name": "Edit Fields",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.3,
+      "position": [
+        -768,
+        288
+      ],
+      "disabled": true
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.pipefy.com/graphql",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Authorization",
+              "value": "{{JWT_TOKEN}}"
+            },
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"query\": \"mutation { createCard(input: {pipe_id: 305619354, phase_id: 333525857,  title: \\\"AUDITORIA DE CARGA\\\" fields_attributes: [{field_id: \\\"descricao\\\", field_value: \\\"{{ $json.condicao_entrega }}\\\"}, {field_id: \\\"unidade\\\", field_value: \\\"{{ $json.unidade }}\\\"}, {field_id: \\\"chave\\\", field_value: \\\"{{ $json.cod_romaneio }}\\\"}, {field_id: \\\"nome_cliente\\\", field_value: \\\"{{ $json.nome_cliente }}\\\"}, {field_id: \\\"data_pagamento\\\", field_value: \\\"{{ $json.data_entrega }}\\\"}]}) { card { id } } }\"\n}",
+        "options": {}
+      },
+      "id": "4753360f-0b46-4379-a02b-8d2a74e12734",
+      "name": "PIPEFY",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.1,
+      "position": [
+        -608,
+        288
+      ],
+      "disabled": true
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.pipefy.com/graphql",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Authorization",
+              "value": "{{JWT_TOKEN}}"
+            },
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"query\": \"mutation { updateCard(input: {id: \\\"{{ $json.data.createCard.card.id }}\\\", label_ids: [\\\"314483769\\\"]}) { card { id } } }\"\n}",
+        "options": {}
+      },
+      "id": "a833a073-9384-4c83-99cd-b63734f1ac33",
+      "name": "PIPEFY - etiqueta",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.1,
+      "position": [
+        -448,
+        288
+      ],
+      "disabled": true
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Schedule Trigger": {
+      "main": [
+        [
+          {
+            "node": "Google Sheets",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Postgres": {
+      "main": [
+        [
+          {
+            "node": "Code",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Convert to File": {
+      "main": [
+        [
+          {
+            "node": "AWS S31",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Wait": {
+      "main": [
+        [
+          {
+            "node": "AWS S33",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Google Sheets": {
+      "main": [
+        [
+          {
+            "node": "AUTH1",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "AUTH",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "AUTH": {
+      "main": [
+        [
+          {
+            "node": "ARQUIVO",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "ARQUIVO": {
+      "main": [
+        [
+          {
+            "node": "Postgres",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "André": {
+      "main": [
+        [
+          {
+            "node": "Wait",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "AWS S31": {
+      "main": [
+        [
+          {
+            "node": "André",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code": {
+      "main": [
+        [
+          {
+            "node": "Convert to File",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "AUTH1": {
+      "main": [
+        [
+          {
+            "node": "Postgres1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Postgres1": {
+      "main": [
+        [
+          {
+            "node": "Code1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code1": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Formata Texto",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Formata Texto": {
+      "main": [
+        [
+          {
+            "node": "contatos",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Loop Over Items": {
+      "main": [
+        [
+          {
+            "node": "formata texto1",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Loop Over Items",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If": {
+      "main": [
+        [
+          {
+            "node": "Loop Over Items",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "formata texto1": {
+      "main": [
+        [
+          {
+            "node": "Gestores",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "contatos": {
+      "main": [
+        [
+          {
+            "node": "If",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Edit Fields": {
+      "main": [
+        [
+          {
+            "node": "PIPEFY",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "PIPEFY": {
+      "main": [
+        [
+          {
+            "node": "PIPEFY - etiqueta",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "9e51a69f-9cc3-44aa-ab90-abee27f4cf44",
+  "meta": {
+    "instanceId": "{{INSTANCE_ID}}"
+  },
+  "id": "jUo2Bld9NNj4kP5p",
+  "tags": [
+    {
+      "updatedAt": "2025-03-21T11:52:03.821Z",
+      "createdAt": "2025-03-21T11:52:03.821Z",
+      "id": "ro9IiNWQxt6VLDLj",
+      "name": "Setor - Controladoria"
+    },
+    {
+      "updatedAt": "2026-01-14T11:04:00.895Z",
+      "createdAt": "2025-03-21T11:47:30.374Z",
+      "id": "CvCy3KNJKyMxSQ3C",
+      "name": "GDA"
+    }
+  ]
+}

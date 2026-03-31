@@ -1,0 +1,490 @@
+{
+  "name": "AUTO Resolução - Pipe - Cargas",
+  "nodes": [
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "field": "weeks",
+              "triggerAtDay": [
+                0,
+                1,
+                2,
+                6,
+                5,
+                4,
+                3
+              ]
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.2,
+      "position": [
+        -528,
+        -304
+      ],
+      "id": "d6bb7fb6-50e5-4ecb-bb60-4a20a7ae9998",
+      "name": "Schedule Trigger"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "edd6ef23-bc46-4a7f-b6ef-cc1c8c7bf6df",
+              "leftValue": "={{ $json.phase_id }}",
+              "rightValue": "319408298",
+              "operator": {
+                "type": "string",
+                "operation": "notEquals"
+              }
+            },
+            {
+              "id": "5244b874-113d-4807-8ca8-7748776739e4",
+              "leftValue": "={{ $json.phase_id }}",
+              "rightValue": "319408304",
+              "operator": {
+                "type": "string",
+                "operation": "notEquals"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        496,
+        -304
+      ],
+      "id": "454b277c-c023-433b-b4b2-7d5c57fa42d0",
+      "name": "If"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "9b755920-084f-4e89-8537-378886394e4d",
+              "name": "hasNextPage",
+              "value": true,
+              "type": "boolean"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        -320,
+        -304
+      ],
+      "id": "3d4fb1a8-5b56-44bf-b03b-e9ef3493c8c2",
+      "name": "hasNextPage"
+    },
+    {
+      "parameters": {
+        "jsCode": "const staticData = $getWorkflowStaticData('global');\nstaticData.cursor = null;\nstaticData.hasNextPage = true;\n\nreturn [{\n  json: {\n    body: {\n      query: \"query { cards(pipe_id: 303155482, first: 50) { edges { node { id current_phase { id name } fields { name value } } } pageInfo { endCursor hasNextPage } } }\"\n    }\n  }\n}];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -112,
+        -304
+      ],
+      "id": "b7f258b8-2dc1-4611-8946-979277f2c867",
+      "name": "cursor"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.pipefy.com/graphql",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Authorization",
+              "value": "Bearer eyJhbGciOiJIUzUxMiJ9.eyJpc3MiOiJQaXBlZnkiLCJpYXQiOjE3MzY0NDc3OTMsImp0aSI6IjgyMWZhZjBkLWMyMDUtNDRjOC05YTU2LWFmYmIxMzI3OTdkYSIsInN1YiI6ODAyNzIsInVzZXIiOnsiaWQiOjgwMjcyLCJlbWFpbCI6Im1hcmNvbGFuZGllZ29AZ21haWwuY29tIn19.czyBeR45RrwDXqnq-TjN7CgM6zmMgR8KB6oeBujazuO1assBjhTFZVyqLw3LB-yT1xDTnJaQS4aIS7_iRhWz4Q"
+            },
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ $json.body }}",
+        "options": {}
+      },
+      "id": "a3218a62-1eb9-4dde-bda4-59d7274c2bce",
+      "name": "Varrer Cards",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.1,
+      "position": [
+        80,
+        -304
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "const staticData = $getWorkflowStaticData('global');\nconst response = $input.first().json.data?.cards;\n\nif (!response) {\n  return [];\n}\n\n// Atualiza paginação\nstaticData.cursor = response.pageInfo.endCursor;\nstaticData.hasNextPage = response.pageInfo.hasNextPage;\n\nconst cards = response.edges\n  .map(edge => {\n    const fields = edge.node.fields;\n    const romaneio = fields.find(f => f.name === 'Romaneio')?.value || null;\n    const unidade = fields.find(f => f.name === 'Unidade')?.value || null;\n\n    return {\n      card_id: edge.node.id,\n      phase_id: edge.node.current_phase.id,\n      phase_name: edge.node.current_phase.name,\n      romaneio,\n      unidade\n    };\n  })\n  .filter(c => c.phase_name !== 'Resolvido');\n\nreturn cards.map(c => ({ json: c }));"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        288,
+        -304
+      ],
+      "id": "1dd6d52c-10ae-4f56-bb5a-d68e8e91e374",
+      "name": "Extrair Cards"
+    },
+    {
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "SELECT \n  eg.unidade,\n  eg.cod_romaneio,\n  SUM(eg.valor_entregue)::numeric as valor_entregue,\n  MAX(spp.totalpago)::numeric as totalpago\nFROM entregas_geral eg\nLEFT JOIN status_pagamento_pedidos spp \n  ON eg.unidade = spp.unidade \n  AND eg.cod_pedido = spp.cod_pedido\nWHERE eg.unidade = '{{ $json.unidade }}' \n  AND eg.cod_romaneio = '{{ $json.romaneio }}'\nGROUP BY eg.unidade, eg.cod_romaneio",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 2.6,
+      "position": [
+        736,
+        -304
+      ],
+      "id": "cef6adad-09a3-4a4d-95ef-e990fe603798",
+      "name": "Consulta Pagamento DB",
+      "credentials": {
+        "postgres": {
+          "id": "G50fA6A0L90xaBIe",
+          "name": "Postgres account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "loose",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "69290ffe-742d-4c95-94d1-edaeba2d5e47",
+              "leftValue": "={{ $json.valor_entregue }}",
+              "rightValue": "={{ $json.totalpago }}",
+              "operator": {
+                "type": "number",
+                "operation": "lte"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "looseTypeValidation": true,
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        912,
+        -304
+      ],
+      "id": "ae58db8e-717d-4b3c-848e-3fd0def52c90",
+      "name": "compare to value"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.pipefy.com/graphql",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Authorization",
+              "value": "Bearer eyJhbGciOiJIUzUxMiJ9.eyJpc3MiOiJQaXBlZnkiLCJpYXQiOjE3MzY0NDc3OTMsImp0aSI6IjgyMWZhZjBkLWMyMDUtNDRjOC05YTU2LWFmYmIxMzI3OTdkYSIsInN1YiI6ODAyNzIsInVzZXIiOnsiaWQiOjgwMjcyLCJlbWFpbCI6Im1hcmNvbGFuZGllZ29AZ21haWwuY29tIn19.czyBeR45RrwDXqnq-TjN7CgM6zmMgR8KB6oeBujazuO1assBjhTFZVyqLw3LB-yT1xDTnJaQS4aIS7_iRhWz4Q"
+            },
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"query\": \"mutation { moveCardToPhase(input: { card_id: \\\"{{ $('Extrair Cards').item.json.card_id }}\\\", destination_phase_id: \\\"319408298\\\" }) { card { id current_phase { name } } } }\"\n}",
+        "options": {}
+      },
+      "id": "e1371044-ccc7-42a3-a589-137956be9d19",
+      "name": "moveCard",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.1,
+      "position": [
+        1136,
+        -448
+      ]
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "loose",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "6f711097-4d13-433b-baa8-2866ffbfe165",
+              "leftValue": "={{ $json.hasNextPage }}",
+              "rightValue": true,
+              "operator": {
+                "type": "boolean",
+                "operation": "equals"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "looseTypeValidation": true,
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        1568,
+        -288
+      ],
+      "id": "0fefa15e-4123-4fed-a90d-fc380cfe13b0",
+      "name": "if next page"
+    },
+    {
+      "parameters": {
+        "jsCode": "const staticData = $getWorkflowStaticData('global');\nconst cursor = staticData.cursor;\n\nreturn [{\n  json: {\n    body: {\n      query: `query { cards(pipe_id: 303155482, first: 50, after: \"${cursor}\") { edges { node { id current_phase { id name } fields { name value } } } pageInfo { endCursor hasNextPage } } }`\n    }\n  }\n}];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        192,
+        -144
+      ],
+      "id": "4910e09e-57e2-403a-9eb0-b19b4bac3f5c",
+      "name": "cursor loop"
+    },
+    {
+      "parameters": {
+        "jsCode": "const staticData = $getWorkflowStaticData('global');\nreturn [{\n  json: {\n    hasNextPage: staticData.hasNextPage || false\n  }\n}];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1360,
+        -288
+      ],
+      "id": "c87b3c96-3bd7-4268-9dbf-37134f442e12",
+      "name": "check next page"
+    },
+    {
+      "parameters": {
+        "phone": "5581994541473",
+        "text": "=✅ Automação Pipe Cargas concluída com sucesso! 📦 Cards analisados e movidos automaticamente para a fase Recebido com base na confirmação de pagamento no sistema. 🕐 Execução concluída em {{ new Date().toLocaleString('pt-BR', { timeZone: 'America/Recife' }) }}",
+        "additionalFields": {}
+      },
+      "type": "n8n-nodes-zapi.zapi",
+      "typeVersion": 1,
+      "position": [
+        1776,
+        -272
+      ],
+      "id": "6b8c9acb-460c-4a2a-a9c8-caa1648d4205",
+      "name": "Send text",
+      "credentials": {
+        "zapiApi": {
+          "id": "cGI15AvSkFAV8Qrr",
+          "name": "Z-API account"
+        }
+      }
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Schedule Trigger": {
+      "main": [
+        [
+          {
+            "node": "hasNextPage",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If": {
+      "main": [
+        [
+          {
+            "node": "Consulta Pagamento DB",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "check next page",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "hasNextPage": {
+      "main": [
+        [
+          {
+            "node": "cursor",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "cursor": {
+      "main": [
+        [
+          {
+            "node": "Varrer Cards",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Varrer Cards": {
+      "main": [
+        [
+          {
+            "node": "Extrair Cards",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Extrair Cards": {
+      "main": [
+        [
+          {
+            "node": "If",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Consulta Pagamento DB": {
+      "main": [
+        [
+          {
+            "node": "compare to value",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "compare to value": {
+      "main": [
+        [
+          {
+            "node": "moveCard",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        []
+      ]
+    },
+    "moveCard": {
+      "main": [
+        [
+          {
+            "node": "check next page",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "if next page": {
+      "main": [
+        [
+          {
+            "node": "cursor loop",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Send text",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "cursor loop": {
+      "main": [
+        [
+          {
+            "node": "Varrer Cards",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "check next page": {
+      "main": [
+        [
+          {
+            "node": "if next page",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": true,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "4e86b0dc-82aa-4f61-ac85-75e4ee824ac7",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "a5e8675e548a032fda81ee9dc775b4fc0a1b2003aee794fb0b37064013276a0f"
+  },
+  "id": "2Qab2FRuE0EN0Xjc",
+  "tags": [
+    {
+      "updatedAt": "2026-01-14T11:04:00.895Z",
+      "createdAt": "2025-03-21T11:47:30.374Z",
+      "id": "CvCy3KNJKyMxSQ3C",
+      "name": "GDA"
+    }
+  ]
+}

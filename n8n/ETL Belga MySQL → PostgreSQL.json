@@ -1,0 +1,2206 @@
+{
+  "name": "ETL Belga MySQL → PostgreSQL",
+  "nodes": [
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "s1",
+              "name": "tabela",
+              "value": "Belga_Consumo",
+              "type": "string"
+            },
+            {
+              "id": "s2",
+              "name": "status",
+              "value": "✅ Sucesso",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "be2fa6da-bb26-4dfa-aa3c-1f06afec8d9d",
+      "name": "Status: Consumo OK",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        1088,
+        1744
+      ]
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "s1",
+              "name": "tabela",
+              "value": "Belga_Produtos_Custo_MP",
+              "type": "string"
+            },
+            {
+              "id": "s2",
+              "name": "status",
+              "value": "✅ Sucesso",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "fdf31d81-624e-4ec4-94e5-dcfdf3c3ac16",
+      "name": "Status: Custo MP OK",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        1088,
+        2080
+      ]
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "s1",
+              "name": "tabela",
+              "value": "Belga_Produtos_PK",
+              "type": "string"
+            },
+            {
+              "id": "s2",
+              "name": "status",
+              "value": "✅ Sucesso",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "610411bf-ac76-4578-9491-9abc0137fbe7",
+      "name": "Status: Produtos PK OK",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        1088,
+        2448
+      ]
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "s1",
+              "name": "tabela",
+              "value": "Belga_Composicao_KIT_PK",
+              "type": "string"
+            },
+            {
+              "id": "s2",
+              "name": "status",
+              "value": "✅ Sucesso",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "84944575-3ae0-4ec5-84a6-96bbece6a962",
+      "name": "Status: Composicao KIT OK",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        1088,
+        2768
+      ]
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "s1",
+              "name": "tabela",
+              "value": "Belga_Pre_Romaneio",
+              "type": "string"
+            },
+            {
+              "id": "s2",
+              "name": "status",
+              "value": "✅ Sucesso",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "599b4559-8508-436d-82d3-42a93c47a94d",
+      "name": "Status: Pre Romaneio OK",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        1104,
+        3136
+      ]
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "s1",
+              "name": "tabela",
+              "value": "Belga_Composicao",
+              "type": "string"
+            },
+            {
+              "id": "s2",
+              "name": "status",
+              "value": "✅ Sucesso",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "10d13b18-95d8-448c-9a7a-8047115c906b",
+      "name": "Status: Composicao OK",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        1104,
+        3520
+      ]
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "e1",
+              "name": "tabela",
+              "value": "Belga_Consumo",
+              "type": "string"
+            },
+            {
+              "id": "e2",
+              "name": "status",
+              "value": "❌ Erro",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "100c6888-53d5-4c39-ad25-55b0cd439b8b",
+      "name": "Status: Consumo ERRO",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        1088,
+        1568
+      ]
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "e1",
+              "name": "tabela",
+              "value": "Belga_Produtos_Custo_MP",
+              "type": "string"
+            },
+            {
+              "id": "e2",
+              "name": "status",
+              "value": "❌ Erro",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "958378f7-09c9-47eb-9bbd-21e9a0c56fa2",
+      "name": "Status: Custo MP ERRO",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        1088,
+        1920
+      ]
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "e1",
+              "name": "tabela",
+              "value": "Belga_Produtos_PK",
+              "type": "string"
+            },
+            {
+              "id": "e2",
+              "name": "status",
+              "value": "❌ Erro",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "c78b60b3-15be-4a8d-af20-c6b43e580a6a",
+      "name": "Status: Produtos PK ERRO",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        1088,
+        2256
+      ]
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "e1",
+              "name": "tabela",
+              "value": "Belga_Composicao_KIT_PK",
+              "type": "string"
+            },
+            {
+              "id": "e2",
+              "name": "status",
+              "value": "❌ Erro",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "aae5a8e2-867f-49d5-b9aa-94332e0db08e",
+      "name": "Status: Composicao KIT ERRO",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        1088,
+        2624
+      ]
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "e1",
+              "name": "tabela",
+              "value": "Belga_Pre_Romaneio",
+              "type": "string"
+            },
+            {
+              "id": "e2",
+              "name": "status",
+              "value": "❌ Erro",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "0f3f4203-f6b4-476e-8688-974da2cd2261",
+      "name": "Status: Pre Romaneio ERRO",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        1088,
+        2960
+      ]
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "e1",
+              "name": "tabela",
+              "value": "Belga_Composicao",
+              "type": "string"
+            },
+            {
+              "id": "e2",
+              "name": "status",
+              "value": "❌ Erro",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "205cb15d-83d9-4f8e-a9e5-6bba88788af5",
+      "name": "Status: Composicao ERRO",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        1104,
+        3312
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "const items = $input.all();\nconst vistas = {};\nconst linhas = [];\n\nfor (const item of items) {\n  const tabela = item.json.tabela;\n  if (!vistas[tabela]) {\n    vistas[tabela] = true;\n    linhas.push(`${tabela} - ${item.json.status}`);\n  }\n}\n\nconst data = new Date().toLocaleDateString('pt-BR');\nconst mensagem = `📊 *ETL Belga - ${data}*\\n\\n` + linhas.join('\\n');\nreturn [{ json: { mensagem } }];"
+      },
+      "id": "66b8e742-7522-4da2-99fe-8d042c8826b3",
+      "name": "Monta Mensagem",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        2192,
+        2592
+      ]
+    },
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "triggerAtHour": 23
+            }
+          ]
+        }
+      },
+      "id": "1569d78b-88e6-4cce-b97e-d23290e03848",
+      "name": "Trigger Diário 06h1",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.1,
+      "position": [
+        -96,
+        2640
+      ]
+    },
+    {
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "CREATE TABLE IF NOT EXISTS public.belga_consumo (\n  cod_pedido VARCHAR(50),\n  data_pedido DATE,\n  data_entrega DATE,\n  vlr_tot_pve NUMERIC(15,2),\n  produto_vendido VARCHAR(100),\n  desc_vendido VARCHAR(255),\n  qtde_produto NUMERIC(15,4),\n  custo_unit NUMERIC(15,4),\n  precovenda NUMERIC(15,4),\n  custo_total NUMERIC(15,4),\n  ferragem VARCHAR(100),\n  desc_ferragem VARCHAR(255),\n  componente_final VARCHAR(100),\n  desc_mp VARCHAR(255),\n  unid VARCHAR(20),\n  qt_ferragem_no_produto NUMERIC(15,4),\n  qt_mp_na_ferragem NUMERIC(15,4),\n  qt_consumo_total NUMERIC(15,4)\n);\nTRUNCATE TABLE public.belga_consumo;",
+        "options": {}
+      },
+      "id": "30646d4f-de29-42ff-97d7-c34a779359b0",
+      "name": "Prep: belga_consumo1",
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 2.3,
+      "position": [
+        368,
+        1744
+      ],
+      "credentials": {
+        "postgres": {
+          "id": "G50fA6A0L90xaBIe",
+          "name": "Postgres account"
+        }
+      },
+      "onError": "continueErrorOutput"
+    },
+    {
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "SELECT\n    p.cod_pedido,\n    p.data_pedido,\n    p.data_entrega,\n    p.vlr_tot_pve,\n    p.cod_interno_vendido AS produto_vendido,\n    p.desc_vendido,\n    p.qtde_produto,\n    p.custo_unit,\n    p.precovenda,\n    (p.custo_unit * p.qtde_produto) AS custo_total,\n    hier.ferragem,\n    hier.desc_ferragem,\n    hier.cod_mp AS componente_final,\n    hier.desc_mp,\n    hier.unid,\n    hier.qt_ferr AS qt_ferragem_no_produto,\n    hier.qt_mp AS qt_mp_na_ferragem,\n    (p.qtde_produto * hier.qt_ferr * hier.qt_mp) AS qt_consumo_total\nFROM\n(\n    SELECT\n        pe.NU_PVE AS cod_pedido,\n        pr.DS_COD_INTERNO AS cod_interno_vendido,\n        pr.DS_PRO AS desc_vendido,\n        it.QT_PRO AS qtde_produto,\n        pe.DT_PVE AS data_pedido,\n        rom.data_entrega AS data_entrega,\n        pr.NU_CUSTO AS custo_unit,\n        pr.NU_PRECOV AS precovenda,\n        pe.VLR_TOT_PVE\n    FROM mgpve01010 pe\n    JOIN mgpve01011 it ON pe.NU_PVE = it.NU_PVE\n    JOIN mgpro01010 pr ON it.NU_PRO = pr.NU_PRO\n    LEFT JOIN (\n        SELECT r11.NU_PVE, MAX(r10.DT_ROM) AS data_entrega\n        FROM mgrom01011 r11\n        JOIN mgrom01010 r10 ON r11.NU_ROM = r10.NU_ROM\n        GROUP BY r11.NU_PVE\n    ) rom ON rom.NU_PVE = pe.NU_PVE\n    WHERE pe.ID_STATUS = '4'\n      AND pe.DT_PVE >= '2025-07-01'\n) p\nJOIN\n(\n    SELECT\n        k.cod_kit AS produto_pai,\n        k.ferragem, k.desc_ferragem, k.qt_ferr,\n        mp.cod_mp, mp.desc_mp, mp.unid, mp.qt_mp\n    FROM (\n        SELECT DISTINCT\n            b.DS_COD_INTERNO AS cod_kit,\n            g.DS_COD_INTERNO AS ferragem,\n            g.DS_PRO AS desc_ferragem,\n            a.QTDE_KIT AS qt_ferr\n        FROM mgpro01011 a\n        JOIN mgpro01010 b ON a.NU_PRO = b.NU_PRO\n        JOIN mgpro01010 g ON a.NU_PRK = g.NU_PRO\n        WHERE b.DS_COD_INTERNO LIKE 'KIT%'\n    ) k\n    LEFT JOIN (\n        SELECT DISTINCT\n            b.DS_COD_INTERNO AS ferragem,\n            g.DS_COD_INTERNO AS cod_mp,\n            g.DS_PRO AS desc_mp,\n            h.DS_CUM AS unid,\n            a.QTDE_KIT AS qt_mp\n        FROM mgpro01011 a\n        JOIN mgpro01010 b ON a.NU_PRO = b.NU_PRO\n        JOIN mgpro01010 g ON a.NU_PRK = g.NU_PRO\n        LEFT JOIN mgcum01010 h ON g.NU_CUM = h.NU_CUM\n        WHERE b.DS_COD_INTERNO NOT LIKE 'KIT%'\n    ) mp ON mp.ferragem = k.ferragem\n    UNION ALL\n    SELECT\n        ferr.cod_pai AS produto_pai,\n        ferr.ferragem, ferr.desc_ferragem,\n        1 AS qt_ferr,\n        mp.cod_mp, mp.desc_mp, mp.unid, mp.qt_mp\n    FROM (\n        SELECT DISTINCT\n            b.DS_COD_INTERNO AS cod_pai,\n            b.DS_COD_INTERNO AS ferragem,\n            b.DS_PRO AS desc_ferragem\n        FROM mgpro01010 b\n        WHERE b.DS_COD_INTERNO NOT LIKE 'KIT%'\n          AND b.DS_COD_INTERNO NOT IN (\n              SELECT DISTINCT g.DS_COD_INTERNO\n              FROM mgpro01011 a\n              JOIN mgpro01010 b2 ON a.NU_PRO = b2.NU_PRO\n              JOIN mgpro01010 g ON a.NU_PRK = g.NU_PRO\n              WHERE b2.DS_COD_INTERNO LIKE 'KIT%'\n          )\n    ) ferr\n    LEFT JOIN (\n        SELECT DISTINCT\n            b.DS_COD_INTERNO AS ferragem,\n            g.DS_COD_INTERNO AS cod_mp,\n            g.DS_PRO AS desc_mp,\n            h.DS_CUM AS unid,\n            a.QTDE_KIT AS qt_mp\n        FROM mgpro01011 a\n        JOIN mgpro01010 b ON a.NU_PRO = b.NU_PRO\n        JOIN mgpro01010 g ON a.NU_PRK = g.NU_PRO\n        LEFT JOIN mgcum01010 h ON g.NU_CUM = h.NU_CUM\n    ) mp ON mp.ferragem = ferr.ferragem\n) hier ON hier.produto_pai = p.cod_interno_vendido\nORDER BY p.cod_pedido, p.cod_interno_vendido, hier.ferragem, hier.cod_mp",
+        "options": {}
+      },
+      "id": "b6fa56e2-41b9-4029-af90-15af2d3c901f",
+      "name": "MySQL: Consumo1",
+      "type": "n8n-nodes-base.mySql",
+      "typeVersion": 2.3,
+      "position": [
+        608,
+        1744
+      ],
+      "credentials": {
+        "mySql": {
+          "id": "EY1CH7IcANXbiyVO",
+          "name": "MySQL belga"
+        }
+      },
+      "onError": "continueErrorOutput"
+    },
+    {
+      "parameters": {
+        "schema": {
+          "__rl": true,
+          "mode": "list",
+          "value": "public"
+        },
+        "table": {
+          "__rl": true,
+          "mode": "list",
+          "value": "belga_consumo"
+        },
+        "columns": {
+          "mappingMode": "autoMapInputData",
+          "value": {},
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "cod_pedido",
+              "displayName": "cod_pedido",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "data_pedido",
+              "displayName": "data_pedido",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "dateTime",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "data_entrega",
+              "displayName": "data_entrega",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "dateTime",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "vlr_tot_pve",
+              "displayName": "vlr_tot_pve",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "number",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "produto_vendido",
+              "displayName": "produto_vendido",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "desc_vendido",
+              "displayName": "desc_vendido",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "qtde_produto",
+              "displayName": "qtde_produto",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "number",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "custo_unit",
+              "displayName": "custo_unit",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "number",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "precovenda",
+              "displayName": "precovenda",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "number",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "custo_total",
+              "displayName": "custo_total",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "number",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "ferragem",
+              "displayName": "ferragem",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "desc_ferragem",
+              "displayName": "desc_ferragem",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "componente_final",
+              "displayName": "componente_final",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "desc_mp",
+              "displayName": "desc_mp",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "unid",
+              "displayName": "unid",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "qt_ferragem_no_produto",
+              "displayName": "qt_ferragem_no_produto",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "number",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "qt_mp_na_ferragem",
+              "displayName": "qt_mp_na_ferragem",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "number",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "qt_consumo_total",
+              "displayName": "qt_consumo_total",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "number",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "cod_pedido\",\"data_pedido\",\"data_entrega\",\"vlr_tot_pve\",\"produto",
+              "displayName": "cod_pedido\",\"data_pedido\",\"data_entrega\",\"vlr_tot_pve\",\"produto",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "column1",
+              "displayName": "column1",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": ",",
+              "displayName": ",",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": ",_1",
+              "displayName": ",_1",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": ",_2",
+              "displayName": ",_2",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": ",_3",
+              "displayName": ",_3",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": ",_4",
+              "displayName": ",_4",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": ",_5",
+              "displayName": ",_5",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": ",_6",
+              "displayName": ",_6",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": ",_7",
+              "displayName": ",_7",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": ",_8",
+              "displayName": ",_8",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": ",_9",
+              "displayName": ",_9",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": ",_10",
+              "displayName": ",_10",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": ",_11",
+              "displayName": ",_11",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": ",_12",
+              "displayName": ",_12",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": ",_13",
+              "displayName": ",_13",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": ",_14",
+              "displayName": ",_14",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": ",_15",
+              "displayName": ",_15",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": ",_16",
+              "displayName": ",_16",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "column37",
+              "displayName": "column37",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "id": "3d4d42a0-3cb3-40dc-a1eb-0624ac349af9",
+      "name": "PG Insert: belga_consumo1",
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 2.3,
+      "position": [
+        848,
+        1744
+      ],
+      "credentials": {
+        "postgres": {
+          "id": "G50fA6A0L90xaBIe",
+          "name": "Postgres account"
+        }
+      },
+      "onError": "continueErrorOutput"
+    },
+    {
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "CREATE TABLE IF NOT EXISTS public.belga_produtos_custo_mp (\n  cod_mp VARCHAR(100),\n  desc_mp VARCHAR(255),\n  custo_unitario_mp NUMERIC(15,4),\n  preco_venda_mp NUMERIC(15,4),\n  id_ativo CHAR(1)\n);\nTRUNCATE TABLE public.belga_produtos_custo_mp;",
+        "options": {}
+      },
+      "id": "8aeba493-7dfb-404a-b94a-a69d94f0c04f",
+      "name": "Prep: belga_produtos_custo_mp1",
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 2.3,
+      "position": [
+        368,
+        2080
+      ],
+      "credentials": {
+        "postgres": {
+          "id": "G50fA6A0L90xaBIe",
+          "name": "Postgres account"
+        }
+      },
+      "onError": "continueErrorOutput"
+    },
+    {
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "SELECT\n    p.DS_COD_INTERNO AS cod_mp,\n    p.DS_PRO AS desc_mp,\n    p.NU_CUSTO AS custo_unitario_mp,\n    p.NU_PRECOV AS preco_venda_mp,\n    p.ID_ATIVO as id_ativo\nFROM mgpro01010 p\nWHERE p.DS_COD_INTERNO IS NOT NULL",
+        "options": {}
+      },
+      "id": "4c603434-6e04-4246-baa9-5ee6cd1538fa",
+      "name": "MySQL: Produtos Custo MP1",
+      "type": "n8n-nodes-base.mySql",
+      "typeVersion": 2.3,
+      "position": [
+        608,
+        2080
+      ],
+      "credentials": {
+        "mySql": {
+          "id": "EY1CH7IcANXbiyVO",
+          "name": "MySQL belga"
+        }
+      },
+      "onError": "continueErrorOutput"
+    },
+    {
+      "parameters": {
+        "schema": {
+          "__rl": true,
+          "value": "public",
+          "mode": "list",
+          "cachedResultName": "public"
+        },
+        "table": {
+          "__rl": true,
+          "value": "belga_produtos_custo_mp",
+          "mode": "list",
+          "cachedResultName": "belga_produtos_custo_mp"
+        },
+        "columns": {
+          "mappingMode": "autoMapInputData",
+          "value": {},
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "cod_mp",
+              "displayName": "cod_mp",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "desc_mp",
+              "displayName": "desc_mp",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "custo_unitario_mp",
+              "displayName": "custo_unitario_mp",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "number",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "preco_venda_mp",
+              "displayName": "preco_venda_mp",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "number",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "id_ativo",
+              "displayName": "id_ativo",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "id": "16910546-fd8f-4787-8690-7a3be14196dd",
+      "name": "PG Insert: belga_produtos_custo_mp1",
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 2.3,
+      "position": [
+        848,
+        2080
+      ],
+      "credentials": {
+        "postgres": {
+          "id": "G50fA6A0L90xaBIe",
+          "name": "Postgres account"
+        }
+      },
+      "onError": "continueErrorOutput"
+    },
+    {
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "CREATE TABLE IF NOT EXISTS public.belga_produtos_pk (\n  CodMovimentacao VARCHAR(50),\n  IdProduto VARCHAR(50),\n  TipoMovimentacao VARCHAR(20),\n  Observacao TEXT,\n  QtdMovimentacao NUMERIC(15,4),\n  DataMovimentacao DATE,\n  Montadores VARCHAR(255),\n  SaldoDia NUMERIC(15,4),\n  CodProduto VARCHAR(100),\n  NomeProduto VARCHAR(255),\n  Categoria VARCHAR(100),\n  Classe VARCHAR(100),\n  Subclasse VARCHAR(100),\n  CustoUnitario NUMERIC(15,4),\n  EstoqueMinimo NUMERIC(15,4),\n  EstoqueAtual NUMERIC(15,4),\n  EstoqueMetro NUMERIC(15,4),\n  EstoquePeso NUMERIC(15,4),\n  Fator_conversao NUMERIC(15,6),\n  PrecoVenda NUMERIC(15,4)\n);\nTRUNCATE TABLE public.belga_produtos_pk;",
+        "options": {}
+      },
+      "id": "f892d137-04d7-4d18-b883-c3cf52e19791",
+      "name": "Prep: belga_produtos_pk1",
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 2.3,
+      "position": [
+        400,
+        2448
+      ],
+      "credentials": {
+        "postgres": {
+          "id": "G50fA6A0L90xaBIe",
+          "name": "Postgres account"
+        }
+      },
+      "onError": "continueErrorOutput"
+    },
+    {
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "SELECT * FROM (\n    SELECT \n        m.NU_MOV AS codmovimentacao,\n        m.NU_PRO AS idproduto,\n        CASE \n            WHEN m.NU_MMV = '501' THEN 'VENDA' \n            WHEN m.NU_MMV = '502' THEN 'COMPRA' \n            WHEN m.NU_MMV = '600' THEN 'PRODUCAO' \n            ELSE 'OUTROS'\n        END AS tipomovimentacao,\n        m.OBS_MOV AS observacao,\n        CASE  \n            WHEN m.TP_MOV = 1 THEN m.QT_MOV\n            WHEN m.TP_MOV = 2 THEN m.QT_MOV * -1\n        END AS qtdmovimentacao,\n        m.DT_MOV AS datamovimentacao,\n        usu.NOM_USU AS montadores,\n        m.SALDO_ATUAL AS saldodia,\n        p.CodProduto AS codproduto,\n        p.NomeProduto AS nomeproduto,\n        p.Categoria AS categoria,\n        p.Classe AS classe,\n        p.Subclasse AS subclasse,\n        p.CustoUnitario AS custounitario,\n        p.EstoqueMinimo AS estoqueminimo,\n        p.EstoqueAtual AS estoqueatual,\n        p.EstoqueMetro AS estoquemetro,\n        p.EstoquePeso AS estoquepeso,\n        p.Fator_conversao AS fator_conversao,\n        p.PrecoVenda AS precovenda\n    FROM mgmov01010 m\n    LEFT JOIN montadores mon ON m.id_montador = mon.id_montador\n    LEFT JOIN mgusu01010 usu ON mon.id_usuario = usu.NU_USU\n    RIGHT JOIN (\n        SELECT produtos.NU_PRO,\n            produtos.DS_COD_INTERNO AS CodProduto,\n            produtos.DS_PRO AS NomeProduto,\n            categoria.DS_CAT AS Categoria,\n            classe.DS_CLP AS Classe,\n            subclasse.DS_SCP AS Subclasse,\n            produtos.NU_CUSTO AS CustoUnitario,\n            produtos.NU_ESTOQMI AS EstoqueMinimo,\n            produtos.NU_ESTOQAT AS EstoqueAtual,\n            produtos.FAT_CONV1 * produtos.NU_ESTOQAT AS EstoqueMetro,\n            produtos.FAT_CONV2 * produtos.NU_ESTOQAT AS EstoquePeso,\n            produtos.FAT_CONV1 AS Fator_conversao,\n            produtos.NU_PRECOV AS PrecoVenda\n        FROM mgpro01010 produtos\n        LEFT JOIN mgcat01010 categoria ON produtos.NU_CAT = categoria.NU_CAT\n        LEFT JOIN mgclp01010 classe ON produtos.NU_CLP = classe.NU_CLP\n        LEFT JOIN mgscp01010 subclasse ON produtos.NU_SCP = subclasse.NU_SCP\n        WHERE categoria.ID_ATIVO = 'S'\n          AND COALESCE(classe.ID_ATIVO, 'S') = 'S'\n          AND COALESCE(subclasse.ID_ATIVO, 'S') = 'S'\n          AND produtos.ID_ATIVO = 'S'\n          AND COALESCE(categoria.ID_USOCONSUMO,'N') != 'S'\n          AND produtos.TP_PROD = 1\n    ) p ON p.NU_PRO = m.NU_PRO\n    WHERE m.DT_MOV >= CURDATE() - INTERVAL 100 DAY\n      AND LOWER(m.OBS_MOV) LIKE '%kits%'\n      AND m.DT_MOV > '2025-07-01'\n) z_q\nWHERE qtdmovimentacao > 0",
+        "options": {}
+      },
+      "id": "ae4e6890-3f7c-483b-ab52-04e943e4846d",
+      "name": "MySQL: Produtos PK1",
+      "type": "n8n-nodes-base.mySql",
+      "typeVersion": 2.3,
+      "position": [
+        640,
+        2448
+      ],
+      "credentials": {
+        "mySql": {
+          "id": "EY1CH7IcANXbiyVO",
+          "name": "MySQL belga"
+        }
+      },
+      "onError": "continueErrorOutput"
+    },
+    {
+      "parameters": {
+        "schema": {
+          "__rl": true,
+          "mode": "list",
+          "value": "public"
+        },
+        "table": {
+          "__rl": true,
+          "mode": "list",
+          "value": "belga_produtos_pk"
+        },
+        "columns": {
+          "mappingMode": "autoMapInputData",
+          "value": {},
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "codmovimentacao",
+              "displayName": "codmovimentacao",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "idproduto",
+              "displayName": "idproduto",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "tipomovimentacao",
+              "displayName": "tipomovimentacao",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "observacao",
+              "displayName": "observacao",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "qtdmovimentacao",
+              "displayName": "qtdmovimentacao",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "number",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "datamovimentacao",
+              "displayName": "datamovimentacao",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "dateTime",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "montadores",
+              "displayName": "montadores",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "saldodia",
+              "displayName": "saldodia",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "number",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "codproduto",
+              "displayName": "codproduto",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "nomeproduto",
+              "displayName": "nomeproduto",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "categoria",
+              "displayName": "categoria",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "classe",
+              "displayName": "classe",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "subclasse",
+              "displayName": "subclasse",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "custounitario",
+              "displayName": "custounitario",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "number",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "estoqueminimo",
+              "displayName": "estoqueminimo",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "number",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "estoqueatual",
+              "displayName": "estoqueatual",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "number",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "estoquemetro",
+              "displayName": "estoquemetro",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "number",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "estoquepeso",
+              "displayName": "estoquepeso",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "number",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "fator_conversao",
+              "displayName": "fator_conversao",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "number",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "precovenda",
+              "displayName": "precovenda",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "number",
+              "canBeUsedToMatch": true,
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "id": "44b730bf-cc82-4199-b575-2a08d29ce18e",
+      "name": "PG Insert: belga_produtos_pk1",
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 2.3,
+      "position": [
+        880,
+        2448
+      ],
+      "credentials": {
+        "postgres": {
+          "id": "G50fA6A0L90xaBIe",
+          "name": "Postgres account"
+        }
+      },
+      "onError": "continueErrorOutput"
+    },
+    {
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "CREATE TABLE IF NOT EXISTS public.belga_composicao_kit_pk (\n  kit_cod VARCHAR(100),\n  ferragem_cod VARCHAR(100),\n  ferragem_desc VARCHAR(255),\n  qtde_ferragem_por_kit NUMERIC(15,4)\n);\nTRUNCATE TABLE public.belga_composicao_kit_pk;",
+        "options": {}
+      },
+      "id": "f62dfeb8-e8f9-4866-a492-bee93f765043",
+      "name": "Prep: belga_composicao_kit_pk1",
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 2.3,
+      "position": [
+        368,
+        2768
+      ],
+      "credentials": {
+        "postgres": {
+          "id": "G50fA6A0L90xaBIe",
+          "name": "Postgres account"
+        }
+      },
+      "onError": "continueErrorOutput"
+    },
+    {
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "SELECT \n    b.DS_COD_INTERNO AS kit_cod,\n    g.DS_COD_INTERNO AS ferragem_cod,\n    g.DS_PRO AS ferragem_desc,\n    a.QTDE_KIT AS qtde_ferragem_por_kit\nFROM mgpro01011 a\nJOIN mgpro01010 b ON a.NU_PRO = b.NU_PRO\nJOIN mgpro01010 g ON a.NU_PRK = g.NU_PRO\nWHERE b.DS_COD_INTERNO LIKE 'KIT%'",
+        "options": {}
+      },
+      "id": "7a40662d-04ee-4fd0-b9db-07d7754e6340",
+      "name": "MySQL: Composição KIT PK1",
+      "type": "n8n-nodes-base.mySql",
+      "typeVersion": 2.3,
+      "position": [
+        608,
+        2768
+      ],
+      "credentials": {
+        "mySql": {
+          "id": "EY1CH7IcANXbiyVO",
+          "name": "MySQL belga"
+        }
+      },
+      "onError": "continueErrorOutput"
+    },
+    {
+      "parameters": {
+        "schema": {
+          "__rl": true,
+          "mode": "list",
+          "value": "public"
+        },
+        "table": {
+          "__rl": true,
+          "mode": "list",
+          "value": "belga_composicao_kit_pk"
+        },
+        "columns": {
+          "mappingMode": "autoMapInputData",
+          "value": {},
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "kit_cod",
+              "displayName": "kit_cod",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "ferragem_cod",
+              "displayName": "ferragem_cod",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "ferragem_desc",
+              "displayName": "ferragem_desc",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "qtde_ferragem_por_kit",
+              "displayName": "qtde_ferragem_por_kit",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "number",
+              "canBeUsedToMatch": true,
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "id": "5e9dea7b-e5cd-4c3d-902b-85958f0c9665",
+      "name": "PG Insert: belga_composicao_kit_pk1",
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 2.3,
+      "position": [
+        848,
+        2768
+      ],
+      "credentials": {
+        "postgres": {
+          "id": "G50fA6A0L90xaBIe",
+          "name": "Postgres account"
+        }
+      },
+      "onError": "continueErrorOutput"
+    },
+    {
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "CREATE TABLE IF NOT EXISTS public.belga_pre_romaneio (\n  cod_pedido VARCHAR(50),\n  pre_romaneio VARCHAR(50),\n  valor_total_pre_romaneio NUMERIC(15,2)\n);\nTRUNCATE TABLE public.belga_pre_romaneio;",
+        "options": {}
+      },
+      "id": "a8f46b42-b58e-4108-9a88-42fa9e85565a",
+      "name": "Prep: belga_pre_romaneio1",
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 2.3,
+      "position": [
+        384,
+        3136
+      ],
+      "credentials": {
+        "postgres": {
+          "id": "G50fA6A0L90xaBIe",
+          "name": "Postgres account"
+        }
+      },
+      "onError": "continueErrorOutput"
+    },
+    {
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "SELECT \n    m.NU_PVE AS cod_pedido,\n    m.NU_ROM AS pre_romaneio,\n    SUM(prerom.VLR_FINAL_PROD) AS valor_total_pre_romaneio\nFROM mgrom01010 m\nLEFT JOIN mgrom01011 prerom ON m.NU_ROM = prerom.NU_ROM\nWHERE m.ID_TP_ROM = '1'\nGROUP BY m.NU_PVE, m.NU_ROM",
+        "options": {}
+      },
+      "id": "6c8e4f1f-fbfe-49d1-86f8-e47bcc0dc543",
+      "name": "MySQL: Pré-Romaneio1",
+      "type": "n8n-nodes-base.mySql",
+      "typeVersion": 2.3,
+      "position": [
+        624,
+        3136
+      ],
+      "credentials": {
+        "mySql": {
+          "id": "EY1CH7IcANXbiyVO",
+          "name": "MySQL belga"
+        }
+      },
+      "onError": "continueErrorOutput"
+    },
+    {
+      "parameters": {
+        "schema": {
+          "__rl": true,
+          "mode": "list",
+          "value": "public"
+        },
+        "table": {
+          "__rl": true,
+          "mode": "list",
+          "value": "belga_pre_romaneio"
+        },
+        "columns": {
+          "mappingMode": "autoMapInputData",
+          "value": {},
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "cod_pedido",
+              "displayName": "cod_pedido",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "pre_romaneio",
+              "displayName": "pre_romaneio",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "valor_total_pre_romaneio",
+              "displayName": "valor_total_pre_romaneio",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "number",
+              "canBeUsedToMatch": true,
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "id": "e9da3353-31b3-4479-84f8-7b09ba07ed0b",
+      "name": "PG Insert: belga_pre_romaneio1",
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 2.3,
+      "position": [
+        864,
+        3136
+      ],
+      "credentials": {
+        "postgres": {
+          "id": "G50fA6A0L90xaBIe",
+          "name": "Postgres account"
+        }
+      },
+      "onError": "continueErrorOutput"
+    },
+    {
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "CREATE TABLE IF NOT EXISTS public.belga_composicao (\n  cod_produto VARCHAR(100),\n  desc_produto VARCHAR(255),\n  nylon_por_unidade NUMERIC(15,6)\n);\nTRUNCATE TABLE public.belga_composicao;",
+        "options": {}
+      },
+      "id": "4a6c4abd-ceed-4cb1-8864-57af18a2d19b",
+      "name": "Prep: belga_composicao1",
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 2.3,
+      "position": [
+        416,
+        3520
+      ],
+      "credentials": {
+        "postgres": {
+          "id": "G50fA6A0L90xaBIe",
+          "name": "Postgres account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "SELECT \n    p.cod_produto,\n    p.desc_produto,\n    SUM(p.qt_nylon_total) AS nylon_por_unidade\nFROM (\n    SELECT\n        kit.cod_kit AS cod_produto,\n        kit.desc_kit AS desc_produto,\n        (kit.qt_ferr * mp.qt_mp) AS qt_nylon_total\n    FROM (\n        SELECT \n            pai.DS_COD_INTERNO AS cod_kit,\n            pai.DS_PRO AS desc_kit,\n            filho.DS_COD_INTERNO AS ferragem,\n            rel.QTDE_KIT AS qt_ferr\n        FROM mgpro01011 rel\n        JOIN mgpro01010 pai ON rel.NU_PRO = pai.NU_PRO\n        JOIN mgpro01010 filho ON rel.NU_PRK = filho.NU_PRO\n        WHERE pai.DS_COD_INTERNO LIKE 'KIT%'\n    ) kit\n    JOIN (\n        SELECT\n            pai.DS_COD_INTERNO AS ferragem,\n            filho.DS_COD_INTERNO AS cod_mp,\n            filho.DS_PRO AS desc_mp,\n            rel.QTDE_KIT AS qt_mp\n        FROM mgpro01011 rel\n        JOIN mgpro01010 pai ON rel.NU_PRO = pai.NU_PRO\n        JOIN mgpro01010 filho ON rel.NU_PRK = filho.NU_PRO\n        WHERE filho.DS_PRO LIKE '%NYLON%'\n    ) mp ON mp.ferragem = kit.ferragem\n    UNION ALL\n    SELECT\n        ferr.cod_ferragem AS cod_produto,\n        ferr.desc_ferragem AS desc_produto,\n        mp.qt_mp AS qt_nylon_total\n    FROM (\n        SELECT \n            pai.DS_COD_INTERNO AS cod_ferragem,\n            pai.DS_PRO AS desc_ferragem\n        FROM mgpro01010 pai\n        WHERE pai.DS_COD_INTERNO NOT LIKE 'KIT%'\n    ) ferr\n    JOIN (\n        SELECT\n            pai.DS_COD_INTERNO AS ferragem,\n            rel.QTDE_KIT AS qt_mp,\n            filho.DS_PRO AS desc_mp\n        FROM mgpro01011 rel\n        JOIN mgpro01010 pai ON rel.NU_PRO = pai.NU_PRO\n        JOIN mgpro01010 filho ON rel.NU_PRK = filho.NU_PRO\n        WHERE filho.DS_PRO LIKE '%NYLON%'\n    ) mp ON mp.ferragem = ferr.cod_ferragem\n) p\nGROUP BY p.cod_produto, p.desc_produto\nORDER BY p.cod_produto",
+        "options": {}
+      },
+      "id": "02e3d4e4-e8ad-4374-bf15-e0816c0b5ce0",
+      "name": "MySQL: Composição1",
+      "type": "n8n-nodes-base.mySql",
+      "typeVersion": 2.3,
+      "position": [
+        656,
+        3520
+      ],
+      "credentials": {
+        "mySql": {
+          "id": "EY1CH7IcANXbiyVO",
+          "name": "MySQL belga"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "schema": {
+          "__rl": true,
+          "mode": "list",
+          "value": "public"
+        },
+        "table": {
+          "__rl": true,
+          "mode": "list",
+          "value": "belga_composicao"
+        },
+        "columns": {
+          "mappingMode": "autoMapInputData",
+          "value": {},
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "cod_produto",
+              "displayName": "cod_produto",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "desc_produto",
+              "displayName": "desc_produto",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "nylon_por_unidade",
+              "displayName": "nylon_por_unidade",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "number",
+              "canBeUsedToMatch": true,
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "id": "26c64c04-4018-4042-92fa-efc6458766c6",
+      "name": "PG Insert: belga_composicao1",
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 2.3,
+      "position": [
+        880,
+        3520
+      ],
+      "credentials": {
+        "postgres": {
+          "id": "G50fA6A0L90xaBIe",
+          "name": "Postgres account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "phone": "5581987473570",
+        "text": "={{ $json.mensagem }}",
+        "additionalFields": {}
+      },
+      "type": "n8n-nodes-zapi.zapi",
+      "typeVersion": 1,
+      "position": [
+        2416,
+        2592
+      ],
+      "id": "620b53aa-a4be-4eb9-b317-7850b756aff3",
+      "name": "Send text",
+      "credentials": {
+        "zapiApi": {
+          "id": "cGI15AvSkFAV8Qrr",
+          "name": "Z-API account"
+        }
+      }
+    },
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.merge",
+      "typeVersion": 3.2,
+      "position": [
+        1968,
+        2592
+      ],
+      "id": "1c6a2b82-fa8a-4bbf-8945-cf1b9fdc451b",
+      "name": "Merge"
+    },
+    {
+      "parameters": {
+        "numberInputs": 6
+      },
+      "id": "4a99f633-a7b0-4d08-a269-c50eac0e8bc1",
+      "name": "Merge Error",
+      "type": "n8n-nodes-base.merge",
+      "typeVersion": 3,
+      "position": [
+        1728,
+        2704
+      ]
+    },
+    {
+      "parameters": {
+        "numberInputs": 6
+      },
+      "id": "089599f0-af66-4057-87c9-67a0ad5bb9ca",
+      "name": "Merge Sucess",
+      "type": "n8n-nodes-base.merge",
+      "typeVersion": 3,
+      "position": [
+        1728,
+        2368
+      ]
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Status: Consumo OK": {
+      "main": [
+        [
+          {
+            "node": "Merge Sucess",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Status: Custo MP OK": {
+      "main": [
+        [
+          {
+            "node": "Merge Sucess",
+            "type": "main",
+            "index": 1
+          }
+        ]
+      ]
+    },
+    "Status: Produtos PK OK": {
+      "main": [
+        [
+          {
+            "node": "Merge Sucess",
+            "type": "main",
+            "index": 2
+          }
+        ]
+      ]
+    },
+    "Status: Composicao KIT OK": {
+      "main": [
+        [
+          {
+            "node": "Merge Sucess",
+            "type": "main",
+            "index": 3
+          }
+        ]
+      ]
+    },
+    "Status: Pre Romaneio OK": {
+      "main": [
+        [
+          {
+            "node": "Merge Sucess",
+            "type": "main",
+            "index": 4
+          }
+        ]
+      ]
+    },
+    "Status: Composicao OK": {
+      "main": [
+        [
+          {
+            "node": "Merge Sucess",
+            "type": "main",
+            "index": 5
+          }
+        ]
+      ]
+    },
+    "Status: Consumo ERRO": {
+      "main": [
+        [
+          {
+            "node": "Merge Error",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Status: Custo MP ERRO": {
+      "main": [
+        [
+          {
+            "node": "Merge Error",
+            "type": "main",
+            "index": 1
+          }
+        ]
+      ]
+    },
+    "Status: Produtos PK ERRO": {
+      "main": [
+        [
+          {
+            "node": "Merge Error",
+            "type": "main",
+            "index": 2
+          }
+        ]
+      ]
+    },
+    "Status: Composicao KIT ERRO": {
+      "main": [
+        [
+          {
+            "node": "Merge Error",
+            "type": "main",
+            "index": 3
+          }
+        ]
+      ]
+    },
+    "Status: Pre Romaneio ERRO": {
+      "main": [
+        [
+          {
+            "node": "Merge Error",
+            "type": "main",
+            "index": 4
+          }
+        ]
+      ]
+    },
+    "Status: Composicao ERRO": {
+      "main": [
+        [
+          {
+            "node": "Merge Error",
+            "type": "main",
+            "index": 5
+          }
+        ]
+      ]
+    },
+    "Monta Mensagem": {
+      "main": [
+        [
+          {
+            "node": "Send text",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Trigger Diário 06h1": {
+      "main": [
+        [
+          {
+            "node": "Prep: belga_produtos_custo_mp1",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Prep: belga_produtos_pk1",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Prep: belga_composicao_kit_pk1",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Prep: belga_pre_romaneio1",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Prep: belga_composicao1",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Prep: belga_consumo1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Prep: belga_consumo1": {
+      "main": [
+        [
+          {
+            "node": "MySQL: Consumo1",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Status: Consumo ERRO",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "MySQL: Consumo1": {
+      "main": [
+        [
+          {
+            "node": "PG Insert: belga_consumo1",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Status: Consumo ERRO",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "PG Insert: belga_consumo1": {
+      "main": [
+        [
+          {
+            "node": "Status: Consumo OK",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Status: Consumo ERRO",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Prep: belga_produtos_custo_mp1": {
+      "main": [
+        [
+          {
+            "node": "MySQL: Produtos Custo MP1",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Status: Custo MP ERRO",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "MySQL: Produtos Custo MP1": {
+      "main": [
+        [
+          {
+            "node": "PG Insert: belga_produtos_custo_mp1",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Status: Custo MP ERRO",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "PG Insert: belga_produtos_custo_mp1": {
+      "main": [
+        [
+          {
+            "node": "Status: Custo MP OK",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Status: Custo MP ERRO",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Prep: belga_produtos_pk1": {
+      "main": [
+        [
+          {
+            "node": "MySQL: Produtos PK1",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Status: Produtos PK ERRO",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "MySQL: Produtos PK1": {
+      "main": [
+        [
+          {
+            "node": "PG Insert: belga_produtos_pk1",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Status: Produtos PK ERRO",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "PG Insert: belga_produtos_pk1": {
+      "main": [
+        [
+          {
+            "node": "Status: Produtos PK OK",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Status: Produtos PK ERRO",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Prep: belga_composicao_kit_pk1": {
+      "main": [
+        [
+          {
+            "node": "MySQL: Composição KIT PK1",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Status: Composicao KIT ERRO",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "MySQL: Composição KIT PK1": {
+      "main": [
+        [
+          {
+            "node": "PG Insert: belga_composicao_kit_pk1",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Status: Composicao KIT ERRO",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "PG Insert: belga_composicao_kit_pk1": {
+      "main": [
+        [
+          {
+            "node": "Status: Composicao KIT OK",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Status: Composicao KIT ERRO",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Prep: belga_pre_romaneio1": {
+      "main": [
+        [
+          {
+            "node": "MySQL: Pré-Romaneio1",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Status: Pre Romaneio ERRO",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "MySQL: Pré-Romaneio1": {
+      "main": [
+        [
+          {
+            "node": "PG Insert: belga_pre_romaneio1",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Status: Pre Romaneio ERRO",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "PG Insert: belga_pre_romaneio1": {
+      "main": [
+        [
+          {
+            "node": "Status: Pre Romaneio OK",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Status: Pre Romaneio ERRO",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Prep: belga_composicao1": {
+      "main": [
+        [
+          {
+            "node": "MySQL: Composição1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "MySQL: Composição1": {
+      "main": [
+        [
+          {
+            "node": "PG Insert: belga_composicao1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "PG Insert: belga_composicao1": {
+      "main": [
+        [
+          {
+            "node": "Status: Composicao OK",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Merge Sucess": {
+      "main": [
+        [
+          {
+            "node": "Merge",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Merge Error": {
+      "main": [
+        [
+          {
+            "node": "Merge",
+            "type": "main",
+            "index": 1
+          }
+        ]
+      ]
+    },
+    "Merge": {
+      "main": [
+        [
+          {
+            "node": "Monta Mensagem",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": true,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "eb5e1284-1d49-46b6-9bbb-4e777629c1af",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "a5e8675e548a032fda81ee9dc775b4fc0a1b2003aee794fb0b37064013276a0f"
+  },
+  "id": "0qlLvICDjNrmzqW3",
+  "tags": [
+    {
+      "updatedAt": "2026-01-14T11:04:00.895Z",
+      "createdAt": "2025-03-21T11:47:30.374Z",
+      "id": "CvCy3KNJKyMxSQ3C",
+      "name": "GDA"
+    }
+  ]
+}

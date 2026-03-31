@@ -1,0 +1,472 @@
+{
+  "name": "Auditoria Pagamento de Adiantamento",
+  "nodes": [
+    {
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "SELECT\n    mf.tipo_unidade,\n    mf.unidade,\n    mf.data_pagamento,\n    mf.vlr_pago,\n    mf.valor_titulo,\n    mf.fornecedor_cliente,\n    mf.classificacao,\n    mf.descricao,\n    mf.chave as titulo,\n    df.nome_conta,\n    mf.tipo_de_lancamento,\n    mf.plano_conta,\n    df.forma_pagamento ,\n    mf.colaborador\nFROM movimentacoes_financeiras mf\nleft join detalhamento_financeiro df on mf.unidade = df.unidade and mf.chave_detalhamento = df.chave\nWHERE \n    mf.data_pagamento::date = CURRENT_DATE - 1\n    AND mf.tipo_de_lancamento = 'Saida'\n    AND mf.classificacao ILIKE '%ADIANT%'\n    AND mf.fornecedor_cliente IS NOT NULL\nORDER BY \n    mf.unidade, mf.fornecedor_cliente;",
+        "options": {}
+      },
+      "id": "462becdb-1e12-4bff-891d-ec3128bc3e77",
+      "name": "Postgres",
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 2.3,
+      "position": [
+        352,
+        432
+      ],
+      "alwaysOutputData": false,
+      "credentials": {
+        "postgres": {
+          "id": "G50fA6A0L90xaBIe",
+          "name": "Postgres account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "documentId": {
+          "__rl": true,
+          "value": "https://docs.google.com/spreadsheets/d/1avLuf5Qpu0lBIFVS-Ny0j-iIFZGkVqqufVGy-sfbqM4/edit?usp=sharing",
+          "mode": "url"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "Página1",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1avLuf5Qpu0lBIFVS-Ny0j-iIFZGkVqqufVGy-sfbqM4/edit#gid=0"
+        },
+        "options": {}
+      },
+      "id": "7378e17e-7e07-4550-8c44-56b2b00af393",
+      "name": "Google Sheets",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.3,
+      "position": [
+        -240,
+        432
+      ],
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "8Ytd3zZKAOSyZNqC",
+          "name": "Sheets Andre"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "c9777b34-96c3-49cb-9e8f-5171d677c039",
+              "name": "link",
+              "value": "={{ $json.Link }}",
+              "type": "string"
+            },
+            {
+              "id": "c29c9cfb-b76e-4088-b0ca-7748646d4779",
+              "name": "link1",
+              "value": "={{ $json.Value }}",
+              "type": "string"
+            },
+            {
+              "id": "a2465349-2aee-4dc2-8ce6-9a40bf305fa7",
+              "name": "link2",
+              "value": "={{ $json.Field }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "7f629f19-8c9a-467a-9a11-013673ea69fe",
+      "name": "AUTH",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.3,
+      "position": [
+        -48,
+        432
+      ]
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "c9777b34-96c3-49cb-9e8f-5171d677c039",
+              "name": "arq",
+              "value": "=adiantamento_fornec_pend - d{{ $now.day }}-{{ $now.hour }}h{{ $now.minute }}m{{ $now.second }}s",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {
+          "includeBinary": "={{ data }}"
+        }
+      },
+      "id": "b0cdcc44-0d91-4e24-a0fc-5dcd0952ad33",
+      "name": "ARQUIVO",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.3,
+      "position": [
+        160,
+        432
+      ]
+    },
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "field": "weeks",
+              "triggerAtDay": [
+                2,
+                3,
+                4,
+                5,
+                6,
+                1
+              ],
+              "triggerAtHour": 6,
+              "triggerAtMinute": 13
+            }
+          ]
+        }
+      },
+      "id": "9e9b236f-9d7f-477c-9051-ea7217b3500a",
+      "name": "Schedule Trigger",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.1,
+      "position": [
+        -416,
+        432
+      ]
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "3fbb6ba3-790c-4f7b-8ec8-7608af1ad30a",
+              "name": "classificacao",
+              "value": "={{ $json.classificacao }}",
+              "type": "string"
+            },
+            {
+              "id": "ede53e75-55ad-405c-803e-e572936d81d2",
+              "name": "unidade",
+              "value": "={{ $json.unidade }}",
+              "type": "string"
+            },
+            {
+              "id": "7e239803-c6f0-4fe2-a6b9-7d08bb0b9d71",
+              "name": "descricao",
+              "value": "={{ $json.descricao }}",
+              "type": "string"
+            },
+            {
+              "id": "29ccf8b7-6893-4831-9998-e5de62db2b13",
+              "name": "valor",
+              "value": "={{ $json.vlr_pago }}",
+              "type": "string"
+            },
+            {
+              "id": "59df42a0-2101-41fd-ac39-b38bd808c083",
+              "name": "data_pagamento",
+              "value": "={{ $json.data_pagamento }}",
+              "type": "string"
+            },
+            {
+              "id": "2aba88b3-2381-4dda-b84e-a22191ea95c5",
+              "name": "chave",
+              "value": "={{ $json.chave }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "bbc55ac6-5f38-4c1c-a29f-406bdbc04584",
+      "name": "Edit Fields",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.3,
+      "position": [
+        352,
+        640
+      ]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.pipefy.com/graphql",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Authorization",
+              "value": "{{JWT_TOKEN}}"
+            },
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"query\": \"mutation { createCard(input: {pipe_id: 305619354, phase_id: 333525857, title: \\\"DEVOLUÇÃO DE SALDO\\\", fields_attributes: [{field_id: \\\"classificacao\\\", field_value: \\\"{{ $json.classificacao }}\\\"}, {field_id: \\\"unidade\\\", field_value: \\\"{{ $json.unidade }}\\\"}, {field_id: \\\"descricao\\\", field_value: \\\"{{ $json.descricao }}\\\"}, {field_id: \\\"chave\\\", field_value: \\\"{{ $json.chave }}\\\"}, {field_id: \\\"valor\\\", field_value: \\\"{{ $json.valor }}\\\"}, {field_id: \\\"data_pagamento\\\", field_value: \\\"{{ $json.data_pagamento }}\\\"}]}) { card { id } } }\"\n}",
+        "options": {}
+      },
+      "id": "3c35436c-f9b5-43f3-845d-3e12170bac1e",
+      "name": "PIPEFY",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.1,
+      "position": [
+        528,
+        640
+      ]
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "90377525-c0f0-4bf2-8a6f-19dcada0fbf1",
+              "name": "=messsage",
+              "value": "=-- *PAGTO ADIANTADO A FORNEC* --\n\nUnidade:  *{{ $json.unidade }}*\nFornecedor:  *{{ $json.fornecedor_cliente }}*\nValor Adiantado:  *{{ $json.vlr_pago }}*\nTítulo: *{{ $json.chave }}*\nForma: *{{ $json.forma_pagamento }}*",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "bc555414-d38b-4e44-b6e3-3be2d57a3bf1",
+      "name": "formata texto",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.3,
+      "position": [
+        608,
+        432
+      ]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{ $('AUTH').item.json.link }}",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "={{ $('AUTH').item.json.link2 }}",
+              "value": "={{ $('AUTH').item.json.link1 }}"
+            }
+          ]
+        },
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "phone",
+              "value": "5581981308564"
+            },
+            {
+              "name": "=message",
+              "value": "={{ $json.messsage }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "b7af3083-bac0-43ff-8f1a-b4bee3cf63a1",
+      "name": "Diego",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.1,
+      "position": [
+        864,
+        352
+      ]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{ $('AUTH').item.json.link }}",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "={{ $('AUTH').item.json.link2 }}",
+              "value": "={{ $('AUTH').item.json.link1 }}"
+            }
+          ]
+        },
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "phone",
+              "value": "5581997305876"
+            },
+            {
+              "name": "=message",
+              "value": "={{ $json.messsage }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "d3f7e342-e9c6-4058-b698-599fca75b8c1",
+      "name": "Bianca",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.1,
+      "position": [
+        864,
+        512
+      ]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{ $('AUTH').item.json.link }}",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "={{ $('AUTH').item.json.link2 }}",
+              "value": "={{ $('AUTH').item.json.link1 }}"
+            }
+          ]
+        },
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "phone",
+              "value": "5581998328798"
+            },
+            {
+              "name": "=message",
+              "value": "={{ $json.messsage }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "cb1cb060-cd55-4b85-9725-aa3e131d90cf",
+      "name": "Marcelo Mendes",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.1,
+      "position": [
+        864,
+        672
+      ]
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Postgres": {
+      "main": [
+        [
+          {
+            "node": "formata texto",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Google Sheets": {
+      "main": [
+        [
+          {
+            "node": "AUTH",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "AUTH": {
+      "main": [
+        [
+          {
+            "node": "ARQUIVO",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "ARQUIVO": {
+      "main": [
+        [
+          {
+            "node": "Postgres",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Schedule Trigger": {
+      "main": [
+        [
+          {
+            "node": "Google Sheets",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Edit Fields": {
+      "main": [
+        [
+          {
+            "node": "PIPEFY",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "formata texto": {
+      "main": [
+        [
+          {
+            "node": "Diego",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Bianca",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Marcelo Mendes",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": true,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "7231c9b1-def9-4d85-9ea2-8a95318c953f",
+  "meta": {
+    "instanceId": "{{INSTANCE_ID}}"
+  },
+  "id": "eUSlHnVY4kYCTtYF",
+  "tags": [
+    {
+      "updatedAt": "2026-01-14T11:04:00.895Z",
+      "createdAt": "2025-03-21T11:47:30.374Z",
+      "id": "CvCy3KNJKyMxSQ3C",
+      "name": "GDA"
+    }
+  ]
+}

@@ -1,0 +1,242 @@
+{
+  "name": "Envio de Comunicados",
+  "nodes": [
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{ $('Token').item.json.Link }}send-document/text",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "={{ $('Token').item.json.Name }}",
+              "value": "={{ $('Token').item.json.Value }}"
+            }
+          ]
+        },
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "phone",
+              "value": "={{ $json.CONTATO }}"
+            },
+            {
+              "name": "message",
+              "value": "=Prezados colaboradores, por um erro no nosso robô o comunicado \"Painel - Fechamento do mês\" foi enviado duas vezes a mais. O comunicado segue sendo válido, pedimos desculpas pela mensagem dobrada."
+            },
+            {
+              "name": "fileName",
+              "value": "Painel – Fechamento do mês"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "0b6d97fd-a8d4-4b8b-82de-3e530ebf2642",
+      "name": "HTTP REQUEST1",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.1,
+      "position": [
+        -960,
+        576
+      ]
+    },
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "field": "weeks",
+              "triggerAtDay": [
+                0,
+                1,
+                2,
+                3,
+                6,
+                4,
+                5
+              ]
+            }
+          ]
+        }
+      },
+      "id": "a433febd-56c7-4a48-a2ae-117f8eabe21f",
+      "name": "Schedule Trigger",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.1,
+      "position": [
+        -1616,
+        352
+      ]
+    },
+    {
+      "parameters": {
+        "documentId": {
+          "__rl": true,
+          "value": "https://docs.google.com/spreadsheets/d/1J9xHE08UPG2QnDrjFsiy3VU3Z8ziZT9aO9MF7ct5ruA/edit?usp=sharing",
+          "mode": "url"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 564051929,
+          "mode": "list",
+          "cachedResultName": "Token",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1J9xHE08UPG2QnDrjFsiy3VU3Z8ziZT9aO9MF7ct5ruA/edit#gid=564051929"
+        },
+        "options": {}
+      },
+      "id": "bac91666-322b-4189-a234-e5ea45f718a6",
+      "name": "Token",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.3,
+      "position": [
+        -1424,
+        352
+      ],
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "HfbTEVMQHA5O66Ya",
+          "name": "Sheets JG e Japa"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "documentId": {
+          "__rl": true,
+          "value": "https://docs.google.com/spreadsheets/d/1J9xHE08UPG2QnDrjFsiy3VU3Z8ziZT9aO9MF7ct5ruA/edit?usp=sharing",
+          "mode": "url"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 1721093655,
+          "mode": "list",
+          "cachedResultName": "Comunicados",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1J9xHE08UPG2QnDrjFsiy3VU3Z8ziZT9aO9MF7ct5ruA/edit#gid=1721093655"
+        },
+        "options": {}
+      },
+      "id": "2c8340af-b451-455d-b4c6-3d278d2526e5",
+      "name": "Token1",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.3,
+      "position": [
+        -1216,
+        352
+      ],
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "HfbTEVMQHA5O66Ya",
+          "name": "Sheets JG e Japa"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{ $('Token').item.json.Link }}send-document/pdf",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "={{ $('Token').item.json.Name }}",
+              "value": "={{ $('Token').item.json.Value }}"
+            }
+          ]
+        },
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "phone",
+              "value": "={{ $json.CONTATO }}"
+            },
+            {
+              "name": "document",
+              "value": "=https://drive.google.com/uc?id=1tU7XirUPSacLVkR1iVDJPwyalIwCvOeh"
+            },
+            {
+              "name": "fileName",
+              "value": "Painel – Fechamento do mês"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "875c293e-e09a-4f79-be17-67525d07dda7",
+      "name": "HTTP REQUEST",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.1,
+      "position": [
+        -960,
+        352
+      ]
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "HTTP REQUEST1": {
+      "main": [
+        []
+      ]
+    },
+    "Schedule Trigger": {
+      "main": [
+        [
+          {
+            "node": "Token",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Token": {
+      "main": [
+        [
+          {
+            "node": "Token1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Token1": {
+      "main": [
+        [
+          {
+            "node": "HTTP REQUEST",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "0d9139ea-6818-4041-9d8c-e796a55cf323",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "{{INSTANCE_ID}}"
+  },
+  "id": "N6Jo1iyJgttybdp3",
+  "tags": [
+    {
+      "updatedAt": "2025-03-21T11:52:03.823Z",
+      "createdAt": "2025-03-21T11:52:03.823Z",
+      "id": "VQmA23kx6h1wy92X",
+      "name": "GUIS"
+    },
+    {
+      "updatedAt": "2025-03-24T11:42:37.665Z",
+      "createdAt": "2025-03-24T11:42:37.665Z",
+      "id": "nDS88XDFC0HV8gKr",
+      "name": "Cargas"
+    }
+  ]
+}

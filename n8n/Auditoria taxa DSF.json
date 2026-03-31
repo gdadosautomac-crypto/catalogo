@@ -1,0 +1,633 @@
+{
+  "name": "Auditoria taxa DSF",
+  "nodes": [
+    {
+      "parameters": {
+        "operation": "delete",
+        "bucketName": "marcolanoperacoes",
+        "fileKey": "=dinheiro_bds - d23-8h43m34s",
+        "options": {}
+      },
+      "id": "dbaa13ce-4e09-49ad-9824-e9250e9d4764",
+      "name": "AWS S37",
+      "type": "n8n-nodes-base.awsS3",
+      "typeVersion": 2,
+      "position": [
+        592,
+        400
+      ],
+      "credentials": {
+        "aws": {
+          "id": "wojq9Jq4bZgupPjh",
+          "name": "AWS account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "getAll",
+        "bucketName": "marcolanoperacoes",
+        "returnAll": true,
+        "options": {}
+      },
+      "id": "499b96c7-68e8-4ea1-9e38-90f50b613d23",
+      "name": "AWS S3",
+      "type": "n8n-nodes-base.awsS3",
+      "typeVersion": 2,
+      "position": [
+        400,
+        400
+      ],
+      "credentials": {
+        "aws": {
+          "id": "wojq9Jq4bZgupPjh",
+          "name": "AWS account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "SELECT *,\n       ROUND((1 - (CAST(REPLACE(valor_liquido_final, ',', '.') AS NUMERIC) / CAST(REPLACE(valor_bruto, ',', '.') AS NUMERIC))) * 100, 2) AS taxa_dsf\nFROM valores_dsf vd\nWHERE DATE(data_dsf ::timestamp) = current_date - 1\n  AND (1 - (CAST(REPLACE(valor_liquido_final, ',', '.') AS NUMERIC) / CAST(REPLACE(valor_bruto, ',', '.') AS NUMERIC))) * 100 >= 9;",
+        "options": {}
+      },
+      "id": "8f2c9370-581f-4c97-981f-f6a5418e0550",
+      "name": "Postgres",
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 2.3,
+      "position": [
+        688,
+        0
+      ],
+      "credentials": {
+        "postgres": {
+          "id": "G50fA6A0L90xaBIe",
+          "name": "Postgres account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "xlsx",
+        "options": {
+          "fileName": "=taxa_DSF"
+        }
+      },
+      "id": "e8c915ef-ef80-4d29-971f-4c766e6cc7a8",
+      "name": "Convert to File",
+      "type": "n8n-nodes-base.convertToFile",
+      "typeVersion": 1.1,
+      "position": [
+        1008,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "operation": "upload",
+        "bucketName": "marcolanoperacoes",
+        "fileName": "={{ $('ARQUIVO').item.json.arq }}",
+        "additionalFields": {
+          "acl": "publicReadWrite"
+        }
+      },
+      "id": "3794631e-6612-4b19-a7bf-57806aa603db",
+      "name": "AWS S31",
+      "type": "n8n-nodes-base.awsS3",
+      "typeVersion": 2,
+      "position": [
+        1168,
+        0
+      ],
+      "credentials": {
+        "aws": {
+          "id": "wojq9Jq4bZgupPjh",
+          "name": "AWS account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "documentId": {
+          "__rl": true,
+          "value": "https://docs.google.com/spreadsheets/d/1avLuf5Qpu0lBIFVS-Ny0j-iIFZGkVqqufVGy-sfbqM4/edit?usp=sharing",
+          "mode": "url"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "Página1",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1avLuf5Qpu0lBIFVS-Ny0j-iIFZGkVqqufVGy-sfbqM4/edit#gid=0"
+        },
+        "options": {}
+      },
+      "id": "14eee279-0381-471c-aafc-66ba7f241b4b",
+      "name": "Google Sheets",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.3,
+      "position": [
+        192,
+        0
+      ],
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "8Ytd3zZKAOSyZNqC",
+          "name": "Sheets Andre"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "c9777b34-96c3-49cb-9e8f-5171d677c039",
+              "name": "link",
+              "value": "={{ $json.Link }}",
+              "type": "string"
+            },
+            {
+              "id": "c29c9cfb-b76e-4088-b0ca-7748646d4779",
+              "name": "link1",
+              "value": "={{ $json.Value }}",
+              "type": "string"
+            },
+            {
+              "id": "a2465349-2aee-4dc2-8ce6-9a40bf305fa7",
+              "name": "link2",
+              "value": "={{ $json.Field }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "8b00b9fd-9005-4baf-9ef7-f788989a87e4",
+      "name": "AUTH",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.3,
+      "position": [
+        368,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "c9777b34-96c3-49cb-9e8f-5171d677c039",
+              "name": "arq",
+              "value": "=taxa_DSF",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {
+          "includeBinary": "={{ data }}"
+        }
+      },
+      "id": "3b3d848f-3be2-4e25-ad49-d78f65fa2983",
+      "name": "ARQUIVO",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.3,
+      "position": [
+        528,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "field": "weeks",
+              "triggerAtDay": [
+                5,
+                1,
+                2,
+                3,
+                4,
+                6
+              ],
+              "triggerAtHour": 7,
+              "triggerAtMinute": 30
+            }
+          ]
+        }
+      },
+      "id": "6cd68a56-3dda-4dd4-82f6-8b4915031e22",
+      "name": "Schedule Trigger",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.1,
+      "position": [
+        0,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "operation": "delete",
+        "bucketName": "marcolanoperacoes",
+        "fileKey": "={{ $('ARQUIVO').item.json.arq }}",
+        "options": {}
+      },
+      "id": "e8811171-42ef-45a0-8458-3d556ed822f1",
+      "name": "AWS S33",
+      "type": "n8n-nodes-base.awsS3",
+      "typeVersion": 2,
+      "position": [
+        1648,
+        0
+      ],
+      "credentials": {
+        "aws": {
+          "id": "wojq9Jq4bZgupPjh",
+          "name": "AWS account"
+        }
+      }
+    },
+    {
+      "parameters": {},
+      "id": "2896744b-85be-44a0-88f7-3bf43a53112b",
+      "name": "Wait",
+      "type": "n8n-nodes-base.wait",
+      "typeVersion": 1.1,
+      "position": [
+        1488,
+        0
+      ],
+      "webhookId": "{{WEBHOOK_ID}}"
+    },
+    {
+      "parameters": {
+        "jsCode": "const items = $input.all();\n\nitems.forEach(item => {\n  // Tratando o campo data_dsf\n  if (item.json.data_dsf) {\n    item.json.data_dsf = item.json.data_dsf.split(' ')[0]; // Pegando apenas a parte da data\n  }\n\n  // Tratando o campo data_finalizacao\n  if (item.json.data_finalizacao) {\n    item.json.data_finalizacao = item.json.data_finalizacao.split(' ')[0]; // Pegando apenas a parte da data\n  }\n});\n\nreturn items;\n"
+      },
+      "id": "88519f0d-dca2-41e8-b8d8-2c38a2e5fc39",
+      "name": "Code",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        848,
+        128
+      ]
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "ede53e75-55ad-405c-803e-e572936d81d2",
+              "name": "unidade",
+              "value": "={{ $json.unidade }}",
+              "type": "string"
+            },
+            {
+              "id": "d4979923-f697-44a6-bf34-26878014b3aa",
+              "name": "dsf",
+              "value": "={{ $json.dsf }}",
+              "type": "string"
+            },
+            {
+              "id": "515ff57c-1d5a-412f-bb4d-4347820f8de4",
+              "name": "data",
+              "value": "={{ $json.data_dsf }}",
+              "type": "string"
+            },
+            {
+              "id": "d1120875-3a4b-4ebb-9a36-00a181491d9c",
+              "name": "taxa",
+              "value": "={{ $json.taxa_dsf }}",
+              "type": "string"
+            },
+            {
+              "id": "363848d9-0d84-4ad5-8dd6-f91ed22203af",
+              "name": "tipo_dsf",
+              "value": "= {{ $json.tipodsf }}",
+              "type": "string"
+            },
+            {
+              "id": "62aabac1-08c7-4a13-a080-8938bf83b020",
+              "name": "conta",
+              "value": "={{ $json.conta }}",
+              "type": "string"
+            },
+            {
+              "id": "5c530404-18eb-4849-8381-67f96a630aad",
+              "name": "valor_taxas",
+              "value": "={{ $json.valor_taxas }}",
+              "type": "string"
+            },
+            {
+              "id": "a3fef896-08dc-4fbc-ac9b-82b6cfc9c604",
+              "name": "valor_bruto",
+              "value": "={{ $json.valor_bruto }}",
+              "type": "string"
+            },
+            {
+              "id": "26e042b3-3457-4f8f-8b29-d2a6682294a4",
+              "name": "valor_liquido",
+              "value": "={{ $json.valor_liquido_final }}",
+              "type": "string"
+            },
+            {
+              "id": "05eda42a-a330-4f3d-bd65-993d404a7d71",
+              "name": "banco",
+              "value": "={{ $json.banco }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "1fac65e7-6272-4166-932e-089d0843e77b",
+      "name": "Edit Fields",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.3,
+      "position": [
+        1008,
+        240
+      ]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.pipefy.com/graphql",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Authorization",
+              "value": "{{JWT_TOKEN}}"
+            },
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"query\": \"mutation { createCard(input: {pipe_id: 305619354, phase_id: 333525857, title: \\\"AUDITORIA DSF\\\", fields_attributes: [{field_id: \\\"descricao\\\", field_value: \\\"{{ $json.tipo_dsf }}\\\"}, {field_id: \\\"unidade\\\", field_value: \\\"{{ $json.unidade }}\\\"}, {field_id: \\\"chave\\\", field_value: \\\"{{ $json.dsf }}\\\"}, {field_id: \\\"conta\\\", field_value: \\\"{{ $json.conta }}\\\"}, {field_id: \\\"banco\\\", field_value: \\\"{{ $json.banco }}\\\"}, {field_id: \\\"valor\\\", field_value: \\\"{{ $json.valor_taxas }}\\\"}, {field_id: \\\"valor_liquido\\\", field_value: \\\"{{ $json.valor_liquido }}\\\"}, {field_id: \\\"valor_bruto\\\", field_value: \\\"{{ $json.valor_bruto }}\\\"}, {field_id: \\\"taxa\\\", field_value: \\\"{{ $json.taxa }}\\\"}, {field_id: \\\"data_pagamento\\\", field_value: \\\"{{ $json.data }}\\\"}]}) { card { id } } }\"\n}\n",
+        "options": {}
+      },
+      "id": "939ad72f-d182-4b5c-bd74-cf4568e89c64",
+      "name": "PIPEFY",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.1,
+      "position": [
+        1168,
+        240
+      ]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.pipefy.com/graphql",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Authorization",
+              "value": "{{JWT_TOKEN}}"
+            },
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"query\": \"mutation { updateCard(input: {id: \\\"{{ $json.data.createCard.card.id }}\\\", label_ids: [\\\"314483783\\\"]}) { card { id } } }\"\n}",
+        "options": {}
+      },
+      "id": "7fa7cebd-a938-40bc-a349-4eb0aee71105",
+      "name": "PIPEFY - etiqueta",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.1,
+      "position": [
+        1328,
+        240
+      ]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "=https://api.z-api.io/instances/3AD47F49CE9AF04B4D43CA225862B38B/token/6EE2B07CF6D61B0059AD2125/send-document/xlsx",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "={{ $('AUTH').item.json.link2 }}",
+              "value": "={{ $('AUTH').item.json.link1 }}"
+            }
+          ]
+        },
+        "sendBody": true,
+        "contentType": "form-urlencoded",
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "phone",
+              "value": "=5581986945032"
+            },
+            {
+              "name": "fileName",
+              "value": "=taxa_DSF {{$today.format('MM-DD')}}"
+            },
+            {
+              "name": "document",
+              "value": "=https://marcolanoperacoes.s3.amazonaws.com/{{ $('ARQUIVO').item.json.arq }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "e3b97ca1-0e80-4974-8b63-03c8d6e14da7",
+      "name": "Controladoria",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.1,
+      "position": [
+        1328,
+        0
+      ]
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "AWS S3": {
+      "main": [
+        [
+          {
+            "node": "AWS S37",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Postgres": {
+      "main": [
+        [
+          {
+            "node": "Code",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Convert to File": {
+      "main": [
+        [
+          {
+            "node": "AWS S31",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "AWS S31": {
+      "main": [
+        [
+          {
+            "node": "Controladoria",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Google Sheets": {
+      "main": [
+        [
+          {
+            "node": "AUTH",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "AUTH": {
+      "main": [
+        [
+          {
+            "node": "ARQUIVO",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "ARQUIVO": {
+      "main": [
+        [
+          {
+            "node": "Postgres",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Schedule Trigger": {
+      "main": [
+        [
+          {
+            "node": "Google Sheets",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Wait": {
+      "main": [
+        [
+          {
+            "node": "AWS S33",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code": {
+      "main": [
+        [
+          {
+            "node": "Convert to File",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Edit Fields",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Edit Fields": {
+      "main": [
+        [
+          {
+            "node": "PIPEFY",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "PIPEFY": {
+      "main": [
+        [
+          {
+            "node": "PIPEFY - etiqueta",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Controladoria": {
+      "main": [
+        [
+          {
+            "node": "Wait",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "77e0b34b-318c-49e8-919f-3c42c15902fe",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "{{INSTANCE_ID}}"
+  },
+  "id": "Hl3uayj3zHqP9GTt",
+  "tags": [
+    {
+      "updatedAt": "2025-03-21T11:52:03.821Z",
+      "createdAt": "2025-03-21T11:52:03.821Z",
+      "id": "ro9IiNWQxt6VLDLj",
+      "name": "Setor - Controladoria"
+    },
+    {
+      "updatedAt": "2026-01-14T11:04:00.895Z",
+      "createdAt": "2025-03-21T11:47:30.374Z",
+      "id": "CvCy3KNJKyMxSQ3C",
+      "name": "GDA"
+    }
+  ]
+}

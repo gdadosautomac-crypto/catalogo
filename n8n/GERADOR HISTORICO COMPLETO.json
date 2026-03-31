@@ -1,0 +1,1002 @@
+{
+  "name": "GERADOR HISTORICO COMPLETO",
+  "nodes": [
+    {
+      "parameters": {
+        "operation": "append",
+        "documentId": {
+          "__rl": true,
+          "value": "={{ $('LINKs SHEETS').first().json.HISTORICO_GRUPO }}",
+          "mode": "url"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "HISTORICO",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1vqHwKEgpuq-ahiWYKxUT6AS6OOWBXm5nGAqe2kQqasg/edit#gid=0"
+        },
+        "columns": {
+          "mappingMode": "autoMapInputData",
+          "value": {},
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "@datarel",
+              "displayName": "@datarel",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "@datarelf",
+              "displayName": "@datarelf",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "LAST",
+              "displayName": "LAST",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "unidade",
+              "displayName": "unidade",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "ENG",
+              "displayName": "ENG",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "PADR",
+              "displayName": "PADR",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "EST_PROD",
+              "displayName": "EST_PROD",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "EST_COM",
+              "displayName": "EST_COM",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "EST_EXP",
+              "displayName": "EST_EXP",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "EST_NCONT",
+              "displayName": "EST_NCONT",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "TOTAL_EST",
+              "displayName": "TOTAL_EST",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "REP_PROD",
+              "displayName": "REP_PROD",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "REP_COM",
+              "displayName": "REP_COM",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "REP_EXP",
+              "displayName": "REP_EXP",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "REP_DIF",
+              "displayName": "REP_DIF",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "TOTAL_REP",
+              "displayName": "TOTAL_REP",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "CHAPA",
+              "displayName": "CHAPA",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "RETALHO",
+              "displayName": "RETALHO",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "INC_08",
+              "displayName": "INC_08",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "MM06",
+              "displayName": "MM06",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "MM08",
+              "displayName": "MM08",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "MM10",
+              "displayName": "MM10",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "PESSOAL",
+              "displayName": "PESSOAL",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "OCUPACAO",
+              "displayName": "OCUPACAO",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "OPERACIONAL",
+              "displayName": "OPERACIONAL",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "id": "b9b62ca4-c793-4137-9bdd-fb6d14af3d1f",
+      "name": "ATUALIZA DADOS",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.3,
+      "position": [
+        224,
+        208
+      ],
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "pcOUCMZeQaE24Td8",
+          "name": "SHEETS INDUSTRIAL"
+        }
+      },
+      "onError": "continueRegularOutput"
+    },
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "field": "months",
+              "triggerAtHour": 2
+            }
+          ]
+        }
+      },
+      "id": "25f61021-0c7c-44c8-bf96-17c03aa7d307",
+      "name": "Schedule Trigger",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.1,
+      "position": [
+        -1904,
+        352
+      ]
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "id": "0f5bca40-dbd5-40ae-96b8-fba56ac421a9",
+      "name": "Loop Over Items",
+      "type": "n8n-nodes-base.splitInBatches",
+      "typeVersion": 3,
+      "position": [
+        -448,
+        352
+      ]
+    },
+    {
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "set @unidade = '{{ $json.unidade }}';\nset @PROD_MOT = '{{ $('Summarize').first().json.concatenated_PROD_MOT }}';\nset @COM_MOT = '{{ $('Summarize').first().json.concatenated_COM_MOT }}';\nset @LOG_MOT = '{{ $('Summarize').first().json.concatenated_LOG_MOT }}';\nset @DIF_MOT = '{{ $('Summarize').first().json.concatenated_DIF_MOT }}';\nset @PROD_MES = '{{ $('Summarize1').first().json.concatenated_PROD_MES }}';\nset @COM_MES = '{{ $('Summarize1').first().json.concatenated_COM_MES }}';\nset @LOG_MES = '{{ $('Summarize1').first().json.concatenated_LOG_MES }}';\nset @NCONT_MES = '{{ $('Summarize1').first().json.concatenated_NCONT_MES }}';\n{{ String($('CODIGOS, LINKS e TELEFONES').item.json.SQL) }}",
+        "options": {
+          "connectionTimeoutMillis": 10000
+        }
+      },
+      "id": "6053c745-2770-44c3-943d-ca5e39b91743",
+      "name": "SQL",
+      "type": "n8n-nodes-base.mySql",
+      "typeVersion": 2.2,
+      "position": [
+        -224,
+        432
+      ],
+      "alwaysOutputData": false,
+      "credentials": {
+        "mySql": {
+          "id": "TCMIvEsjEY93g6mS",
+          "name": "MySQL WILL"
+        }
+      },
+      "onError": "continueRegularOutput"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{ $('CODIGOS, LINKS e TELEFONES').item.json.link }}send-sticker",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "={{ $('CODIGOS, LINKS e TELEFONES').item.json.link2 }}",
+              "value": "={{ $('CODIGOS, LINKS e TELEFONES').item.json.link1 }}"
+            }
+          ]
+        },
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "phone",
+              "value": "={{ $('CODIGOS, LINKS e TELEFONES').item.json.Solicitante }}"
+            },
+            {
+              "name": "sticker",
+              "value": "={{ $('CODIGOS, LINKS e TELEFONES').item.json.ERRO }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "571bc9aa-54f4-494f-b9b9-8d3aea6b1f1a",
+      "name": "ERRO1",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.1,
+      "position": [
+        32,
+        448
+      ],
+      "executeOnce": true
+    },
+    {
+      "parameters": {
+        "workflowId": "Mzncl2PY653mQvrF",
+        "options": {}
+      },
+      "id": "a72815fd-b35f-4e6d-8ea3-24752f533ccd",
+      "name": "LINKs SHEETS",
+      "type": "n8n-nodes-base.executeWorkflow",
+      "typeVersion": 1,
+      "position": [
+        -1728,
+        352
+      ]
+    },
+    {
+      "parameters": {
+        "workflowId": "Du7x4YkD8xJLMMZo",
+        "options": {}
+      },
+      "id": "b51244d9-a5fc-47c9-a60f-0fe9fc1eee0e",
+      "name": "CODIGOS, LINKS e TELEFONES",
+      "type": "n8n-nodes-base.executeWorkflow",
+      "typeVersion": 1,
+      "position": [
+        -624,
+        352
+      ]
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "9cac78a2-6c62-4261-bcfd-9740923cf9aa",
+              "name": "CODIGO",
+              "value": "GERADOR HISTORICO COMPLETO",
+              "type": "string"
+            },
+            {
+              "id": "1c4d9d4d-b475-4df1-8257-6bf3c56df1e9",
+              "name": "TIPO",
+              "value": "AUTO",
+              "type": "string"
+            },
+            {
+              "id": "54e4a748-1d55-4ae3-84a6-1c37d2182e4b",
+              "name": "Solicitante",
+              "value": "=",
+              "type": "string"
+            },
+            {
+              "id": "efc5ac4e-b973-4252-be35-d5109272579d",
+              "name": "sheets",
+              "value": "={{ String($('LINKs SHEETS').item.json.sheets) }}",
+              "type": "string"
+            },
+            {
+              "id": "40e6424b-0768-4853-adaa-302211ccd111",
+              "name": "arq",
+              "value": "=BOX PENDENTE - {{ $now.format('yyyy-MM-dd hh:mm:ss') }}",
+              "type": "string"
+            }
+          ]
+        },
+        "includeOtherFields": true,
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        -816,
+        352
+      ],
+      "id": "b8e9ecdc-a6a0-4441-872f-738382dbfe95",
+      "name": "CODIGO"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "00d63c12-96f1-4443-932f-eaa7d2739066",
+              "name": "ENG",
+              "value": "={{ $json.ENG.replaceAll('.',',') }}",
+              "type": "string"
+            },
+            {
+              "id": "5e4cbec8-304e-49ee-a185-14a72d683f95",
+              "name": "PADR",
+              "value": "={{ $json.PADR.replaceAll('.',',') }}",
+              "type": "string"
+            },
+            {
+              "id": "e238a4b4-8a01-4e76-b6cc-b1f519eb707a",
+              "name": "EST_PROD",
+              "value": "={{ $json.EST_PROD.replaceAll('.',',') }}",
+              "type": "string"
+            },
+            {
+              "id": "c5e3ceaa-1683-4310-9f16-f5be062bbdcd",
+              "name": "EST_COM",
+              "value": "={{ $json.EST_COM.replaceAll('.',',') }}",
+              "type": "string"
+            },
+            {
+              "id": "b357f9c9-37d8-47a6-9cd3-12f19545b81a",
+              "name": "EST_EXP",
+              "value": "={{ $json.EST_EXP.replaceAll('.',',') }}",
+              "type": "string"
+            },
+            {
+              "id": "2466f231-b37a-4a15-99a8-2678ddce7ba0",
+              "name": "EST_NCONT",
+              "value": "={{ $json.EST_NCONT.replaceAll('.',',') }}",
+              "type": "string"
+            },
+            {
+              "id": "80f2e236-7a76-46c5-8277-8de6870142dd",
+              "name": "TOTAL_EST",
+              "value": "={{ $json.TOTAL_EST.replaceAll('.',',') }}",
+              "type": "string"
+            },
+            {
+              "id": "b475fd57-e9f0-4d82-8550-f38316bbc28c",
+              "name": "REP_PROD",
+              "value": "={{ $json.REP_PROD.replaceAll('.',',') }}",
+              "type": "string"
+            },
+            {
+              "id": "5cc5ae91-6276-4914-93db-8d2ab72d5db2",
+              "name": "REP_COM",
+              "value": "={{ $json.REP_COM.replaceAll('.',',') }}",
+              "type": "string"
+            },
+            {
+              "id": "9c442c37-eaf5-48fd-ba78-864c2781c471",
+              "name": "REP_EXP",
+              "value": "={{ $json.REP_EXP.replaceAll('.',',') }}",
+              "type": "string"
+            },
+            {
+              "id": "84296388-5793-481a-a04d-e8bea4e5b4a6",
+              "name": "REP_DIF",
+              "value": "={{ $json.REP_DIF.replaceAll('.',',') }}",
+              "type": "string"
+            },
+            {
+              "id": "76603779-f72b-4a2f-a10f-0944e36dac30",
+              "name": "TOTAL_REP",
+              "value": "={{ $json.TOTAL_REP.replaceAll('.',',') }}",
+              "type": "string"
+            },
+            {
+              "id": "30c538d3-eb52-4198-9b60-e9b051914515",
+              "name": "CHAPA",
+              "value": "={{ $json.CHAPA.replaceAll('.',',') }}",
+              "type": "string"
+            },
+            {
+              "id": "5ee7ec10-c31d-4e03-be3b-bf269cf6d4f8",
+              "name": "RETALHO",
+              "value": "={{ $json.RETALHO.replaceAll('.',',') }}",
+              "type": "string"
+            },
+            {
+              "id": "11668d00-81dc-4efd-b2a4-31441eec54be",
+              "name": "INC_08",
+              "value": "={{ $json.INC_08.replaceAll('.',',') }}",
+              "type": "string"
+            },
+            {
+              "id": "eedce1bb-d292-4bfe-a2fc-99df428f5317",
+              "name": "MM06",
+              "value": "={{ $json.MM06.replaceAll('.',',') }}",
+              "type": "string"
+            },
+            {
+              "id": "45fe4d4b-5018-4656-b373-a56c2d725aac",
+              "name": "MM08",
+              "value": "={{ $json.MM08.replaceAll('.',',') }}",
+              "type": "string"
+            },
+            {
+              "id": "24695500-93bb-4ea3-a00a-12a9cf97cf44",
+              "name": "MM10",
+              "value": "={{ $json.MM10.replaceAll('.',',') }}",
+              "type": "string"
+            },
+            {
+              "id": "d6a976fa-560e-4ebe-bcdc-5c22b557ec52",
+              "name": "PESSOAL",
+              "value": "={{ $json.PESSOAL.replaceAll('.',',') }}",
+              "type": "string"
+            },
+            {
+              "id": "ddba7db5-08ec-44f9-a365-107fc4425a08",
+              "name": "OCUPACAO",
+              "value": "={{ $json.OCUPACAO.replaceAll('.',',') }}",
+              "type": "string"
+            },
+            {
+              "id": "c3cd8aec-7a3d-4d66-9e85-5f9cd2c6ca20",
+              "name": "OPERACIONAL",
+              "value": "={{ $json.OPERACIONAL.replaceAll('.',',') }}",
+              "type": "string"
+            }
+          ]
+        },
+        "includeOtherFields": true,
+        "options": {}
+      },
+      "id": "93627391-667b-403c-bb29-2562bd499ec5",
+      "name": "BASE DADOS",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.3,
+      "position": [
+        32,
+        208
+      ]
+    },
+    {
+      "parameters": {
+        "operation": "update",
+        "documentId": {
+          "__rl": true,
+          "value": "={{ $('LINKs SHEETS').item.json.PERDAS_TODAS }}",
+          "mode": "url"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 1733753940,
+          "mode": "list",
+          "cachedResultName": "CHECK LIST",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1n_idHmRUq7zjEVdWlIDDsOkjizOp9gk41QqoxnkqJjM/edit#gid=1733753940"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "ROBO": "={{ $('CODIGOS, LINKS e TELEFONES').item.json.CODIGO }}",
+            "ATT": "={{ $now.format('yyyy-MM-dd') }}"
+          },
+          "matchingColumns": [
+            "ROBO"
+          ],
+          "schema": [
+            {
+              "id": "ROBO",
+              "displayName": "ROBO",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "ATT",
+              "displayName": "ATT",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "row_number",
+              "displayName": "row_number",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "readOnly": true,
+              "removed": true
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "id": "7e738a4f-338d-422a-8fd3-2c68e973f249",
+      "name": "LOG ATT",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.3,
+      "position": [
+        400,
+        208
+      ],
+      "executeOnce": true,
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "pcOUCMZeQaE24Td8",
+          "name": "SHEETS INDUSTRIAL"
+        }
+      },
+      "onError": "continueRegularOutput"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "040d1303-d83e-441e-b20f-9ad9e46e5277",
+              "leftValue": "={{ $json.LAST }}",
+              "rightValue": "",
+              "operator": {
+                "type": "string",
+                "operation": "exists",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        -224,
+        240
+      ],
+      "id": "e53b7e1e-7b2b-4156-bb99-5de04eb1ff6c",
+      "name": "If"
+    },
+    {
+      "parameters": {
+        "fieldsToSummarize": {
+          "values": [
+            {
+              "aggregation": "concatenate",
+              "field": "PROD_MES"
+            },
+            {
+              "aggregation": "concatenate",
+              "field": "COM_MES"
+            },
+            {
+              "aggregation": "concatenate",
+              "field": "LOG_MES"
+            },
+            {
+              "aggregation": "concatenate",
+              "field": "NCONT_MES"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "fc983ded-adfc-46d1-8e06-8a38068eadd3",
+      "name": "Summarize1",
+      "type": "n8n-nodes-base.summarize",
+      "typeVersion": 1,
+      "position": [
+        -1360,
+        352
+      ]
+    },
+    {
+      "parameters": {
+        "documentId": {
+          "__rl": true,
+          "value": "={{ $json.sheets }}",
+          "mode": "url"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "RESUMO ESTORNOS",
+          "mode": "name"
+        },
+        "options": {}
+      },
+      "id": "efe2f23a-0407-4c60-b124-dd5ed3a8e588",
+      "name": "ESTORNOS",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.3,
+      "position": [
+        -1536,
+        352
+      ],
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "pcOUCMZeQaE24Td8",
+          "name": "SHEETS INDUSTRIAL"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "documentId": {
+          "__rl": true,
+          "value": "={{ $('LINKs SHEETS').item.json.sheets }}",
+          "mode": "url"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "RESUMO REP",
+          "mode": "name"
+        },
+        "options": {}
+      },
+      "id": "97facad0-9de3-4919-8c46-7303b427ed5d",
+      "name": "REPOSICOES",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.3,
+      "position": [
+        -1184,
+        352
+      ],
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "pcOUCMZeQaE24Td8",
+          "name": "SHEETS INDUSTRIAL"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "fieldsToSummarize": {
+          "values": [
+            {
+              "aggregation": "concatenate",
+              "field": "PROD_MOT"
+            },
+            {
+              "aggregation": "concatenate",
+              "field": "COM_MOT"
+            },
+            {
+              "aggregation": "concatenate",
+              "field": "LOG_MOT"
+            },
+            {
+              "aggregation": "concatenate",
+              "field": "DIF_MOT"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "c6215fc7-d370-4566-b7de-052bc5ca7b06",
+      "name": "Summarize",
+      "type": "n8n-nodes-base.summarize",
+      "typeVersion": 1,
+      "position": [
+        -1008,
+        352
+      ]
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "ATUALIZA DADOS": {
+      "main": [
+        [
+          {
+            "node": "LOG ATT",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Schedule Trigger": {
+      "main": [
+        [
+          {
+            "node": "LINKs SHEETS",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Loop Over Items": {
+      "main": [
+        [
+          {
+            "node": "If",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "SQL",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "SQL": {
+      "main": [
+        [
+          {
+            "node": "Loop Over Items",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "LINKs SHEETS": {
+      "main": [
+        [
+          {
+            "node": "ESTORNOS",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "CODIGOS, LINKS e TELEFONES": {
+      "main": [
+        [
+          {
+            "node": "Loop Over Items",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "CODIGO": {
+      "main": [
+        [
+          {
+            "node": "CODIGOS, LINKS e TELEFONES",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "BASE DADOS": {
+      "main": [
+        [
+          {
+            "node": "ATUALIZA DADOS",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If": {
+      "main": [
+        [
+          {
+            "node": "BASE DADOS",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        []
+      ]
+    },
+    "Summarize1": {
+      "main": [
+        [
+          {
+            "node": "REPOSICOES",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "ESTORNOS": {
+      "main": [
+        [
+          {
+            "node": "Summarize1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "REPOSICOES": {
+      "main": [
+        [
+          {
+            "node": "Summarize",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Summarize": {
+      "main": [
+        [
+          {
+            "node": "CODIGO",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": true,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "a1f8ed83-d371-4021-8137-0ec496d6bfe1",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "{{INSTANCE_ID}}"
+  },
+  "id": "1yr56jmdp0jvL4Ep",
+  "tags": [
+    {
+      "updatedAt": "2025-03-21T16:08:01.406Z",
+      "createdAt": "2025-03-21T16:08:01.406Z",
+      "id": "TOQ3ATxyyu1bCn2c",
+      "name": "AUTO"
+    },
+    {
+      "updatedAt": "2025-03-21T11:31:29.426Z",
+      "createdAt": "2025-03-21T11:31:29.426Z",
+      "id": "RkprmC0aTVoaMnTe",
+      "name": "E.Ind"
+    }
+  ]
+}

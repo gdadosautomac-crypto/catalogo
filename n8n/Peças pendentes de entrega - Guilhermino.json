@@ -1,0 +1,384 @@
+{
+  "name": "Peças pendentes de entrega - Guilhermino",
+  "nodes": [
+    {
+      "parameters": {
+        "operation": "xlsx",
+        "options": {
+          "fileName": "={{ $('ARQUIVO').item.json.arq }}"
+        }
+      },
+      "id": "22d89493-f6ed-4224-9a69-1df0c43bca86",
+      "name": "Convert to File",
+      "type": "n8n-nodes-base.convertToFile",
+      "typeVersion": 1.1,
+      "position": [
+        1120,
+        368
+      ]
+    },
+    {
+      "parameters": {},
+      "id": "32b59ac2-4c17-4e6e-a0a4-0a2fbab46367",
+      "name": "Wait",
+      "type": "n8n-nodes-base.wait",
+      "typeVersion": 1.1,
+      "position": [
+        1808,
+        368
+      ],
+      "webhookId": "{{WEBHOOK_ID}}"
+    },
+    {
+      "parameters": {
+        "operation": "upload",
+        "bucketName": "marcolanoperacoes",
+        "fileName": "={{ $('ARQUIVO').item.json.arq }}",
+        "additionalFields": {
+          "acl": "publicReadWrite"
+        }
+      },
+      "id": "6947e0ac-b6b4-4a25-8aa9-04907f19ddfd",
+      "name": "AWS S31",
+      "type": "n8n-nodes-base.awsS3",
+      "typeVersion": 2,
+      "position": [
+        1424,
+        368
+      ],
+      "credentials": {
+        "aws": {
+          "id": "wojq9Jq4bZgupPjh",
+          "name": "AWS account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "delete",
+        "bucketName": "marcolanoperacoes",
+        "fileKey": "={{ $('ARQUIVO').item.json.arq }}",
+        "options": {}
+      },
+      "id": "ed68ccca-2982-42ef-8876-9e19a4fba4a3",
+      "name": "AWS S33",
+      "type": "n8n-nodes-base.awsS3",
+      "typeVersion": 2,
+      "position": [
+        1968,
+        368
+      ],
+      "credentials": {
+        "aws": {
+          "id": "wojq9Jq4bZgupPjh",
+          "name": "AWS account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "delete",
+        "bucketName": "marcolanoperacoes",
+        "fileKey": "=SugestaoBox - d26-10h6m15s",
+        "options": {}
+      },
+      "id": "f1a72fe1-bd06-4d91-bca7-0fb49cce81f3",
+      "name": "AWS S37",
+      "type": "n8n-nodes-base.awsS3",
+      "typeVersion": 2,
+      "position": [
+        1072,
+        768
+      ],
+      "credentials": {
+        "aws": {
+          "id": "wojq9Jq4bZgupPjh",
+          "name": "AWS account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "getAll",
+        "bucketName": "marcolanoperacoes",
+        "returnAll": true,
+        "options": {}
+      },
+      "id": "0b3a1f9f-b1ea-42f2-b6f3-36e02a5a02da",
+      "name": "AWS S3",
+      "type": "n8n-nodes-base.awsS3",
+      "typeVersion": 2,
+      "position": [
+        848,
+        768
+      ],
+      "credentials": {
+        "aws": {
+          "id": "wojq9Jq4bZgupPjh",
+          "name": "AWS account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "c9777b34-96c3-49cb-9e8f-5171d677c039",
+              "name": "arq",
+              "value": "=PeçasPendentesGuilhermino - d{{ $now.day }}-{{ $now.hour }}h{{ $now.minute }}m{{ $now.second }}s",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "2ad21a49-affd-4dbd-8549-cf92b9b0baa7",
+      "name": "ARQUIVO",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.3,
+      "position": [
+        768,
+        368
+      ]
+    },
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "field": "months",
+              "triggerAtHour": 6
+            },
+            {
+              "field": "months",
+              "triggerAtDayOfMonth": 15,
+              "triggerAtHour": 6
+            },
+            {
+              "field": "months",
+              "triggerAtDayOfMonth": 21,
+              "triggerAtHour": 6
+            }
+          ]
+        }
+      },
+      "id": "2bbb563e-c34f-411c-a00d-993f1dd67203",
+      "name": "Schedule Trigger1",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.1,
+      "position": [
+        400,
+        368
+      ]
+    },
+    {
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "select * from (\n\tselect \n\t\ty.data_pedido,\n\t\ty.cod_cliente,\n\t\ty.nome_cliente,\n\t\ty.cod_pedido,\n\t\ty.categoria_produto,\n\t\ty.classe_produto,\n\t\ty.sub_classe_produto,\n\t\ty.nome_produto,\n\t\tY.qtd_produto as Qtd_produto,\n\t\tcoalesce(qtd_entregue,0) as qtd_entregue,\n\t\t(y.qtd_produto - coalesce(qtd_entregue,0)) as Pendentes\n\tfrom (\n\t\tselect \n\t\t\tunidade,\n\t\t\tcod_cliente,\n\t\t\tnome_cliente,\n\t\t\tcod_pedido,\n\t\t\tp.cod_produto,\n\t\t\tdata_pedido::Date,\n\t\t\tstatus_pedido,\n\t\t\tcategoria_produto,\n\t\t\tclasse_produto,\n\t\t\tsub_classe_produto,\n\t\t\tnome_produto,\n\t\t\tROUND(sum(replace(qtd_produto,',','.')::numeric),2) as Qtd_Produto\n\t\tfrom pedidos p \n\t\t\tleft join coes c on p.coes = c.nome \n\t\twhere \n\t\t\tc.gerafaturamento = 'SIM' and p.unidade = 'VITORIA DE SANTO ANTAO' and p.status_pedido in ('Em Separacao', 'Em Producao', 'Aberto')\n\t\tgroup by unidade, cod_cliente, nome_cliente, cod_pedido, p.cod_produto, data_pedido::Date, status_pedido, categoria_produto, classe_produto,\n\t\tsub_classe_produto, nome_produto\n\t) y \n\t\tleft join (\n\t\t\tselect \n\t\t\t\tunidade, \n\t\t\t\tcod_cliente, \n\t\t\t\tcod_pedido, \n\t\t\t\tcod_produto, \n\t\t\t\tcategoria_produto, \n\t\t\t\tclasse_produto, \n\t\t\t\tsub_classe_produto, \n\t\t\t\tnome_produto, \n\t\t\t\tROUND(SUM(qtd_entregue),2) as QTD_ENTREGUE\n\t\t\tfrom entregas_geral eg \n\t\t\twhere unidade = 'VITORIA DE SANTO ANTAO'\n\t\t\tgroup by unidade, cod_cliente, COD_PEDIDO, cod_produto, categoria_produto, classe_produto, sub_classe_produto, nome_produto\n\t\t) x on x.unidade = y.unidade and x.categoria_produto = y.categoria_produto and x.classe_produto = y.classe_produto \n\t\tand x.sub_classe_produto = y.sub_classe_produto and x.nome_produto = y.nome_produto and x.cod_produto = y.cod_produto and x.cod_pedido = y.cod_pedido\n) c where pendentes <> 0 and COD_CLIENTE in ('721', '1009', '1050', '1063', '1151', '1315', '1354', '1447', '1462')  and categoria_produto not like ('%TEMPERADO%')\norder by data_pedido::Date asc, cod_cliente desc, cod_pedido asc, nome_produto asc",
+        "options": {}
+      },
+      "id": "14052cf5-d7cf-489c-8607-49a345f5ad85",
+      "name": "Postgres",
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 2.3,
+      "position": [
+        944,
+        368
+      ],
+      "credentials": {
+        "postgres": {
+          "id": "G50fA6A0L90xaBIe",
+          "name": "Postgres account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{ $('Token').item.json.Link }}send-document/xlsx",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "={{ $('Token').item.json.Name }}",
+              "value": "={{ $('Token').item.json.Value }}"
+            }
+          ]
+        },
+        "sendBody": true,
+        "contentType": "form-urlencoded",
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "phone",
+              "value": "=5581982111972"
+            },
+            {
+              "name": "fileName",
+              "value": "=Peças Pendentes de Entrega"
+            },
+            {
+              "name": "document",
+              "value": "=https://marcolanoperacoes.s3.amazonaws.com/{{ $('ARQUIVO').item.json.arq }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "5e809793-b03c-4c4d-8173-1de85af64046",
+      "name": "Guilhermino",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.1,
+      "position": [
+        1632,
+        368
+      ]
+    },
+    {
+      "parameters": {
+        "documentId": {
+          "__rl": true,
+          "value": "https://docs.google.com/spreadsheets/d/1J9xHE08UPG2QnDrjFsiy3VU3Z8ziZT9aO9MF7ct5ruA/edit?usp=sharing",
+          "mode": "url"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 564051929,
+          "mode": "list",
+          "cachedResultName": "Token",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1J9xHE08UPG2QnDrjFsiy3VU3Z8ziZT9aO9MF7ct5ruA/edit#gid=564051929"
+        },
+        "options": {}
+      },
+      "id": "d5603720-43cf-402a-a792-9440aedb4233",
+      "name": "Token",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.3,
+      "position": [
+        592,
+        368
+      ],
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "HfbTEVMQHA5O66Ya",
+          "name": "Sheets JG e Japa"
+        }
+      }
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Convert to File": {
+      "main": [
+        []
+      ]
+    },
+    "Wait": {
+      "main": [
+        [
+          {
+            "node": "AWS S33",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "ARQUIVO": {
+      "main": [
+        [
+          {
+            "node": "Postgres",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Schedule Trigger1": {
+      "main": [
+        [
+          {
+            "node": "Token",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Postgres": {
+      "main": [
+        [
+          {
+            "node": "Convert to File",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "AWS S31": {
+      "main": [
+        [
+          {
+            "node": "Guilhermino",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Guilhermino": {
+      "main": [
+        [
+          {
+            "node": "Wait",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Token": {
+      "main": [
+        [
+          {
+            "node": "ARQUIVO",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "fda73572-17a9-4b78-8d1b-d54bda833d13",
+  "meta": {
+    "instanceId": "{{INSTANCE_ID}}"
+  },
+  "id": "OSRv0jLnU7eWlLX4",
+  "tags": [
+    {
+      "updatedAt": "2025-03-24T14:13:38.023Z",
+      "createdAt": "2025-03-24T14:13:38.023Z",
+      "id": "4ZyNuatpCj0NdhLU",
+      "name": "Bodinhos"
+    },
+    {
+      "updatedAt": "2025-03-24T14:24:48.667Z",
+      "createdAt": "2025-03-24T14:24:48.667Z",
+      "id": "DRs3JJesnD7xa1AS",
+      "name": "Setor - Comercial"
+    },
+    {
+      "updatedAt": "2025-03-21T11:52:03.823Z",
+      "createdAt": "2025-03-21T11:52:03.823Z",
+      "id": "VQmA23kx6h1wy92X",
+      "name": "GUIS"
+    }
+  ]
+}

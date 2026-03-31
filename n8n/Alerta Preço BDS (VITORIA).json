@@ -1,0 +1,523 @@
+{
+  "name": "Alerta Preço BDS (VITORIA)",
+  "nodes": [
+    {
+      "parameters": {
+        "authentication": "oAuth2",
+        "sheetId": "1LPM5t2JYIGGvTtBWDxMSjddM8Up2cLIc77ruckMLhgY",
+        "options": {}
+      },
+      "name": "Get Precos Minimos",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 1,
+      "position": [
+        304,
+        784
+      ],
+      "id": "9eda5fd3-d63e-4eba-8383-b6d18e54495b",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "8Ytd3zZKAOSyZNqC",
+          "name": "Sheets Andre"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "field": "minutes",
+              "minutesInterval": 32
+            }
+          ]
+        }
+      },
+      "id": "a711e370-7592-436d-8cc6-06da7f8aaec1",
+      "name": "Schedule Trigger",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.1,
+      "position": [
+        80,
+        560
+      ]
+    },
+    {
+      "parameters": {
+        "documentId": {
+          "__rl": true,
+          "value": "https://docs.google.com/spreadsheets/d/1avLuf5Qpu0lBIFVS-Ny0j-iIFZGkVqqufVGy-sfbqM4/edit?gid=0#gid=0",
+          "mode": "url"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "Página1",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1avLuf5Qpu0lBIFVS-Ny0j-iIFZGkVqqufVGy-sfbqM4/edit#gid=0"
+        },
+        "options": {}
+      },
+      "id": "76bbd79e-750f-4205-8b5d-3e0eadce1815",
+      "name": "Google Sheets",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.3,
+      "position": [
+        304,
+        560
+      ],
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "8Ytd3zZKAOSyZNqC",
+          "name": "Sheets Andre"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "c9777b34-96c3-49cb-9e8f-5171d677c039",
+              "name": "link",
+              "value": "={{ $json.Link }}",
+              "type": "string"
+            },
+            {
+              "id": "c29c9cfb-b76e-4088-b0ca-7748646d4779",
+              "name": "link1",
+              "value": "={{ $json.Value }}",
+              "type": "string"
+            },
+            {
+              "id": "a2465349-2aee-4dc2-8ce6-9a40bf305fa7",
+              "name": "link2",
+              "value": "={{ $json.Field }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "f33ca844-1ad6-4e9f-ab03-f2cbc21d3cc2",
+      "name": "AUTH",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.3,
+      "position": [
+        480,
+        560
+      ]
+    },
+    {
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "SELECT \n  p.unidade, \n  p.categoria_produto, \n  p.classe_produto, \n  p.cod_pedido,\n  p.metragem_cobrada ,\n  p.nome_cliente,\n  p.custo_unitario_produto ,\nROUND(REPLACE(p.valor_unitario_com_desconto, ',', '.')::numeric, 2) AS valor_unitario_com_desconto,\n  p.nome_produto, \n  ROUND(p.valor_unitario_total_com_desconto::numeric) AS valor_unitario_total_com_desconto,\n  CASE \n    WHEN p.categoria_produto = 'TEMPERADO' THEN \n      CASE \n        WHEN p.classe_produto = 'INCOLOR' THEN \n          CONCAT('INCOLOR ', REGEXP_REPLACE(p.nome_produto, '.*([0-9]{2}MM).*', '\\1'))\n        ELSE \n          CONCAT('COLORIDO ', REGEXP_REPLACE(p.nome_produto, '.*([0-9]{2}MM).*', '\\1'))\n      END\n    WHEN p.categoria_produto = 'BOX PADRÃO' THEN \n      CASE \n        WHEN p.classe_produto = 'INCOLOR' THEN 'BOX INCOLOR'\n        ELSE 'BOX COLORIDO'\n      END\n    ELSE \n      'OUTROS'\n  END AS produto\nFROM pedidos p\nWHERE p.unidade IN ('ARCOVERDE', 'BELO JARDIM', 'CABO', 'GOIANA', 'GRAVATA', 'IGARASSU', 'PONTO VIDRO', 'SANTA CRUZ')\n  AND p.categoria_produto IN ('TEMPERADO', 'BOX PADRÃO')\n  AND TO_TIMESTAMP(p.last_updated, 'YYYY-MM-DD HH24:MI:SS') >= NOW() - INTERVAL '30 minutes'\n",
+        "options": {}
+      },
+      "id": "cb299b80-a836-4b52-853c-17199238014c",
+      "name": "Postgres",
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 2.3,
+      "position": [
+        672,
+        560
+      ],
+      "alwaysOutputData": false,
+      "credentials": {
+        "postgres": {
+          "id": "G50fA6A0L90xaBIe",
+          "name": "Postgres account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "return items.map(item => {\n  const precoBanco = parseFloat(item.json.valor_unitario_total_com_desconto);\n  const precoPlanilha = parseFloat(item.json.precovenda);\n\n  if (precoBanco !== precoPlanilha) {\n    return {\n      json: {\n        ...item.json,\n        status: 'Divergente'\n      }\n    };\n  } else {\n    return {\n      json: {\n        ...item.json,\n        status: 'Ok'\n      }\n    };\n  }\n});"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1360,
+        608
+      ],
+      "id": "034db86e-0bdb-4e1b-9b05-0a946cfa3c47",
+      "name": "Code"
+    },
+    {
+      "parameters": {
+        "mode": "combine",
+        "advanced": true,
+        "mergeByFields": {
+          "values": [
+            {
+              "field1": "unidade",
+              "field2": "unidade"
+            },
+            {
+              "field1": "produto",
+              "field2": "produto"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.merge",
+      "typeVersion": 3.1,
+      "position": [
+        1168,
+        608
+      ],
+      "id": "b2fd2405-4bcf-45cb-a4bc-19da70ac7c84",
+      "name": "Merge"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "dc966000-cad6-4451-9127-15c0e4e8a3c6",
+              "leftValue": "={{ $json.valor_unitario_com_desconto }}",
+              "rightValue": "={{ $json.precovenda }}",
+              "operator": {
+                "type": "number",
+                "operation": "lt"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        1552,
+        608
+      ],
+      "id": "6550f37a-7b2a-4e59-baea-f49589c9bec7",
+      "name": "If"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "c48479f3-6d21-44f9-ac31-55aa881099c0",
+              "name": "unidade",
+              "value": "={{ $json.unidade }}",
+              "type": "string"
+            },
+            {
+              "id": "30ffe41d-26a4-4aeb-9537-c41fa7aa66b1",
+              "name": "produto",
+              "value": "={{ $json.produto }}",
+              "type": "string"
+            },
+            {
+              "id": "970e2176-a90b-4b11-8c43-84773b1144b8",
+              "name": "precovenda",
+              "value": "={{ $json.precovenda }}",
+              "type": "number"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        560,
+        784
+      ],
+      "id": "9e495b34-4da8-4095-9ba7-594fc70a2d80",
+      "name": "Edit Fields"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "93aec209-e2c6-4b3b-8ddf-35389e3705c2",
+              "name": "unidade",
+              "value": "={{ $json.unidade }}",
+              "type": "string"
+            },
+            {
+              "id": "5b84f6d3-23d2-4c06-ba33-ee83e6ecc74b",
+              "name": "categoria_produto",
+              "value": "={{ $json.categoria_produto }}",
+              "type": "string"
+            },
+            {
+              "id": "4067a435-859c-446b-9f1c-88623cb97ebf",
+              "name": "classe_produto",
+              "value": "={{ $json.classe_produto }}",
+              "type": "string"
+            },
+            {
+              "id": "4a4bd950-5ec1-46fc-9da6-f87737b4916e",
+              "name": "cod_pedido",
+              "value": "={{ $json.cod_pedido }}",
+              "type": "string"
+            },
+            {
+              "id": "89b43644-99c3-4202-a4c8-38f4ce6f8c83",
+              "name": "nome_cliente",
+              "value": "={{ $json.nome_cliente }}",
+              "type": "string"
+            },
+            {
+              "id": "0055dea2-5de0-4b6d-b24e-c201c88ccb3f",
+              "name": "nome_produto",
+              "value": "={{ $json.nome_produto }}",
+              "type": "string"
+            },
+            {
+              "id": "6f1ca34b-c703-44c1-92ba-44c4288d0f9c",
+              "name": "valor_unitario_com_desconto",
+              "value": "={{ $json.valor_unitario_com_desconto }}",
+              "type": "number"
+            },
+            {
+              "id": "14f399f9-c331-445e-8077-336c25c9b187",
+              "name": "produto",
+              "value": "={{ $json.produto }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        880,
+        560
+      ],
+      "id": "5777b56a-77eb-4f52-9fd9-efdcbc7ee455",
+      "name": "Edit Fields1"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{ $('AUTH').item.json.link }}",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "={{ $('AUTH').item.json.link2 }}",
+              "value": "={{ $('AUTH').item.json.link1 }}"
+            }
+          ]
+        },
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "phone",
+              "value": "5581987473570"
+            },
+            {
+              "name": "message",
+              "value": "=*----- ALERTA PRECO MÍNIMO -----*\n\nUnidade: *{{ $json.unidade }}*\nCategoria: *{{ $json.categoria_produto }}*\nCod Pedido: *{{ $json.cod_pedido }}*\nNome Cliente: *{{ $json.nome_cliente }}*\nNome Produto: *{{ $json.nome_produto }}*\npreco_tabela: *R$ {{ $json.precovenda }}*\npreco_vendido: R$ *{{ $json.valor_unitario_com_desconto }}*"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "ee6a579b-4e77-4a05-87d7-8b1a1101e16a",
+      "name": "André",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.1,
+      "position": [
+        1792,
+        464
+      ],
+      "disabled": true
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{ $('AUTH').item.json.link }}",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "={{ $('AUTH').item.json.link2 }}",
+              "value": "={{ $('AUTH').item.json.link1 }}"
+            }
+          ]
+        },
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "phone",
+              "value": "558198719-8774"
+            },
+            {
+              "name": "message",
+              "value": "=*----- ALERTA PRECO MÍNIMO -----*\n\nUnidade: *{{ $json.unidade }}*\nCategoria: *{{ $json.categoria_produto }}*\nCod Pedido: *{{ $json.cod_pedido }}*\nNome Cliente: *{{ $json.nome_cliente }}*\nNome Produto: *{{ $json.nome_produto }}*\npreco_tabela: *R$ {{ $json.precovenda }}*\npreco_vendido: R$ *{{ $json.valor_unitario_com_desconto }}*"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "5b30735b-6cb2-4ffc-ba3d-147305e1389a",
+      "name": "Manu",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.1,
+      "position": [
+        1792,
+        688
+      ]
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Schedule Trigger": {
+      "main": [
+        [
+          {
+            "node": "Google Sheets",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Get Precos Minimos",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Google Sheets": {
+      "main": [
+        [
+          {
+            "node": "AUTH",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "AUTH": {
+      "main": [
+        [
+          {
+            "node": "Postgres",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Postgres": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get Precos Minimos": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Merge": {
+      "main": [
+        [
+          {
+            "node": "Code",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code": {
+      "main": [
+        [
+          {
+            "node": "If",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Edit Fields": {
+      "main": [
+        [
+          {
+            "node": "Merge",
+            "type": "main",
+            "index": 1
+          }
+        ]
+      ]
+    },
+    "Edit Fields1": {
+      "main": [
+        [
+          {
+            "node": "Merge",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If": {
+      "main": [
+        [
+          {
+            "node": "André",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Manu",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        []
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "ea163a05-4181-4812-b6de-d90f4e01d1ef",
+  "meta": {
+    "instanceId": "{{INSTANCE_ID}}"
+  },
+  "id": "NwKP8oWcyGZgX6jv",
+  "tags": [
+    {
+      "updatedAt": "2026-01-14T11:04:00.895Z",
+      "createdAt": "2025-03-21T11:47:30.374Z",
+      "id": "CvCy3KNJKyMxSQ3C",
+      "name": "GDA"
+    }
+  ]
+}

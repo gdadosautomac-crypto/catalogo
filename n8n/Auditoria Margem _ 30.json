@@ -1,0 +1,378 @@
+{
+  "name": "Auditoria Margem < 30",
+  "nodes": [
+    {
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "select \n\tp.tipo_unidade,\n\tp.unidade,\n\tp.cod_cliente ,\n\tp.nome_cliente ,\n\tp.cod_pedido ,\n\tp.nome_produto ,\n\tp.categoria_produto,\n\tp.classe_produto,\n\tp.cod_cliente,\n\tp.coes,\n\tp.cond_pagamento,\n\tP.valor_unitario_total_com_desconto as valor_unitario ,\n\tp.custo_unitario_total_produto ,\n\tp.data_hora_pedido ,\n\tROUND(p.margem_bruta_produto::numeric) as margem,\n\tmc.ramo_atividade ,\n\tp.valor_total_pedido,\n\tp.qtd_produto,\n\tp.metragem_cobrada::numeric\nfrom pedidos p\nleft join mapeamento_clientes mc on p.cod_cliente = mc.codcliente and p.unidade = mc.unidade \nwhere p.margem_bruta_produto::NUMERIC < '29'\nand p.categoria_produto ilike '%chapa%'\nand TO_TIMESTAMP(last_updated, 'YYYY-MM-DD HH24:MI:SS') >= NOW() - INTERVAL '30 minutes'\nand p.coes != 'TRANSFERENCIA ENTRE LOJAS'\nand mc.ramo_atividade != 'INTERCOMPANY'\nand p.tipo_unidade !=  'Bodinho'\nand p.custo_unitario_produto > '10'",
+        "options": {}
+      },
+      "id": "de37f617-b909-4022-a303-0a378252fb74",
+      "name": "Postgres",
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 2.3,
+      "position": [
+        352,
+        -96
+      ],
+      "credentials": {
+        "postgres": {
+          "id": "G50fA6A0L90xaBIe",
+          "name": "Postgres account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "documentId": {
+          "__rl": true,
+          "value": "https://docs.google.com/spreadsheets/d/1avLuf5Qpu0lBIFVS-Ny0j-iIFZGkVqqufVGy-sfbqM4/edit?usp=sharing",
+          "mode": "url"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "Página1",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1avLuf5Qpu0lBIFVS-Ny0j-iIFZGkVqqufVGy-sfbqM4/edit#gid=0"
+        },
+        "options": {}
+      },
+      "id": "81806cf7-c2c7-4b8b-842a-4c3140f9204d",
+      "name": "Google Sheets",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.3,
+      "position": [
+        -128,
+        -16
+      ],
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "8Ytd3zZKAOSyZNqC",
+          "name": "Sheets Andre"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "field": "minutes",
+              "minutesInterval": 32
+            }
+          ]
+        }
+      },
+      "id": "d44cb10c-e7a2-4cd9-b0da-2d261377c012",
+      "name": "Schedule Trigger",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.1,
+      "position": [
+        -320,
+        -16
+      ]
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "07860d31-8538-4c0f-8664-7123ea8dfef3",
+              "name": "message",
+              "value": "=----- ALERTA PEDIDO MARGEM < 30 -----\n\n*Unidade:* {{ $json.unidade }}\n*nome_cliente:*  {{ $json.nome_cliente }}\n*cod_pedido:* {{ $json.cod_pedido }}\n*Nome_produto:* {{ $json.nome_produto }}\n*Categoria:* {{ $json.categoria_produto }}\n*Classe:* {{ $json.classe_produto }}\n*Qtd_vendida:* {{ $json.qtd_produto }}\n*Metragem:* {{ $json.metragem_cobrada }}\n*COES:* {{ $json.coes }}\n*Cond_Pagamento:* {{ $json.cond_pagamento }}\n*Valor Pedido:* {{ $json.valor_total_pedido }}\n*Valor_Item:* {{ $json.valor_unitario }}\n*Margem:* {{ $json.margem }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "a1643939-f2b5-4e77-974b-e3e324c42b82",
+      "name": "Formata Texto",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.3,
+      "position": [
+        528,
+        -96
+      ]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{ $('AUTH1').item.json.link }}",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "={{ $('AUTH1').item.json.link2 }}",
+              "value": "={{ $('AUTH1').item.json.link1 }}"
+            }
+          ]
+        },
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "phone",
+              "value": "5581987473570"
+            },
+            {
+              "name": "message",
+              "value": "=---- {{ $json[\"message\"] }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "a2934869-50c5-4b45-8fc3-234698b05ee5",
+      "name": "André2",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.1,
+      "position": [
+        880,
+        32
+      ],
+      "disabled": true
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{ $('AUTH1').item.json.link }}",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "={{ $('AUTH1').item.json.link2 }}",
+              "value": "={{ $('AUTH1').item.json.link1 }}"
+            }
+          ]
+        },
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "phone",
+              "value": "5581981308564"
+            },
+            {
+              "name": "message",
+              "value": "=---- {{ $json[\"message\"] }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "54e2df7f-ae59-495d-9b93-4453168c97f8",
+      "name": "Diego Marcolan",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.1,
+      "position": [
+        704,
+        -96
+      ]
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "c9777b34-96c3-49cb-9e8f-5171d677c039",
+              "name": "link",
+              "value": "={{ $json.Link }}",
+              "type": "string"
+            },
+            {
+              "id": "c29c9cfb-b76e-4088-b0ca-7748646d4779",
+              "name": "link1",
+              "value": "={{ $json.Value }}",
+              "type": "string"
+            },
+            {
+              "id": "a2465349-2aee-4dc2-8ce6-9a40bf305fa7",
+              "name": "link2",
+              "value": "={{ $json.Field }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "d72cb346-8d8f-4473-a2f7-a00322bb9ea0",
+      "name": "AUTH1",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.3,
+      "position": [
+        112,
+        -16
+      ]
+    },
+    {
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "select \n\tp.tipo_unidade,\n\tp.unidade,\n\tp.cod_cliente ,\n\tp.nome_cliente ,\n\tp.cod_pedido ,\n\tp.nome_produto ,\n\tp.categoria_produto,\n\tp.classe_produto,\n\tp.cod_cliente,\n\tp.coes,\n\tp.cond_pagamento,\n\tP.valor_unitario_total_com_desconto as valor_unitario ,\n\tp.custo_unitario_total_produto ,\n\tp.data_hora_pedido ,\n\tROUND(p.margem_bruta_produto::numeric) as margem,\n\tmc.ramo_atividade ,\n\tp.valor_total_pedido,\n\tp.qtd_produto,\n\tp.metragem_cobrada::numeric\nfrom pedidos p\nleft join mapeamento_clientes mc on p.cod_cliente = mc.codcliente and p.unidade = mc.unidade \nwhere p.margem_bruta_produto::NUMERIC < '24'\nand p.categoria_produto ilike '%chapa%'\nand TO_TIMESTAMP(last_updated, 'YYYY-MM-DD HH24:MI:SS') >= NOW() - INTERVAL '30 minutes'\nand p.coes != 'TRANSFERENCIA ENTRE LOJAS'\nand mc.ramo_atividade != 'INTERCOMPANY'\nand p.tipo_unidade !=  'Bodinho'\nand p.custo_unitario_produto > '10'",
+        "options": {}
+      },
+      "id": "f94c3e53-eedd-4923-9a43-0938ef55aa06",
+      "name": "Postgres1",
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 2.3,
+      "position": [
+        352,
+        80
+      ],
+      "credentials": {
+        "postgres": {
+          "id": "G50fA6A0L90xaBIe",
+          "name": "Postgres account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "07860d31-8538-4c0f-8664-7123ea8dfef3",
+              "name": "message",
+              "value": "=----- ALERTA PEDIDO MARGEM < 25% -----\n\n*Unidade:* {{ $json.unidade }}\n*nome_cliente:*  {{ $json.nome_cliente }}\n*cod_pedido:* {{ $json.cod_pedido }}\n*Nome_produto:* {{ $json.nome_produto }}\n*Categoria:* {{ $json.categoria_produto }}\n*Classe:* {{ $json.classe_produto }}\n*Qtd_vendida:* {{ $json.qtd_produto }}\n*Metragem:* {{ $json.metragem_cobrada }}\n*COES:* {{ $json.coes }}\n*Cond_Pagamento:* {{ $json.cond_pagamento }}\n*Valor Pedido:* {{ $json.valor_total_pedido }}\n*Valor_Item:* {{ $json.valor_unitario }}\n*Margem:* {{ $json.margem }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "1944337a-0039-4845-9c4a-3c097d67bbbb",
+      "name": "Formata Texto1",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.3,
+      "position": [
+        528,
+        80
+      ]
+    },
+    {
+      "parameters": {
+        "phone": "5582999410447",
+        "text": "={{ $json.message }}",
+        "additionalFields": {}
+      },
+      "type": "n8n-nodes-zapi.zapi",
+      "typeVersion": 1,
+      "position": [
+        704,
+        80
+      ],
+      "id": "d9823ae2-c5b7-4f79-b6ef-172aa22805ef",
+      "name": "Z-API",
+      "credentials": {
+        "zapiApi": {
+          "id": "cGI15AvSkFAV8Qrr",
+          "name": "Z-API account"
+        }
+      }
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Postgres": {
+      "main": [
+        [
+          {
+            "node": "Formata Texto",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Google Sheets": {
+      "main": [
+        [
+          {
+            "node": "AUTH1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Schedule Trigger": {
+      "main": [
+        [
+          {
+            "node": "Google Sheets",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Formata Texto": {
+      "main": [
+        [
+          {
+            "node": "Diego Marcolan",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "AUTH1": {
+      "main": [
+        [
+          {
+            "node": "Postgres",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Postgres1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Postgres1": {
+      "main": [
+        [
+          {
+            "node": "Formata Texto1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Formata Texto1": {
+      "main": [
+        [
+          {
+            "node": "Z-API",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": true,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "39f300ea-351a-45ec-8b7c-4b4f81093658",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "{{INSTANCE_ID}}"
+  },
+  "id": "yDqpbdWJRfQs5pkQ",
+  "tags": [
+    {
+      "updatedAt": "2026-01-14T11:04:00.895Z",
+      "createdAt": "2025-03-21T11:47:30.374Z",
+      "id": "CvCy3KNJKyMxSQ3C",
+      "name": "GDA"
+    }
+  ]
+}

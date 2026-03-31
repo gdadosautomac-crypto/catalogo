@@ -1,0 +1,568 @@
+{
+  "name": "META 24hrs",
+  "nodes": [
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{ $('CODIGOS, LINKS e TELEFONES').item.json.link }}send-text",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "={{ $('CODIGOS, LINKS e TELEFONES').item.json.link2 }}",
+              "value": "={{ $('CODIGOS, LINKS e TELEFONES').item.json.link1 }}"
+            }
+          ]
+        },
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "phone",
+              "value": "={{ $('CODIGOS, LINKS e TELEFONES').item.json.Solicitante }}"
+            },
+            {
+              "name": "message",
+              "value": "=*{{$json[\"unidade\"]}}*\n*Pedidos com previsão* {{$json[\"DATA\"]}}\n\n*{{$json[\"QTD_EMITIDO\"]}} pçs   {{$json[\"M2_EMITIDO\"]}} m²*\n\n{{$json[\"QTD_OF\"]}}% Gerou O.F.\n{{$json[\"QTD_FLX\"]}}% Gerou Fluxo\n{{$json[\"QTD_CORTE\"]}}% Cortado\n{{$json[\"QTD_MARCA\"]}}% Marcado\n{{$json[\"QTD_LAVA\"]}}% Lavado/Conferido\n{{$json[\"QTD_ENTRADA\"]}}% Entrou no Forno\n{{$json[\"QTD_SAIDA\"]}}% Pronto"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "7aa2e13d-a590-42d0-9ceb-ea09f30179ef",
+      "name": "MSG Grupo Produção6",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.1,
+      "position": [
+        0,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "field": "weeks",
+              "triggerAtDay": [
+                1,
+                2,
+                3,
+                4,
+                5
+              ],
+              "triggerAtHour": 20,
+              "triggerAtMinute": 2
+            }
+          ]
+        }
+      },
+      "id": "60f5d0c0-b811-4ad5-8e1f-e46d016976a6",
+      "name": "Schedule Trigger",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.1,
+      "position": [
+        -1376,
+        160
+      ]
+    },
+    {
+      "parameters": {
+        "operation": "append",
+        "documentId": {
+          "__rl": true,
+          "value": "={{ $('LINKs SHEETS').first().json.PAINEL_INDUSTRIAL }}",
+          "mode": "url"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 1310216283,
+          "mode": "list",
+          "cachedResultName": "BASE24hrs",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1-5CzQNHyRFWB_-FlZiRCfnWa0YqoPQjd2HxkW1gWlCM/edit#gid=1310216283"
+        },
+        "columns": {
+          "mappingMode": "autoMapInputData",
+          "value": {
+            "UNIDADE": "={{$json[\"unidade\"]}}",
+            "DATA": "={{ $json.DATA }}",
+            "QTD": "={{ $json.QTD_EMITIDO }}",
+            "M2": "={{ $json.M2_EMITIDO }}",
+            "OF": "={{ $json.QTD_OF }}",
+            "FLX": "={{ $json.QTD_FLX }}",
+            "CORTE": "={{ $json.QTD_CORTE }}",
+            "MARCACAO": "={{ $json.QTD_MARCA }}",
+            "CONFERENCIA": "={{ $json.QTD_LAVA }}",
+            "FORNO": "={{ $json.QTD_ENTRADA }}",
+            "SAIDA": "={{ $json.QTD_SAIDA }}"
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "UNIDADE",
+              "displayName": "UNIDADE",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "DATA",
+              "displayName": "DATA",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "QTD",
+              "displayName": "QTD",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "M2",
+              "displayName": "M2",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "OF",
+              "displayName": "OF",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "FLX",
+              "displayName": "FLX",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "CORTE",
+              "displayName": "CORTE",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "MARCACAO",
+              "displayName": "MARCACAO",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "CONFERENCIA",
+              "displayName": "CONFERENCIA",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "FORNO",
+              "displayName": "FORNO",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "SAIDA",
+              "displayName": "SAIDA",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "VALIDACAO",
+              "displayName": "VALIDACAO",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "id": "8d6eaee7-1cb0-4643-b94f-db2f261b880f",
+      "name": "Google Sheets",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.3,
+      "position": [
+        0,
+        160
+      ],
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "pcOUCMZeQaE24Td8",
+          "name": "SHEETS INDUSTRIAL"
+        }
+      },
+      "onError": "continueRegularOutput"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "3f5e26e2-d61f-4fcc-8a55-c8690c6333ab",
+              "name": "M2_EMITIDO",
+              "value": "={{ $json.M2_EMITIDO.replaceAll('.',',')}}",
+              "type": "string"
+            },
+            {
+              "id": "a2de077e-a3a7-4f21-b116-b7e4ee4d31c8",
+              "name": "QTD_OF",
+              "value": "={{ $json.QTD_OF.replaceAll('.',',')}}",
+              "type": "string"
+            },
+            {
+              "id": "960d2ddb-b7a4-4fe7-9e39-c56c1c1cbcd4",
+              "name": "QTD_FLX",
+              "value": "={{ $json.QTD_FLX.replaceAll('.',',')}}",
+              "type": "string"
+            },
+            {
+              "id": "7b66c3e9-64f5-49e5-95a3-b792e87d396e",
+              "name": "QTD_CORTE",
+              "value": "={{ $json.QTD_CORTE.replaceAll('.',',')}}",
+              "type": "string"
+            },
+            {
+              "id": "3270aeb6-7eb6-4519-8d14-817e7d7ffa91",
+              "name": "QTD_MARCA",
+              "value": "={{ $json.QTD_MARCA.replaceAll('.',',')}}",
+              "type": "string"
+            },
+            {
+              "id": "a9c668cd-9154-4be9-b310-0d513a2c062b",
+              "name": "QTD_LAVA",
+              "value": "={{ $json.QTD_LAVA.replaceAll('.',',')}}",
+              "type": "string"
+            },
+            {
+              "id": "2015b14f-4b9b-451e-94e6-fabf17a637e2",
+              "name": "QTD_ENTRADA",
+              "value": "={{ $json.QTD_ENTRADA.replaceAll('.',',')}}",
+              "type": "string"
+            },
+            {
+              "id": "39355abf-dfeb-4dc7-9826-e113b114e3f4",
+              "name": "QTD_SAIDA",
+              "value": "={{ $json.QTD_SAIDA.replaceAll('.',',')}}",
+              "type": "string"
+            }
+          ]
+        },
+        "includeOtherFields": true,
+        "options": {}
+      },
+      "id": "d02bb2b5-74db-494a-b8b0-e6cab6e5af62",
+      "name": "Edit Fields",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.3,
+      "position": [
+        -224,
+        80
+      ]
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "id": "7e3fad84-c9e3-4c1c-a584-190839d237d3",
+      "name": "Loop Over Items",
+      "type": "n8n-nodes-base.splitInBatches",
+      "typeVersion": 3,
+      "position": [
+        -640,
+        160
+      ]
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 1
+          },
+          "conditions": [
+            {
+              "id": "7b05cd93-0efc-4c4f-8b55-71bede10d178",
+              "leftValue": "={{ $json.DATA }}",
+              "rightValue": "={{ parseInt(0) }}",
+              "operator": {
+                "type": "string",
+                "operation": "exists",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "id": "ccdecfce-0d81-48b8-aeb5-6ec4c89ec81e",
+      "name": "If1",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2,
+      "position": [
+        -416,
+        80
+      ],
+      "onError": "continueRegularOutput"
+    },
+    {
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "set @unidade = '{{ $json.unidade }}';\n{{ String($('CODIGOS, LINKS e TELEFONES').item.json.SQL) }}",
+        "options": {
+          "connectionTimeoutMillis": 10000
+        }
+      },
+      "id": "d9f00293-aea3-47cb-90d1-001a4dd67a52",
+      "name": "SQL",
+      "type": "n8n-nodes-base.mySql",
+      "typeVersion": 2.2,
+      "position": [
+        -416,
+        240
+      ],
+      "alwaysOutputData": false,
+      "credentials": {
+        "mySql": {
+          "id": "TCMIvEsjEY93g6mS",
+          "name": "MySQL WILL"
+        }
+      },
+      "onError": "continueRegularOutput"
+    },
+    {
+      "parameters": {
+        "workflowId": "Mzncl2PY653mQvrF",
+        "options": {}
+      },
+      "id": "54a9221b-f332-450d-8d2c-1a7ec35cc540",
+      "name": "LINKs SHEETS",
+      "type": "n8n-nodes-base.executeWorkflow",
+      "typeVersion": 1,
+      "position": [
+        -1200,
+        160
+      ]
+    },
+    {
+      "parameters": {
+        "workflowId": "Du7x4YkD8xJLMMZo",
+        "options": {}
+      },
+      "id": "f3c2ae8b-1ea7-4008-b90e-94cb6cf487c2",
+      "name": "CODIGOS, LINKS e TELEFONES",
+      "type": "n8n-nodes-base.executeWorkflow",
+      "typeVersion": 1,
+      "position": [
+        -848,
+        160
+      ]
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "9cac78a2-6c62-4261-bcfd-9740923cf9aa",
+              "name": "CODIGO",
+              "value": "META 24hrs",
+              "type": "string"
+            },
+            {
+              "id": "1c4d9d4d-b475-4df1-8257-6bf3c56df1e9",
+              "name": "TIPO",
+              "value": "AUTO",
+              "type": "string"
+            },
+            {
+              "id": "54e4a748-1d55-4ae3-84a6-1c37d2182e4b",
+              "name": "Solicitante",
+              "value": "=",
+              "type": "string"
+            },
+            {
+              "id": "efc5ac4e-b973-4252-be35-d5109272579d",
+              "name": "sheets",
+              "value": "={{ String($('LINKs SHEETS').item.json.sheets) }}",
+              "type": "string"
+            }
+          ]
+        },
+        "includeOtherFields": true,
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        -1024,
+        160
+      ],
+      "id": "6cafad65-fd65-4d0a-b8bb-7fa40659771a",
+      "name": "CODIGO"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Schedule Trigger": {
+      "main": [
+        [
+          {
+            "node": "LINKs SHEETS",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Edit Fields": {
+      "main": [
+        [
+          {
+            "node": "Google Sheets",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "MSG Grupo Produção6",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Loop Over Items": {
+      "main": [
+        [
+          {
+            "node": "If1",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "SQL",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If1": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "SQL": {
+      "main": [
+        [
+          {
+            "node": "Loop Over Items",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "LINKs SHEETS": {
+      "main": [
+        [
+          {
+            "node": "CODIGO",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "CODIGO": {
+      "main": [
+        [
+          {
+            "node": "CODIGOS, LINKS e TELEFONES",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "CODIGOS, LINKS e TELEFONES": {
+      "main": [
+        [
+          {
+            "node": "Loop Over Items",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": true,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "951537d1-0ad3-4dfd-9bae-5b561aac920c",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "{{INSTANCE_ID}}"
+  },
+  "id": "aJwfpDyENcjRmaPC",
+  "tags": [
+    {
+      "updatedAt": "2025-03-21T16:08:01.406Z",
+      "createdAt": "2025-03-21T16:08:01.406Z",
+      "id": "TOQ3ATxyyu1bCn2c",
+      "name": "AUTO"
+    },
+    {
+      "updatedAt": "2025-03-21T11:31:29.426Z",
+      "createdAt": "2025-03-21T11:31:29.426Z",
+      "id": "RkprmC0aTVoaMnTe",
+      "name": "E.Ind"
+    }
+  ]
+}

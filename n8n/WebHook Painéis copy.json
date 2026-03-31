@@ -1,0 +1,1818 @@
+{
+  "name": "WebHook Painéis copy",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "a093ed3f-6b0c-4401-a1cc-2382e100fc4d",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2.1,
+      "position": [
+        -816,
+        -304
+      ],
+      "id": "7bee96f9-7835-4c0a-b6a7-a9e133e44df0",
+      "name": "Webhook",
+      "webhookId": "{{WEBHOOK_ID}}"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "5650e35c-251c-4dac-ab78-793e3f6ba7eb",
+              "name": "body.Alerta",
+              "value": "={{ $json.body.Alerta }}",
+              "type": "string"
+            },
+            {
+              "id": "27623b37-3180-42cd-8725-fbaf529cb67b",
+              "name": "body['Tipo Unidade']",
+              "value": "={{ $json.body['Tipo Unidade'] }}",
+              "type": "string"
+            },
+            {
+              "id": "33633290-a041-42ec-a1f2-2f0454d52900",
+              "name": "body.Unidade",
+              "value": "={{ $json.body.Unidade }}",
+              "type": "string"
+            },
+            {
+              "id": "3e92579f-4230-4ea2-ad16-2f6124489711",
+              "name": "body.Responsável",
+              "value": "={{ $json.body['Responsável'] }}",
+              "type": "string"
+            },
+            {
+              "id": "34466ae9-22a5-462b-9840-59798b4f5c10",
+              "name": "body.Contato",
+              "value": "={{ $json.body.Contato }}",
+              "type": "string"
+            },
+            {
+              "id": "f2fe0bc3-e75b-4317-884d-30be9be0a86c",
+              "name": "body.Data",
+              "value": "={{ $json.body.Data }}",
+              "type": "string"
+            },
+            {
+              "id": "8b345ca4-0463-41c8-93b6-0186399190fd",
+              "name": "body['Dinheiro Sistema']",
+              "value": "={{ $json.body['Dinheiro Real'] }}",
+              "type": "string"
+            },
+            {
+              "id": "8c3cc403-0f1b-4170-8d32-8491edf87e9e",
+              "name": "body['Dinheiro Real']",
+              "value": "={{ $json.body['Dinheiro Real'] }}",
+              "type": "string"
+            },
+            {
+              "id": "86e60953-7bfb-4af3-97ca-14de7db9acf0",
+              "name": "body['Dinheiro Obs']",
+              "value": "={{ $json.body['Dinheiro Obs'] }}",
+              "type": "string"
+            },
+            {
+              "id": "5f35207a-739c-4e9a-9d50-701a725e3549",
+              "name": "body['Banco do Brasil 159-7 - Sistema']",
+              "value": "={{ $json.body['Banco do Brasil 159-7 - Sistema'] }}",
+              "type": "string"
+            },
+            {
+              "id": "dd80292d-ba7a-4cfe-8e29-8b04098cd6ab",
+              "name": "body['Banco do Brasil 159-7 - Extrato']",
+              "value": "={{ $json.body['Banco do Brasil 159-7 - Extrato'] }}",
+              "type": "string"
+            },
+            {
+              "id": "5b217bc2-538c-418a-98fa-37a162edaef8",
+              "name": "body['Banco do Brasil 159-7 - Obs']",
+              "value": "={{ $json.body['Banco do Brasil 159-7 - Obs'] }}",
+              "type": "string"
+            },
+            {
+              "id": "5afedb7d-6383-4d42-bf1b-8b60aa20901a",
+              "name": "body['Banco do Brasil 8074-8 - Sistema']",
+              "value": "={{ $json.body['Banco do Brasil 8074-8 - Sistema'] }}",
+              "type": "string"
+            },
+            {
+              "id": "a5545935-b11e-4768-94b1-06171c2b840e",
+              "name": "body['Banco do Brasil 8074-8 - Extrato']",
+              "value": "={{ $json.body['Banco do Brasil 8074-8 - Extrato'] }}",
+              "type": "string"
+            },
+            {
+              "id": "0a89ee33-8f77-436e-b239-d28f2f829573",
+              "name": "body['Banco do Brasil 8074-8 - Obs']",
+              "value": "={{ $json.body['Banco do Brasil 8074-8 - Obs'] }}",
+              "type": "string"
+            },
+            {
+              "id": "9d2f69df-d38e-465d-809e-8e9d0f298778",
+              "name": "body['Banco do Brasil 8575-8 - Sistema']",
+              "value": "={{ $json.body['Banco do Brasil 8575-8 - Sistema'] }}",
+              "type": "string"
+            },
+            {
+              "id": "171db0b4-0579-4ddb-8574-1cfd7be6b73f",
+              "name": "body['Banco do Brasil 8575-8 - Extrato']",
+              "value": "={{ $json.body['Banco do Brasil 8575-8 - Extrato'] }}",
+              "type": "string"
+            },
+            {
+              "id": "75d0a073-9012-41ab-8f3d-71aa455a9820",
+              "name": "body['Banco do Brasil 8575-8 - Obs']",
+              "value": "={{ $json.body['Banco do Brasil 8575-8 - Obs'] }}",
+              "type": "string"
+            },
+            {
+              "id": "bf758fd1-9ef5-410d-ac6f-c86c6c126478",
+              "name": "body['Banco do Brasil 714-5 - Sistema']",
+              "value": "={{ $json.body['Banco do Brasil 714-5 - Sistema'] }}",
+              "type": "string"
+            },
+            {
+              "id": "3e5a7e2d-eacb-4882-afca-125914e09c88",
+              "name": "body['Banco do Brasil 714-5 - Extrato']",
+              "value": "={{ $json.body['Banco do Brasil 714-5 - Extrato'] }}",
+              "type": "string"
+            },
+            {
+              "id": "32c16a87-3089-445d-8508-1789f608dfe6",
+              "name": "body['Banco do Brasil 714-5 - Obs']",
+              "value": "={{ $json.body['Banco do Brasil 714-5 - Obs'] }}",
+              "type": "string"
+            },
+            {
+              "id": "d8bd6f14-1bc6-4c16-bb06-4e26526255ad",
+              "name": "body['Bradesco - Sistema']",
+              "value": "={{ $json.body['Bradesco - Sistema'] }}",
+              "type": "string"
+            },
+            {
+              "id": "72b3d4ed-5bab-4ad6-9668-c079faed6271",
+              "name": "body['Bradesco - Extrato']",
+              "value": "={{ $json.body['Bradesco - Extrato'] }}",
+              "type": "string"
+            },
+            {
+              "id": "d881a642-e0ad-470e-ae0b-207d7bbae9b6",
+              "name": "body['Bradesco - Obs']",
+              "value": "={{ $json.body['Bradesco - Obs'] }}",
+              "type": "string"
+            },
+            {
+              "id": "86233139-d8a5-447e-a438-d46d43579b5d",
+              "name": "body['BRB - Sistema']",
+              "value": "={{ $json.body['BRB - Sistema'] }}",
+              "type": "string"
+            },
+            {
+              "id": "daf603be-0234-4c3e-a14f-68cbf5f7756b",
+              "name": "body['BRB - Extrato']",
+              "value": "={{ $json.body['BRB - Extrato'] }}",
+              "type": "string"
+            },
+            {
+              "id": "3b215e61-0ac7-4452-9979-3d4991ac7a45",
+              "name": "body['BRB - Obs']",
+              "value": "={{ $json.body['BRB - Obs'] }}",
+              "type": "string"
+            },
+            {
+              "id": "93803326-881d-458e-9813-e8cacf7a85cc",
+              "name": "body['BS2 - Sistema']",
+              "value": "={{ $json.body['BS2 - Sistema'] }}",
+              "type": "string"
+            },
+            {
+              "id": "d91f511e-e7fd-4d78-b264-09cff9ab68f7",
+              "name": "body['BS2 - Extrato']",
+              "value": "={{ $json.body['BS2 - Extrato'] }}",
+              "type": "string"
+            },
+            {
+              "id": "2fd5ef35-c4ea-4c24-b54d-3d29501079d1",
+              "name": "body['BS2 - Obs']",
+              "value": "={{ $json.body['BS2 - Obs'] }}",
+              "type": "string"
+            },
+            {
+              "id": "786b20bb-c8b5-48b1-8c64-ab6c5b18c971",
+              "name": "body['BTG - Sistema']",
+              "value": "={{ $json.body['BTG - Sistema'] }}",
+              "type": "string"
+            },
+            {
+              "id": "0a137681-a54c-48e4-8418-e2521cdc9cdd",
+              "name": "body['BTG - Extrato']",
+              "value": "={{ $json.body['BTG - Extrato'] }}",
+              "type": "string"
+            },
+            {
+              "id": "b525bc58-8f02-4b54-98b7-fcff13a5ecc2",
+              "name": "body['BTG - Obs']",
+              "value": "={{ $json.body['BTG - Obs'] }}",
+              "type": "string"
+            },
+            {
+              "id": "f0d84cde-21dc-459b-b6c9-fd1842fbf52c",
+              "name": "body['BTG Alumiaço - Sistema']",
+              "value": "={{ $json.body['BTG Alumiaço - Sistema'] }}",
+              "type": "string"
+            },
+            {
+              "id": "0e962d4e-6acf-4a5a-a6d7-25378bf37719",
+              "name": "body['BTG Alumiaço - Extrato']",
+              "value": "={{ $json.body['BTG Alumiaço - Extrato'] }}",
+              "type": "string"
+            },
+            {
+              "id": "8d941784-ea5b-4fac-bb93-36ff333c29f3",
+              "name": "body['BTG Alumiaço - Obs']",
+              "value": "={{ $json.body['BTG Alumiaço - Obs'] }}",
+              "type": "string"
+            },
+            {
+              "id": "d75f9c26-701f-4c5d-84c7-48d8b98745a1",
+              "name": "body['Caixa 2399 - Sistema']",
+              "value": "={{ $json.body['Caixa 2399 - Sistema'] }}",
+              "type": "string"
+            },
+            {
+              "id": "c4e97ecc-d0ca-4b8f-9fe8-106830734340",
+              "name": "body['Caixa 2399 - Extrato']",
+              "value": "={{ $json.body['Caixa 2399 - Extrato'] }}",
+              "type": "string"
+            },
+            {
+              "id": "29919c21-8630-4dc1-a3f1-5afa7cb235dc",
+              "name": "body['Caixa 2399 - Obs']",
+              "value": "={{ $json.body['Caixa 2399 - Obs'] }}",
+              "type": "string"
+            },
+            {
+              "id": "b2eb1cdc-e8f9-4db4-923f-552fa46fd340",
+              "name": "body['Caixa 4253 - Sistema']",
+              "value": "={{ $json.body['Caixa 4253 - Sistema'] }}",
+              "type": "string"
+            },
+            {
+              "id": "90b86214-0d4f-4441-9ea1-1ac7115197bd",
+              "name": "body['Caixa 4253 - Extrato']",
+              "value": "={{ $json.body['Caixa 4253 - Extrato'] }}",
+              "type": "string"
+            },
+            {
+              "id": "d794cfee-cb05-417b-b470-74841fb74101",
+              "name": "body['Caixa 4253 - Obs']",
+              "value": "={{ $json.body['Caixa 4253 - Obs'] }}",
+              "type": "string"
+            },
+            {
+              "id": "0fb42b87-3e4c-4350-83b0-fdffda2288c1",
+              "name": "body['Caixa 2991 - Sistema']",
+              "value": "={{ $json.body['Caixa 2991 - Sistema'] }}",
+              "type": "string"
+            },
+            {
+              "id": "b32124fc-bc62-4e19-91bb-c83567e44976",
+              "name": "body['Caixa 2991 - Extrato']",
+              "value": "={{ $json.body['Caixa 2991 - Extrato'] }}",
+              "type": "string"
+            },
+            {
+              "id": "d5335504-23d8-4402-9bca-aa7cfc4b7c6f",
+              "name": "body['Caixa 2991 - Obs']",
+              "value": "={{ $json.body['Caixa 2991 - Obs'] }}",
+              "type": "string"
+            },
+            {
+              "id": "58b13084-0066-44f3-a5ec-ffc7f72ff988",
+              "name": "body['Caixa 1020 - Sistema']",
+              "value": "={{ $json.body['Caixa 1020 - Sistema'] }}",
+              "type": "string"
+            },
+            {
+              "id": "79629b56-f9c7-4078-91b8-5e8b870032a8",
+              "name": "body['Caixa 1020 - Extrato']",
+              "value": "={{ $json.body['Caixa 1020 - Extrato'] }}",
+              "type": "string"
+            },
+            {
+              "id": "e35b7db9-3409-4feb-8d24-57479d66b4ab",
+              "name": "body['Caixa 1020 - Obs']",
+              "value": "={{ $json.body['Caixa 1020 - Obs'] }}",
+              "type": "string"
+            },
+            {
+              "id": "fb44a0aa-4665-44a2-96bd-5bec339dbd68",
+              "name": "body['Flash - Sistema']",
+              "value": "={{ $json.body['Flash - Sistema'] }}",
+              "type": "string"
+            },
+            {
+              "id": "26a0c0e3-49ee-43f4-ac3c-b0333ada4899",
+              "name": "body['Flash - Extrato']",
+              "value": "={{ $json.body['Flash - Extrato'] }}",
+              "type": "string"
+            },
+            {
+              "id": "55d46233-80bc-4c3a-aa38-f35d20336c87",
+              "name": "body['Flash - Obs']",
+              "value": "={{ $json.body['Flash - Obs'] }}",
+              "type": "string"
+            },
+            {
+              "id": "a30cdade-0cea-4bc7-8239-f67e1ffbe84c",
+              "name": "body['Inter - Sistema']",
+              "value": "={{ $json.body['Inter - Sistema'] }}",
+              "type": "string"
+            },
+            {
+              "id": "bb8883a2-e6be-44fe-a303-b84391c567ca",
+              "name": "body['Inter - Extrato']",
+              "value": "={{ $json.body['Inter - Extrato'] }}",
+              "type": "string"
+            },
+            {
+              "id": "663fa402-607b-492e-9bed-be717e8a02d7",
+              "name": "body['Inter - Obs']",
+              "value": "={{ $json.body['Inter - Obs'] }}",
+              "type": "string"
+            },
+            {
+              "id": "214fe578-d317-4b39-adbc-643e2b080ad8",
+              "name": "body['Itaú - Sistema']",
+              "value": "={{ $json.body['Itaú - Sistema'] }}",
+              "type": "string"
+            },
+            {
+              "id": "add17b2a-1544-407f-94a7-fc5a04545c30",
+              "name": "body['Itaú - Extrato']",
+              "value": "={{ $json.body['Itaú - Extrato'] }}",
+              "type": "string"
+            },
+            {
+              "id": "01a23934-9c3f-46fb-ac58-239ad6bb4573",
+              "name": "body['Itaú - Obs']",
+              "value": "={{ $json.body['Itaú - Obs'] }}",
+              "type": "string"
+            },
+            {
+              "id": "3c3efb5b-eb70-41b0-9e25-dcbf201636e5",
+              "name": "body['PagPix - Sistema']",
+              "value": "={{ $json.body['PagPix - Sistema'] }}",
+              "type": "string"
+            },
+            {
+              "id": "79564b93-22a5-434c-919e-8a27de658366",
+              "name": "body['PagPix - Extrato']",
+              "value": "={{ $json.body['PagPix - Extrato'] }}",
+              "type": "string"
+            },
+            {
+              "id": "7ec50c2c-15e6-4e14-9765-4c0b3de9c403",
+              "name": "body['PagPix - Obs']",
+              "value": "={{ $json.body['PagPix - Obs'] }}",
+              "type": "string"
+            },
+            {
+              "id": "6d0ef7f8-76a5-4a12-8925-5dcd8ea56f3a",
+              "name": "body['Pague Veloz - Sistema']",
+              "value": "={{ $json.body['Pague Veloz - Sistema'] }}",
+              "type": "string"
+            },
+            {
+              "id": "72c2ae66-1010-4261-9f29-0716c915b75f",
+              "name": "body['Pague Veloz - Extrato']",
+              "value": "={{ $json.body['Pague Veloz - Extrato'] }}",
+              "type": "string"
+            },
+            {
+              "id": "c061556e-ac4f-4e90-a067-d0f228b5f21b",
+              "name": "body['Pague Veloz - Obs']",
+              "value": "={{ $json.body['Pague Veloz - Obs'] }}",
+              "type": "string"
+            },
+            {
+              "id": "8a849251-31cc-418e-adbe-4f6e098614ef",
+              "name": "body['Safra - Sistema']",
+              "value": "={{ $json.body['Safra - Sistema'] }}",
+              "type": "string"
+            },
+            {
+              "id": "94a39771-b40e-4def-8a8a-2f5117580efc",
+              "name": "body['Safra - Extrato']",
+              "value": "={{ $json.body['Safra - Extrato'] }}",
+              "type": "string"
+            },
+            {
+              "id": "050165b9-cb6f-469c-be52-02a066f3d49b",
+              "name": "body['Safra - Obs']",
+              "value": "={{ $json.body['Safra - Obs'] }}",
+              "type": "string"
+            },
+            {
+              "id": "c1d86a07-782f-4fb1-8f52-ecbbd979a901",
+              "name": "body['Santander - Sistema']",
+              "value": "={{ $json.body['Santander - Sistema'] }}",
+              "type": "string"
+            },
+            {
+              "id": "f0560c2a-8e57-45f5-91a6-88068b4f4766",
+              "name": "body['Santander - Extrato']",
+              "value": "={{ $json.body['Santander - Extrato'] }}",
+              "type": "string"
+            },
+            {
+              "id": "ac1a1341-8dc4-4f07-868c-9a05b9acfec6",
+              "name": "body['Santander - Obs']",
+              "value": "={{ $json.body['Santander - Obs'] }}",
+              "type": "string"
+            },
+            {
+              "id": "224ab883-d7ea-448d-ad05-96c049cc0c62",
+              "name": "body['Sicoob - Sistema']",
+              "value": "={{ $json.body['Sicoob - Sistema'] }}",
+              "type": "string"
+            },
+            {
+              "id": "dc90b63a-1ae0-4f56-a8e9-697a8ed09611",
+              "name": "body['Sicoob - Extrato']",
+              "value": "={{ $json.body['Sicoob - Extrato'] }}",
+              "type": "string"
+            },
+            {
+              "id": "249dfcf8-d64e-43b4-aee4-d6115e9c9dbc",
+              "name": "body['Sicoob - Obs']",
+              "value": "={{ $json.body['Sicoob - Obs'] }}",
+              "type": "string"
+            },
+            {
+              "id": "87c7f684-590f-4bea-a24c-f318555e1b9c",
+              "name": "body['Stone - Sistema']",
+              "value": "={{ $json.body['Stone - Sistema'] }}",
+              "type": "string"
+            },
+            {
+              "id": "a4e623a8-aae9-43c1-8181-c5e36cde8e2e",
+              "name": "body['Stone - Extrato']",
+              "value": "={{ $json.body['Stone - Extrato'] }}",
+              "type": "string"
+            },
+            {
+              "id": "a31e281d-3379-469f-9059-949e13206115",
+              "name": "body['Stone - Obs']",
+              "value": "={{ $json.body['Stone - Obs'] }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        -608,
+        -304
+      ],
+      "id": "07ed4722-00a9-4b7c-8ca7-b440dbefa458",
+      "name": "Edit Fields"
+    },
+    {
+      "parameters": {
+        "rules": {
+          "values": [
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 3
+                },
+                "conditions": [
+                  {
+                    "leftValue": "={{ $json.body.alerta }}",
+                    "rightValue": "Enviado",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    },
+                    "id": "79db853c-a003-4850-83e3-d647f49a4b70"
+                  }
+                ],
+                "combinator": "and"
+              }
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 3
+                },
+                "conditions": [
+                  {
+                    "id": "d41062f7-75a4-4576-b38a-ed8520c4add1",
+                    "leftValue": "={{ $json.body.alerta }}",
+                    "rightValue": "Reprovado",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              }
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 3
+                },
+                "conditions": [
+                  {
+                    "id": "0601a387-5411-42b4-a715-9b95dade6d47",
+                    "leftValue": "={{ $json.body.alerta }}",
+                    "rightValue": "Aprovado",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals",
+                      "name": "filter.operator.equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              }
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 3.4,
+      "position": [
+        -64,
+        -16
+      ],
+      "id": "1affa44f-bf90-423c-83ac-23eada181acf",
+      "name": "Switch"
+    },
+    {
+      "parameters": {
+        "jsCode": "return items.map(item => {\n  const body = item.json.body || {};\n\n  const numeroOriginal = body.contato || \"\";\n  const numeroLimpo = numeroOriginal.replace(/[^0-9]/g, \"\");\n\n  const dataOriginal = body.Data || \"\"; // YYYY-MM-DD\n  let dataFormatada = \"\";\n\n  if (dataOriginal) {\n    const [ano, mes, dia] = dataOriginal.split(\"-\");\n    dataFormatada = `${dia}-${mes}-${ano}`;\n  }\n\n  return {\n    json: {\n      ...item.json,\n      body: {\n        ...body,\n        telefoneFormatado: numeroLimpo,\n        Data: dataFormatada\n      }\n    }\n  };\n});\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        624,
+        -256
+      ],
+      "id": "9c893987-fe13-41a6-9175-8a57454500ef",
+      "name": "limpa)numero"
+    },
+    {
+      "parameters": {
+        "jsCode": "return items.map(item => {\n  const body = item.json.body || {};\n\n  const numeroOriginal = body.contato || \"\";\n  const numeroLimpo = numeroOriginal.replace(/[^0-9]/g, \"\");\n\n  const dataOriginal = body.Data || \"\"; // YYYY-MM-DD\n  let dataFormatada = \"\";\n\n  if (dataOriginal) {\n    const [ano, mes, dia] = dataOriginal.split(\"-\");\n    dataFormatada = `${dia}-${mes}-${ano}`;\n  }\n\n  return {\n    json: {\n      ...item.json,\n      body: {\n        ...body,\n        telefoneFormatado: numeroLimpo,\n        Data: dataFormatada\n      }\n    }\n  };\n});\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        624,
+        -48
+      ],
+      "id": "3521669a-b02a-4519-978e-d0bfe83b9086",
+      "name": "limpa)numero1"
+    },
+    {
+      "parameters": {
+        "jsCode": "return items.map(item => {\n  const body = item.json.body || {};\n\n  const numeroOriginal = body.contato || \"\";\n  const numeroLimpo = numeroOriginal.replace(/[^0-9]/g, \"\");\n\n  const dataOriginal = body.Data || \"\"; // YYYY-MM-DD\n  let dataFormatada = \"\";\n\n  if (dataOriginal) {\n    const [ano, mes, dia] = dataOriginal.split(\"-\");\n    dataFormatada = `${dia}-${mes}-${ano}`;\n  }\n\n  return {\n    json: {\n      ...item.json,\n      body: {\n        ...body,\n        telefoneFormatado: numeroLimpo,\n        Data: dataFormatada\n      }\n    }\n  };\n});\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        576,
+        176
+      ],
+      "id": "ad591e7c-ed62-471d-a564-fff7bdb05905",
+      "name": "limpa)numero2"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "eeae5c07-0073-49c8-b264-4e7159d725be",
+              "leftValue": "={{ $json.body['Comentário'] }}",
+              "rightValue": "",
+              "operator": {
+                "type": "string",
+                "operation": "empty",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        144,
+        144
+      ],
+      "id": "c824ee0b-2274-4af1-8aab-5d928a5b6f5f",
+      "name": "If"
+    },
+    {
+      "parameters": {
+        "phone": "={{ $json.body.Contato }}",
+        "text": "={{ $json.body['Responsável'] }},\n\nO painel referente a data *{{ $json.body.Data }}* foi *{{ $json.body.alerta }}* com sucesso.",
+        "additionalFields": {}
+      },
+      "type": "n8n-nodes-zapi.zapi",
+      "typeVersion": 1,
+      "position": [
+        912,
+        -336
+      ],
+      "id": "11254b6c-44f8-49f4-9510-61456c4537dc",
+      "name": "Enviado",
+      "credentials": {
+        "zapiApi": {
+          "id": "cGI15AvSkFAV8Qrr",
+          "name": "Z-API account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "phone": "={{ $json.body.Contato }}",
+        "text": "={{ $json.body['Responsável'] }},\n\nO painel referente a data *{{ $json.body.Data }}* foi *{{ $json.body.alerta }}*, pois não cumpriu os requisitos necessários do processo.\n\n{{ $json.body['Comentário'] }}",
+        "additionalFields": {}
+      },
+      "type": "n8n-nodes-zapi.zapi",
+      "typeVersion": 1,
+      "position": [
+        864,
+        32
+      ],
+      "id": "924f5178-76e3-425c-8b4b-93f88e519a73",
+      "name": "Rejeitado",
+      "credentials": {
+        "zapiApi": {
+          "id": "cGI15AvSkFAV8Qrr",
+          "name": "Z-API account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "phone": "={{ $json.body.Contato }}",
+        "text": "={{ $json.body['Responsável'] }},\n\nO painel referente a data *{{ $json.body.Data }}* foi analizado e *{{ $json.body.alerta }}* com sucesso. Muito obrigado pelo envio dos anexos e o preenchimento correto dos campos.\n\nObs.: {{ $json.body['Comentário'] }}",
+        "additionalFields": {}
+      },
+      "type": "n8n-nodes-zapi.zapi",
+      "typeVersion": 1,
+      "position": [
+        816,
+        256
+      ],
+      "id": "0b23916f-1903-40c2-bdc0-6e08345adb86",
+      "name": "Aprovado",
+      "credentials": {
+        "zapiApi": {
+          "id": "cGI15AvSkFAV8Qrr",
+          "name": "Z-API account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "5650e35c-251c-4dac-ab78-793e3f6ba7eb",
+              "name": "body.alerta",
+              "value": "={{ $json.body.alerta }}",
+              "type": "string"
+            },
+            {
+              "id": "34466ae9-22a5-462b-9840-59798b4f5c10",
+              "name": "body.Contato",
+              "value": "={{ $json.body.Contato }}",
+              "type": "string"
+            },
+            {
+              "id": "3e92579f-4230-4ea2-ad16-2f6124489711",
+              "name": "body.Responsável",
+              "value": "={{ $json.body['Responsável'] }}",
+              "type": "string"
+            },
+            {
+              "id": "f2fe0bc3-e75b-4317-884d-30be9be0a86c",
+              "name": "body.Data",
+              "value": "={{ $json.body.Data }}",
+              "type": "string"
+            },
+            {
+              "id": "9bc027cb-ed14-4a5a-a0c3-c7f470705ee0",
+              "name": "body.Comentário",
+              "value": "=Nenhuma",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        352,
+        80
+      ],
+      "id": "ac531697-d6c1-4354-8dba-04de561cbc9a",
+      "name": "Nenhuma"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "5650e35c-251c-4dac-ab78-793e3f6ba7eb",
+              "name": "body.alerta",
+              "value": "={{ $json.body.alerta }}",
+              "type": "string"
+            },
+            {
+              "id": "34466ae9-22a5-462b-9840-59798b4f5c10",
+              "name": "body.Contato",
+              "value": "={{ $json.body.Contato }}",
+              "type": "string"
+            },
+            {
+              "id": "3e92579f-4230-4ea2-ad16-2f6124489711",
+              "name": "body.Responsável",
+              "value": "={{ $json.body['Responsável'] }}",
+              "type": "string"
+            },
+            {
+              "id": "f2fe0bc3-e75b-4317-884d-30be9be0a86c",
+              "name": "body.Data",
+              "value": "={{ $json.body.Data }}",
+              "type": "string"
+            },
+            {
+              "id": "9bc027cb-ed14-4a5a-a0c3-c7f470705ee0",
+              "name": "body.Comentário",
+              "value": "={{ $json.body['Comentário'] }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        352,
+        256
+      ],
+      "id": "d6a8b07a-c16d-495d-a5e9-779ee457f5c6",
+      "name": "Comentário"
+    },
+    {
+      "parameters": {
+        "operation": "xlsx",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.convertToFile",
+      "typeVersion": 1.1,
+      "position": [
+        -368,
+        240
+      ],
+      "id": "9cb38404-9db7-4747-b33c-5ead84f53344",
+      "name": "Convert to File"
+    },
+    {
+      "parameters": {
+        "operation": "append",
+        "documentId": {
+          "__rl": true,
+          "value": "https://docs.google.com/spreadsheets/d/1To6KAN97cS1WJQ0L43jtePDBBDztO0xK1CVmNOG-5wQ/edit?usp=sharing",
+          "mode": "url"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "Página1",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1To6KAN97cS1WJQ0L43jtePDBBDztO0xK1CVmNOG-5wQ/edit#gid=0"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "Tipo Unidade": "={{ $json.body['Tipo Unidade'] }}",
+            "Unidade": "={{ $json.body.Unidade }}",
+            "Responsável": "={{ $json.body['Responsável'] }}",
+            "Contato": "={{ $json.body.Contato.replace(/\\D/g, '') }}",
+            "Data": "={{ $json.body.Data.split('T')[0].split('-').reverse().join('/') }}",
+            "Dinheiro Sistema": "={{ $json.body['Dinheiro Sistema'] }}",
+            "Dinheiro Real": "={{ $json.body['Dinheiro Real'] }}",
+            "Dinheiro Obs": "={{ $json.body['Dinheiro Obs'] }}",
+            "Banco do Brasil 159-7 - Sistema": "={{ $json.body['Banco do Brasil 159-7 - Sistema'] }}",
+            "Banco do Brasil 159-7 - Extrato": "={{ $json.body['Banco do Brasil 159-7 - Extrato'] }}",
+            "Banco do Brasil 159-7 - Obs": "={{ $json.body['Banco do Brasil 159-7 - Obs'] }}",
+            "Banco do Brasil 8074-8 - Sistema": "={{ $json.body['Banco do Brasil 8074-8 - Sistema'] }}",
+            "Banco do Brasil 8074-8 - Extrato": "={{ $json.body['Banco do Brasil 8074-8 - Extrato'] }}",
+            "Banco do Brasil 8074-8 - Obs": "={{ $json.body['Banco do Brasil 8074-8 - Obs'] }}",
+            "Banco do Brasil 8575-8 - Sistema": "={{ $json.body['Banco do Brasil 8575-8 - Sistema'] }}",
+            "Banco do Brasil 8575-8 - Extrato": "={{ $json.body['Banco do Brasil 8575-8 - Extrato'] }}",
+            "Banco do Brasil 8575-8 - Obs": "={{ $json.body['Banco do Brasil 8575-8 - Obs'] }}",
+            "Banco do Brasil 714-5 - Sistema": "={{ $json.body['Banco do Brasil 714-5 - Sistema'] }}",
+            "Banco do Brasil 714-5 - Extrato": "={{ $json.body['Banco do Brasil 714-5 - Extrato'] }}",
+            "Banco do Brasil 714-5 - Obs": "={{ $json.body['Banco do Brasil 714-5 - Obs'] }}",
+            "Bradesco - Sistema": "={{ $json.body['Bradesco - Sistema'] }}",
+            "Bradesco - Extrato": "={{ $json.body['Bradesco - Extrato'] }}",
+            "Bradesco - Obs": "={{ $json.body['Bradesco - Obs'] }}",
+            "BRB - Sistema": "={{ $json.body['BRB - Sistema'] }}",
+            "BRB - Extrato": "={{ $json.body['BRB - Extrato'] }}",
+            "BRB - Obs": "={{ $json.body['BRB - Obs'] }}",
+            "BS2 - Sistema": "={{ $json.body['BS2 - Sistema'] }}",
+            "BS2 - Extrato": "={{ $json.body['BS2 - Extrato'] }}",
+            "BS2 - Obs": "={{ $json.body['BS2 - Obs'] }}",
+            "BTG - Sistema": "={{ $json.body['BTG - Sistema'] }}",
+            "BTG - Extrato": "={{ $json.body['BTG - Extrato'] }}",
+            "BTG - Obs": "={{ $json.body['BTG - Obs'] }}",
+            "BTG Alumiaço - Sistema": "={{ $json.body['BTG Alumiaço - Sistema'] }}",
+            "BTG Alumiaço - Extrato": "={{ $json.body['BTG Alumiaço - Extrato'] }}",
+            "BTG Alumiaço - Obs": "={{ $json.body['BTG Alumiaço - Obs'] }}",
+            "Caixa 2399 - Sistema": "={{ $json.body['Caixa 2399 - Sistema'] }}",
+            "Caixa 2399 - Extrato": "={{ $json.body['Caixa 2399 - Extrato'] }}",
+            "Caixa 2399 - Obs": "={{ $json.body['Caixa 2399 - Obs'] }}",
+            "Caixa 4253 - Sistema": "={{ $json.body['Caixa 4253 - Sistema'] }}",
+            "Caixa 4253 - Extrato": "={{ $json.body['Caixa 4253 - Extrato'] }}",
+            "Caixa 4253 - Obs": "={{ $json.body['Caixa 4253 - Obs'] }}",
+            "Caixa 2991 - Sistema": "={{ $json.body['Caixa 2991 - Sistema'] }}",
+            "Caixa 2991 - Extrato": "={{ $json.body['Caixa 2991 - Extrato'] }}",
+            "Caixa 2991 - Obs": "={{ $json.body['Caixa 2991 - Obs'] }}",
+            "Caixa 1020 - Sistema": "={{ $json.body['Caixa 1020 - Sistema'] }}",
+            "Caixa 1020 - Extrato": "={{ $json.body['Caixa 1020 - Extrato'] }}",
+            "Caixa 1020 - Obs": "={{ $json.body['Caixa 1020 - Obs'] }}",
+            "Flash - Sistema": "={{ $json.body['Flash - Sistema'] }}",
+            "Flash - Extrato": "={{ $json.body['Flash - Extrato'] }}",
+            "Flash - Obs": "={{ $json.body['Flash - Obs'] }}",
+            "Inter - Sistema": "={{ $json.body['Inter - Sistema'] }}",
+            "Inter - Extrato": "={{ $json.body['Inter - Extrato'] }}",
+            "Inter - Obs": "={{ $json.body['Inter - Obs'] }}",
+            "Itaú - Sistema": "={{ $json.body['Itaú - Sistema'] }}",
+            "Itaú - Extrato": "={{ $json.body['Itaú - Extrato'] }}",
+            "Itaú - Obs": "={{ $json.body['Itaú - Obs'] }}",
+            "PagPix - Sistema": "={{ $json.body['PagPix - Sistema'] }}",
+            "PagPix - Extrato": "={{ $json.body['PagPix - Extrato'] }}",
+            "PagPix - Obs": "={{ $json.body['PagPix - Obs'] }}",
+            "Pague Veloz - Sistema": "={{ $json.body['Pague Veloz - Sistema'] }}",
+            "Pague Veloz - Extrato": "={{ $json.body['PagPix - Extrato'] }}",
+            "Pague Veloz - Obs": "={{ $json.body['PagPix - Obs'] }}",
+            "Safra - Sistema": "={{ $json.body['Safra - Sistema'] }}",
+            "Safra - Extrato": "={{ $json.body['Safra - Extrato'] }}",
+            "Safra - Obs": "={{ $json.body['Safra - Obs'] }}",
+            "Santander - Sistema": "={{ $json.body['Santander - Sistema'] }}",
+            "Santander - Extrato": "={{ $json.body['Santander - Extrato'] }}",
+            "Santander - Obs": "={{ $json.body['Santander - Obs'] }}",
+            "Sicoob - Sistema": "={{ $json.body['Sicoob - Sistema'] }}",
+            "Sicoob - Extrato": "={{ $json.body['Sicoob - Extrato'] }}",
+            "Sicoob - Obs": "={{ $json.body['Sicoob - Obs'] }}",
+            "Stone - Sistema": "={{ $json.body['Stone - Sistema'] }}",
+            "Stone - Extrato": "={{ $json.body['Stone - Extrato'] }}",
+            "Stone - Obs": "={{ $json.body['Stone - Obs'] }}"
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "Tipo Unidade",
+              "displayName": "Tipo Unidade",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Unidade",
+              "displayName": "Unidade",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Responsável",
+              "displayName": "Responsável",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Contato",
+              "displayName": "Contato",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Data",
+              "displayName": "Data",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Dinheiro Sistema",
+              "displayName": "Dinheiro Sistema",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Dinheiro Real",
+              "displayName": "Dinheiro Real",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Dinheiro Obs",
+              "displayName": "Dinheiro Obs",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Banco do Brasil 159-7 - Sistema",
+              "displayName": "Banco do Brasil 159-7 - Sistema",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Banco do Brasil 159-7 - Extrato",
+              "displayName": "Banco do Brasil 159-7 - Extrato",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Banco do Brasil 159-7 - Obs",
+              "displayName": "Banco do Brasil 159-7 - Obs",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Banco do Brasil 8074-8 - Sistema",
+              "displayName": "Banco do Brasil 8074-8 - Sistema",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Banco do Brasil 8074-8 - Extrato",
+              "displayName": "Banco do Brasil 8074-8 - Extrato",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Banco do Brasil 8074-8 - Obs",
+              "displayName": "Banco do Brasil 8074-8 - Obs",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Banco do Brasil 8575-8 - Sistema",
+              "displayName": "Banco do Brasil 8575-8 - Sistema",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Banco do Brasil 8575-8 - Extrato",
+              "displayName": "Banco do Brasil 8575-8 - Extrato",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Banco do Brasil 8575-8 - Obs",
+              "displayName": "Banco do Brasil 8575-8 - Obs",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Banco do Brasil 714-5 - Sistema",
+              "displayName": "Banco do Brasil 714-5 - Sistema",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Banco do Brasil 714-5 - Extrato",
+              "displayName": "Banco do Brasil 714-5 - Extrato",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Banco do Brasil 714-5 - Obs",
+              "displayName": "Banco do Brasil 714-5 - Obs",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Bradesco - Sistema",
+              "displayName": "Bradesco - Sistema",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Bradesco - Extrato",
+              "displayName": "Bradesco - Extrato",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Bradesco - Obs",
+              "displayName": "Bradesco - Obs",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "BRB - Sistema",
+              "displayName": "BRB - Sistema",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "BRB - Extrato",
+              "displayName": "BRB - Extrato",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "BRB - Obs",
+              "displayName": "BRB - Obs",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "BS2 - Sistema",
+              "displayName": "BS2 - Sistema",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "BS2 - Extrato",
+              "displayName": "BS2 - Extrato",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "BS2 - Obs",
+              "displayName": "BS2 - Obs",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "BTG - Sistema",
+              "displayName": "BTG - Sistema",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "BTG - Extrato",
+              "displayName": "BTG - Extrato",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "BTG - Obs",
+              "displayName": "BTG - Obs",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "BTG Alumiaço - Sistema",
+              "displayName": "BTG Alumiaço - Sistema",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "BTG Alumiaço - Extrato",
+              "displayName": "BTG Alumiaço - Extrato",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "BTG Alumiaço - Obs",
+              "displayName": "BTG Alumiaço - Obs",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Caixa 2399 - Sistema",
+              "displayName": "Caixa 2399 - Sistema",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Caixa 2399 - Extrato",
+              "displayName": "Caixa 2399 - Extrato",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Caixa 2399 - Obs",
+              "displayName": "Caixa 2399 - Obs",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Caixa 4253 - Sistema",
+              "displayName": "Caixa 4253 - Sistema",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Caixa 4253 - Extrato",
+              "displayName": "Caixa 4253 - Extrato",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Caixa 4253 - Obs",
+              "displayName": "Caixa 4253 - Obs",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Caixa 2991 - Sistema",
+              "displayName": "Caixa 2991 - Sistema",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Caixa 2991 - Extrato",
+              "displayName": "Caixa 2991 - Extrato",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Caixa 2991 - Obs",
+              "displayName": "Caixa 2991 - Obs",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Caixa 1020 - Sistema",
+              "displayName": "Caixa 1020 - Sistema",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Caixa 1020 - Extrato",
+              "displayName": "Caixa 1020 - Extrato",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Caixa 1020 - Obs",
+              "displayName": "Caixa 1020 - Obs",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Flash - Sistema",
+              "displayName": "Flash - Sistema",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Flash - Extrato",
+              "displayName": "Flash - Extrato",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Flash - Obs",
+              "displayName": "Flash - Obs",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Inter - Sistema",
+              "displayName": "Inter - Sistema",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Inter - Extrato",
+              "displayName": "Inter - Extrato",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Inter - Obs",
+              "displayName": "Inter - Obs",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Itaú - Sistema",
+              "displayName": "Itaú - Sistema",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Itaú - Extrato",
+              "displayName": "Itaú - Extrato",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Itaú - Obs",
+              "displayName": "Itaú - Obs",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "PagPix - Sistema",
+              "displayName": "PagPix - Sistema",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "PagPix - Extrato",
+              "displayName": "PagPix - Extrato",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "PagPix - Obs",
+              "displayName": "PagPix - Obs",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Pague Veloz - Sistema",
+              "displayName": "Pague Veloz - Sistema",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Pague Veloz - Extrato",
+              "displayName": "Pague Veloz - Extrato",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Pague Veloz - Obs",
+              "displayName": "Pague Veloz - Obs",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Safra - Sistema",
+              "displayName": "Safra - Sistema",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Safra - Extrato",
+              "displayName": "Safra - Extrato",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Safra - Obs",
+              "displayName": "Safra - Obs",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Santander - Sistema",
+              "displayName": "Santander - Sistema",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Santander - Extrato",
+              "displayName": "Santander - Extrato",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Santander - Obs",
+              "displayName": "Santander - Obs",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Sicoob - Sistema",
+              "displayName": "Sicoob - Sistema",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Sicoob - Extrato",
+              "displayName": "Sicoob - Extrato",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Sicoob - Obs",
+              "displayName": "Sicoob - Obs",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Stone - Sistema",
+              "displayName": "Stone - Sistema",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Stone - Extrato",
+              "displayName": "Stone - Extrato",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Stone - Obs",
+              "displayName": "Stone - Obs",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "id": "777f3bc2-f3ce-4217-93f8-90be262f8c40",
+      "name": "Google Sheets1",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.3,
+      "position": [
+        -288,
+        -272
+      ],
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "HfbTEVMQHA5O66Ya",
+          "name": "Sheets JG e Japa"
+        }
+      },
+      "onError": "continueRegularOutput"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Webhook": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Edit Fields": {
+      "main": [
+        [
+          {
+            "node": "Google Sheets1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Switch": {
+      "main": [
+        [
+          {
+            "node": "limpa)numero",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "limpa)numero1",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "If",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "limpa)numero": {
+      "main": [
+        [
+          {
+            "node": "Enviado",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "limpa)numero1": {
+      "main": [
+        [
+          {
+            "node": "Rejeitado",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "limpa)numero2": {
+      "main": [
+        [
+          {
+            "node": "Aprovado",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If": {
+      "main": [
+        [
+          {
+            "node": "Nenhuma",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Comentário",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Nenhuma": {
+      "main": [
+        [
+          {
+            "node": "limpa)numero2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Comentário": {
+      "main": [
+        [
+          {
+            "node": "limpa)numero2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": true,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "dc864df3-bd9e-4a4a-8d86-49044d3262f8",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "{{INSTANCE_ID}}"
+  },
+  "id": "Ta68sbNTskVdjhyj",
+  "tags": [
+    {
+      "updatedAt": "2026-01-14T11:04:00.895Z",
+      "createdAt": "2025-03-21T11:47:30.374Z",
+      "id": "CvCy3KNJKyMxSQ3C",
+      "name": "GDA"
+    },
+    {
+      "updatedAt": "2025-03-21T11:52:03.821Z",
+      "createdAt": "2025-03-21T11:52:03.821Z",
+      "id": "ro9IiNWQxt6VLDLj",
+      "name": "Setor - Controladoria"
+    },
+    {
+      "updatedAt": "2025-03-21T11:52:03.823Z",
+      "createdAt": "2025-03-21T11:52:03.823Z",
+      "id": "VQmA23kx6h1wy92X",
+      "name": "GUIS"
+    }
+  ]
+}

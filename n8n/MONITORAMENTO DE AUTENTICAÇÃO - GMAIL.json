@@ -1,0 +1,173 @@
+{
+  "name": "MONITORAMENTO DE AUTENTICAÇÃO - GMAIL",
+  "nodes": [
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {}
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.2,
+      "position": [
+        -400,
+        112
+      ],
+      "id": "3cfef8c8-5875-4200-b0f4-b9f0cc956659",
+      "name": "Schedule Trigger"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.z-api.io/instances/3AD47F49CE9AF04B4D43CA225862B38B/token/6EE2B07CF6D61B0059AD2125/send-text",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Client-Token",
+              "value": "Fb834c77bdcad40999dcb28212a96a9a0S"
+            }
+          ]
+        },
+        "sendBody": true,
+        "contentType": "form-urlencoded",
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "phone",
+              "value": "5581996730645"
+            },
+            {
+              "name": "message",
+              "value": "*ALERTA GRAVE N8N*\n\n*ERRO NA AUTENTICAÇÃO DO GMAIL:*\nFINCORPGM1@GMAIL.COM\n\nCONFERIR URGENTEMENTE!!!!"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "ca46cd91-dcb9-43eb-bf70-54bc15ed36f6",
+      "name": "Detalhamento",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.1,
+      "position": [
+        192,
+        144
+      ]
+    },
+    {
+      "parameters": {
+        "operation": "getAll",
+        "limit": 1,
+        "simple": false,
+        "filters": {},
+        "options": {}
+      },
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.1,
+      "position": [
+        -112,
+        128
+      ],
+      "id": "cbc849be-d813-4e03-bcb4-89f5530accba",
+      "name": "Get many messages",
+      "webhookId": "{{WEBHOOK_ID}}",
+      "notesInFlow": false,
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "H1rV9pJz76P8yHF7",
+          "name": "Gmail account"
+        }
+      },
+      "onError": "continueErrorOutput"
+    },
+    {
+      "parameters": {
+        "authentication": "tickTickOAuth2Api",
+        "projectId": "692742c6ebbf5a0000000aec",
+        "title": "CONECTAR GMAIL - n8n",
+        "additionalFields": {
+          "isAllDay": true,
+          "priority": 5,
+          "startDate": "={{ $today }}"
+        }
+      },
+      "type": "n8n-nodes-ticktick.tickTick",
+      "typeVersion": 1,
+      "position": [
+        480,
+        144
+      ],
+      "id": "1da03d16-f8fc-4eeb-886b-beb7c4eec191",
+      "name": "Create a task",
+      "credentials": {
+        "tickTickOAuth2Api": {
+          "id": "0sZtfhQnHsUy1RXu",
+          "name": "TickTick account"
+        }
+      }
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Schedule Trigger": {
+      "main": [
+        [
+          {
+            "node": "Get many messages",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get many messages": {
+      "main": [
+        [],
+        [
+          {
+            "node": "Detalhamento",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Detalhamento": {
+      "main": [
+        [
+          {
+            "node": "Create a task",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "308bada0-f31d-4660-aeec-0709bba617ac",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "{{INSTANCE_ID}}"
+  },
+  "id": "q7l8TBMo7NLMl7Tl",
+  "tags": [
+    {
+      "updatedAt": "2025-03-21T11:52:03.823Z",
+      "createdAt": "2025-03-21T11:52:03.823Z",
+      "id": "VQmA23kx6h1wy92X",
+      "name": "GUIS"
+    },
+    {
+      "updatedAt": "2025-11-26T12:35:03.400Z",
+      "createdAt": "2025-11-26T12:35:03.400Z",
+      "id": "K5I1ygKf1UlaIarm",
+      "name": "AUTENTICAÇÃO"
+    }
+  ]
+}

@@ -1,0 +1,1617 @@
+{
+  "name": "Script Auditoria Padronizado",
+  "nodes": [
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {}
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.2,
+      "position": [
+        -960,
+        -16
+      ],
+      "id": "9afe389d-44bd-4317-8dd5-b20c293a2b7a",
+      "name": "Schedule Trigger"
+    },
+    {
+      "parameters": {
+        "documentId": {
+          "__rl": true,
+          "mode": "list",
+          "value": ""
+        },
+        "sheetName": {
+          "__rl": true,
+          "mode": "list",
+          "value": ""
+        }
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.5,
+      "position": [
+        -320,
+        -736
+      ],
+      "id": "2aaf4a52-126a-47c1-8b76-2724bbb38631",
+      "name": "Painel Financeiro",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "8Ytd3zZKAOSyZNqC",
+          "name": "Sheets Andre"
+        }
+      },
+      "disabled": true
+    },
+    {
+      "parameters": {
+        "documentId": {
+          "__rl": true,
+          "mode": "list",
+          "value": ""
+        },
+        "sheetName": {
+          "__rl": true,
+          "mode": "list",
+          "value": ""
+        }
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.5,
+      "position": [
+        -320,
+        -528
+      ],
+      "id": "07b2f4c2-ef2f-4f4a-8d95-c2006d8625b8",
+      "name": "Estoque",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "8Ytd3zZKAOSyZNqC",
+          "name": "Sheets Andre"
+        }
+      },
+      "disabled": true
+    },
+    {
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "-- Despesas bodinhos\nSELECT \n    mf.tipo_unidade,\n    mf.unidade,\n    mf.tipo_de_lancamento,\n    TO_CHAR(TO_DATE(mf.data_pagamento, 'YYYY/MM/DD'), 'YYYY-MM-DD') AS data_pagamento, -- Retorna apenas a data sem hora\n    mf.plano_conta,\n    mf.nome_conta,\n    mf.centro_custo,\n    mf.classificacao,\n    mf.descricao,\n    mf.vlr_pago\nFROM  \n    movimentacoes_financeiras mf \nWHERE \n  \tmf.unidade = '{{ $json[\"unidade\"] }}'\nand TO_DATE(mf.data_pagamento, 'YYYY/MM/DD') >= CURRENT_DATE - INTERVAL '90 days'\n    AND mf.tipo_de_lancamento = 'Saida'\nORDER BY \n    mf.unidade;",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 2.6,
+      "position": [
+        -320,
+        -320
+      ],
+      "id": "4392d819-6a63-4120-8213-2eebd629e46f",
+      "name": "Auditoria Despesa",
+      "credentials": {
+        "postgres": {
+          "id": "G50fA6A0L90xaBIe",
+          "name": "Postgres account"
+        }
+      },
+      "disabled": true
+    },
+    {
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "=-- devolucao de saldo\nSELECT \n  \tmf.unidade,\n\tmf.tipo_unidade,\n\tmf.id,\n\tmf.chave,\n\tmf.vlr_pago,\n\tmf.descricao,\n\tmf.nome_conta,\n\tmf.classificacao,\n\tTO_CHAR(TO_DATE(mf.data_pagamento, 'YYYY/MM/DD'), 'YYYY-MM-DD') AS data_pagamento_formatada\nFROM movimentacoes_financeiras mf\nWHERE \n\tmf.unidade = '{{ $json[\"unidade\"] }}'\n\tAND TO_DATE(mf.data_pagamento, 'YYYY/MM/DD') >= CURRENT_DATE - INTERVAL '90 days'\n\tAND mf.classificacao ILIKE '%SALDO%'\nORDER BY mf.unidade;\n",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 2.6,
+      "position": [
+        -320,
+        -128
+      ],
+      "id": "6bb4a981-12ec-40fe-bbd0-cfc8cf6ee995",
+      "name": "Devolução de Saldo",
+      "credentials": {
+        "postgres": {
+          "id": "G50fA6A0L90xaBIe",
+          "name": "Postgres account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "-- devolução de pedidos (filtrado e com flags)\nSELECT\n  tipo_unidade,\n  unidade,\n  nome_cliente,\n  cod_pedido,\n  coes,\n  TO_CHAR(data_pedido::date, 'YYYY-MM-DD') AS data_pedido,\n  TO_CHAR(data_devolucao::date, 'YYYY-MM-DD') AS data_devolucao,\n  classe_produto,\n  sub_classe_produto,\n  categoria_produto,\n  custo_devolvido,\n  lucrodevolvido,\n  faturamento_devolvido,\n  qtd_devolvida,\n  -- métricas/flags:\n  (data_devolucao::date - data_pedido::date) AS dias_entre_pedido_devolucao,\n  (UPPER(categoria_produto) LIKE '%TEMPERADO%') AS eh_temperado,\n  ((data_devolucao::date - data_pedido::date) > 30) AS devolucao_maior_30\nFROM dre_devolucoes dd\nWHERE\n  unidade = '{{ $json[\"unidade\"] }}'\n  AND data_devolucao::date >= CURRENT_DATE - INTERVAL '90 days'\n  AND (\n    UPPER(categoria_produto) LIKE '%TEMPERADO%'\n    OR (data_devolucao::date - data_pedido::date) > 30\n  );\n",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 2.6,
+      "position": [
+        -320,
+        112
+      ],
+      "id": "8b1816ee-8bbb-44ab-b9ff-5c0674705964",
+      "name": "Devolução de Pedido",
+      "credentials": {
+        "postgres": {
+          "id": "G50fA6A0L90xaBIe",
+          "name": "Postgres account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "-- total_pendente por cliente (sem duplicidade de pedidos)\nWITH pedidos_consolidados AS (\n    SELECT \n        p.tipo_unidade,\n        p.unidade,\n        p.cod_cliente,\n        p.nome_cliente,\n        p.data_pedido,\n        p.cod_pedido,\n        p.coes,\n        p.nome_produto,\n        p.categoria_produto,\n        TO_CHAR(eg.data_hora_entregue::date, 'YYYY-MM-DD') AS data_entrega,\n        eg.cod_romaneio,\n        spp.totalpendente AS total_pendente\n    FROM \n        pedidos p\n    LEFT JOIN \n        status_pagamento_pedidos spp \n        ON p.cod_pedido = spp.cod_pedido AND p.unidade = spp.unidade\n    LEFT JOIN \n        entregas_geral eg \n        ON p.cod_pedido = eg.cod_pedido AND p.unidade = eg.unidade\n    WHERE \n        spp.totalpendente != 0\n        AND p.unidade = '{{ $json[\"unidade\"] }}'\n        and eg.data_hora_entregue is not null\n)\nSELECT DISTINCT ON (cod_pedido)\n    pc.tipo_unidade,\n    pc.unidade,\n    pc.cod_cliente,\n    pc.nome_cliente,\n    pc.data_entrega,\n    pc.cod_pedido,\n    total_pendente\nFROM \n    pedidos_consolidados pc\nORDER BY \n    cod_pedido, data_entrega DESC;",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 2.6,
+      "position": [
+        -320,
+        320
+      ],
+      "id": "055ee493-fb10-4173-a988-28c3c4dda456",
+      "name": "Pedidos Finalizados e Pendentes",
+      "credentials": {
+        "postgres": {
+          "id": "G50fA6A0L90xaBIe",
+          "name": "Postgres account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "-- total_pendente por cliente (sem duplicidade de pedidos)\nWITH pedidos_consolidados AS (\n    SELECT \n        p.tipo_unidade,\n        p.unidade,\n        p.cod_cliente,\n        p.nome_cliente,\n        p.data_pedido,\n        p.cod_pedido,\n        p.coes,\n        p.nome_produto,\n        p.categoria_produto,\n        TO_CHAR(eg.data_hora_entregue::date, 'YYYY-MM-DD') AS data_entrega,\n        eg.cod_romaneio,\n        spp.totalpendente AS total_pendente\n    FROM \n        pedidos p\n    LEFT JOIN \n        status_pagamento_pedidos spp \n        ON p.cod_pedido = spp.cod_pedido AND p.unidade = spp.unidade\n    LEFT JOIN \n        entregas_geral eg \n        ON p.cod_pedido = eg.cod_pedido AND p.unidade = eg.unidade\n    WHERE \n        spp.totalpendente != 0\n        AND p.unidade = '{{ $json[\"unidade\"] }}'\n        and p.categoria_produto = 'TEMPERADO'\n)\nSELECT DISTINCT ON (cod_pedido)\n    pc.tipo_unidade,\n    pc.unidade,\n    pc.cod_cliente,\n    pc.nome_cliente,\n    pc.data_entrega,\n    pc.cod_pedido,\n    total_pendente\nFROM \n    pedidos_consolidados pc\nORDER BY \n    cod_pedido, data_entrega DESC;",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 2.6,
+      "position": [
+        -320,
+        560
+      ],
+      "id": "0c7e2a9b-120d-4124-854d-7014e5e8ae42",
+      "name": "Pendencia de Pedidos Temperados",
+      "credentials": {
+        "postgres": {
+          "id": "G50fA6A0L90xaBIe",
+          "name": "Postgres account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "select ddt.tipo_unidade, ddt.unidade, ddt.descricao, ddt.data_hora_entregue, ddt.credito_debito , ddt.desconto_titulo from dre_desconto_titulo ddt  \nwhere\tddt.unidade = '{{ $json[\"unidade\"] }}'\n\tAND ddt.data_hora_entregue::date >= CURRENT_DATE - INTERVAL '90 days'\n  and ddt.desconto_titulo > '1';",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 2.6,
+      "position": [
+        -320,
+        784
+      ],
+      "id": "8e91baa5-915d-4d24-8cca-30eaa4de2807",
+      "name": "Desconto em Título",
+      "credentials": {
+        "postgres": {
+          "id": "G50fA6A0L90xaBIe",
+          "name": "Postgres account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "return items.map(item => {\n  if (item.json.vlr_pago !== null && item.json.vlr_pago !== undefined) {\n    const num = Number(item.json.vlr_pago); // garante que é número\n    item.json.vlr_pago = num.toFixed(2).replace('.', ','); // duas casas e vírgula\n  }\n  return item;\n});\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        48,
+        -320
+      ],
+      "id": "4f674829-6ea0-45fc-9cf8-da2cf55df1f4",
+      "name": "Code",
+      "disabled": true
+    },
+    {
+      "parameters": {
+        "jsCode": "return items.map(item => {\n  if (item.json.vlr_pago !== null && item.json.vlr_pago !== undefined) {\n    const num = Number(item.json.vlr_pago); // garante que é número\n    item.json.vlr_pago = num.toFixed(2).replace('.', ','); // duas casas e vírgula\n  }\n  return item;\n});\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        48,
+        -128
+      ],
+      "id": "289ab085-e868-454c-b60b-5ff8f8541593",
+      "name": "Code1"
+    },
+    {
+      "parameters": {
+        "jsCode": "return items.map(item => {\n  const colunas = [\"custo_devolvido\", \"lucrodevolvido\", \"faturamento_devolvido\"];\n\n  colunas.forEach(coluna => {\n    if (item.json[coluna] !== null && item.json[coluna] !== undefined) {\n      const num = Number(item.json[coluna]);\n      item.json[coluna] = num.toFixed(2).replace('.', ','); // 2 casas e vírgula\n    }\n  });\n\n  return item;\n});\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        48,
+        112
+      ],
+      "id": "18cf7112-390f-466c-8933-b684b297b879",
+      "name": "Code2"
+    },
+    {
+      "parameters": {
+        "jsCode": "return items.map(item => {\n  if (item.json.total_pendente !== null && item.json.total_pendente !== undefined) {\n    const num = Number(item.json.total_pendente); // garante que é número\n    item.json.total_pendente = num.toFixed(2).replace('.', ','); // duas casas e vírgula\n  }\n  return item;\n});\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        48,
+        320
+      ],
+      "id": "45f295a8-b901-4764-9c2a-fffbd6915caa",
+      "name": "Code4"
+    },
+    {
+      "parameters": {
+        "jsCode": "return items.map(item => {\n  if (item.json.total_pendente !== null && item.json.total_pendente !== undefined) {\n    const num = Number(item.json.total_pendente); // garante que é número\n    item.json.total_pendente = num.toFixed(2).replace('.', ','); // duas casas e vírgula\n  }\n  return item;\n});\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        48,
+        560
+      ],
+      "id": "f6d13722-c288-4ad5-8e74-a089f89bf9c8",
+      "name": "Code5"
+    },
+    {
+      "parameters": {
+        "jsCode": "return items.map(item => {\n  if (item.json.desconto_titulo !== null && item.json.desconto_titulo !== undefined) {\n    const num = Number(item.json.desconto_titulo); // garante que é número\n    item.json.desconto_titulo = num.toFixed(2).replace('.', ','); // duas casas e vírgula\n  }\n  return item;\n});\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        48,
+        784
+      ],
+      "id": "03f2c024-7353-4212-922d-baee188b49b8",
+      "name": "Code3"
+    },
+    {
+      "parameters": {
+        "operation": "append",
+        "documentId": {
+          "__rl": true,
+          "value": "https://docs.google.com/spreadsheets/d/11E4tAaX6JntC1ZmrpyNeNNxSbLUJA4zCEP-bQbHr7ng/edit?gid=0#gid=0",
+          "mode": "url"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 916090368,
+          "mode": "list",
+          "cachedResultName": "Temperado_Pendente",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/11E4tAaX6JntC1ZmrpyNeNNxSbLUJA4zCEP-bQbHr7ng/edit#gid=916090368"
+        },
+        "columns": {
+          "mappingMode": "autoMapInputData",
+          "value": {},
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "tipo_unidade",
+              "displayName": "tipo_unidade",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "unidade",
+              "displayName": "unidade",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "cod_cliente",
+              "displayName": "cod_cliente",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "nome_cliente",
+              "displayName": "nome_cliente",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "data_entrega",
+              "displayName": "data_entrega",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "cod_pedido",
+              "displayName": "cod_pedido",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "total_pendente",
+              "displayName": "total_pendente",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.5,
+      "position": [
+        384,
+        560
+      ],
+      "id": "f33088a8-be21-4981-bd52-0d66b33d1641",
+      "name": "Temperado_Pendente",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "8Ytd3zZKAOSyZNqC",
+          "name": "Sheets Andre"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "append",
+        "documentId": {
+          "__rl": true,
+          "value": "https://docs.google.com/spreadsheets/d/11E4tAaX6JntC1ZmrpyNeNNxSbLUJA4zCEP-bQbHr7ng/edit?gid=0#gid=0",
+          "mode": "url"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 661767693,
+          "mode": "list",
+          "cachedResultName": "Finalizado_pendente",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/11E4tAaX6JntC1ZmrpyNeNNxSbLUJA4zCEP-bQbHr7ng/edit#gid=661767693"
+        },
+        "columns": {
+          "mappingMode": "autoMapInputData",
+          "value": {},
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "tipo_unidade",
+              "displayName": "tipo_unidade",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "unidade",
+              "displayName": "unidade",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "cod_cliente",
+              "displayName": "cod_cliente",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "nome_cliente",
+              "displayName": "nome_cliente",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "data_entrega",
+              "displayName": "data_entrega",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "cod_pedido",
+              "displayName": "cod_pedido",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "total_pendente",
+              "displayName": "total_pendente",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.5,
+      "position": [
+        384,
+        320
+      ],
+      "id": "993b61ef-f2c8-49ba-a6e0-ea7d1adef515",
+      "name": "Finalizado_Pendente",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "8Ytd3zZKAOSyZNqC",
+          "name": "Sheets Andre"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "append",
+        "documentId": {
+          "__rl": true,
+          "value": "https://docs.google.com/spreadsheets/d/11E4tAaX6JntC1ZmrpyNeNNxSbLUJA4zCEP-bQbHr7ng/edit?gid=0#gid=0",
+          "mode": "url"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 491663381,
+          "mode": "list",
+          "cachedResultName": "devolucao_pedido",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/11E4tAaX6JntC1ZmrpyNeNNxSbLUJA4zCEP-bQbHr7ng/edit#gid=491663381"
+        },
+        "columns": {
+          "mappingMode": "autoMapInputData",
+          "value": {},
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "tipo_unidade",
+              "displayName": "tipo_unidade",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "unidade",
+              "displayName": "unidade",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "nome_cliente",
+              "displayName": "nome_cliente",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "cod_pedido",
+              "displayName": "cod_pedido",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "coes",
+              "displayName": "coes",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "data_pedido",
+              "displayName": "data_pedido",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "data_devolucao",
+              "displayName": "data_devolucao",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "classe_produto",
+              "displayName": "classe_produto",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "sub_classe_produto",
+              "displayName": "sub_classe_produto",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "categoria_produto",
+              "displayName": "categoria_produto",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "custo_devolvido",
+              "displayName": "custo_devolvido",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "lucrodevolvido",
+              "displayName": "lucrodevolvido",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "faturamento_devolvido",
+              "displayName": "faturamento_devolvido",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "qtd_devolvida",
+              "displayName": "qtd_devolvida",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.5,
+      "position": [
+        384,
+        112
+      ],
+      "id": "bb05218b-f03e-4f8a-9223-c7925d1377c7",
+      "name": "Devolução Pedido",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "8Ytd3zZKAOSyZNqC",
+          "name": "Sheets Andre"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "append",
+        "documentId": {
+          "__rl": true,
+          "value": "https://docs.google.com/spreadsheets/d/11E4tAaX6JntC1ZmrpyNeNNxSbLUJA4zCEP-bQbHr7ng/edit?gid=0#gid=0",
+          "mode": "url"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 868434306,
+          "mode": "list",
+          "cachedResultName": "devolucao_saldo",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/11E4tAaX6JntC1ZmrpyNeNNxSbLUJA4zCEP-bQbHr7ng/edit#gid=868434306"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {},
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "unidade",
+              "displayName": "unidade",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "tipo_unidade",
+              "displayName": "tipo_unidade",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "id",
+              "displayName": "id",
+              "required": false,
+              "defaultMatch": true,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "chave",
+              "displayName": "chave",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "vlr_pago",
+              "displayName": "vlr_pago",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "descricao",
+              "displayName": "descricao",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "nome_conta",
+              "displayName": "nome_conta",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "classificacao",
+              "displayName": "classificacao",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "data_pagamento_formatada",
+              "displayName": "data_pagamento_formatada",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.5,
+      "position": [
+        384,
+        -128
+      ],
+      "id": "312455e5-bbfd-4c60-bae2-d9a90e962f25",
+      "name": "Devolução de Saldo1",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "8Ytd3zZKAOSyZNqC",
+          "name": "Sheets Andre"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "append",
+        "documentId": {
+          "__rl": true,
+          "value": "https://docs.google.com/spreadsheets/d/11E4tAaX6JntC1ZmrpyNeNNxSbLUJA4zCEP-bQbHr7ng/edit?usp=sharing",
+          "mode": "url"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "despesas",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/11E4tAaX6JntC1ZmrpyNeNNxSbLUJA4zCEP-bQbHr7ng/edit#gid=0"
+        },
+        "columns": {
+          "mappingMode": "autoMapInputData",
+          "value": {},
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "tipo_unidade",
+              "displayName": "tipo_unidade",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "unidade",
+              "displayName": "unidade",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "tipo_de_lancamento",
+              "displayName": "tipo_de_lancamento",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "data_pagamento",
+              "displayName": "data_pagamento",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "plano_conta",
+              "displayName": "plano_conta",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "nome_conta",
+              "displayName": "nome_conta",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "centro_custo",
+              "displayName": "centro_custo",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "classificacao",
+              "displayName": "classificacao",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "descricao",
+              "displayName": "descricao",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "vlr_pago",
+              "displayName": "vlr_pago",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.5,
+      "position": [
+        384,
+        -320
+      ],
+      "id": "5529aebc-0f3b-40a7-b686-87288374f982",
+      "name": "Despesas",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "8Ytd3zZKAOSyZNqC",
+          "name": "Sheets Andre"
+        }
+      },
+      "disabled": true
+    },
+    {
+      "parameters": {
+        "numberInputs": 6
+      },
+      "type": "n8n-nodes-base.merge",
+      "typeVersion": 3.1,
+      "position": [
+        1248,
+        160
+      ],
+      "id": "5dc6fff9-80e9-48cf-8a88-3d8856713ffa",
+      "name": "Merge"
+    },
+    {
+      "parameters": {
+        "jsCode": "// Transforma N itens em 1 item com um array \"devolucao_pedidos\"\nreturn [{\n  json: {\n    auditoria_despesas: items.map(i => i.json)\n  }\n}];\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -144,
+        -240
+      ],
+      "id": "9d406402-4335-42e2-9691-48c38c4ef299",
+      "name": "auditoria_despesas",
+      "disabled": true
+    },
+    {
+      "parameters": {
+        "jsCode": "// Transforma N itens em 1 item com um array \"devolucao_pedidos\"\nreturn [{\n  json: {\n    devolucao_saldo: items.map(i => i.json)\n  }\n}];\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -144,
+        0
+      ],
+      "id": "803d5f4d-389b-4487-a52f-6357430a5c6c",
+      "name": "devolucao_saldo"
+    },
+    {
+      "parameters": {
+        "jsCode": "// Transforma N itens em 1 item com um array \"devolucao_pedidos\"\nreturn [{\n  json: {\n    devolucao_pedido: items.map(i => i.json)\n  }\n}];\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -144,
+        208
+      ],
+      "id": "33193253-d400-4e4e-a36d-f64a3b0d46f6",
+      "name": "devolucao_pedido"
+    },
+    {
+      "parameters": {
+        "jsCode": "// Transforma N itens em 1 item com um array \"devolucao_pedidos\"\nreturn [{\n  json: {\n    finalizado_pendente: items.map(i => i.json)\n  }\n}];\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -144,
+        432
+      ],
+      "id": "624c888e-655b-439f-a67a-6cd3b642121c",
+      "name": "finalizado_pendente"
+    },
+    {
+      "parameters": {
+        "jsCode": "// Transforma N itens em 1 item com um array \"devolucao_pedidos\"\nreturn [{\n  json: {\n    temperado_pendente: items.map(i => i.json)\n  }\n}];\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -144,
+        672
+      ],
+      "id": "35b13c76-3871-4a58-b6b9-564371a0653a",
+      "name": "temperado_pendente"
+    },
+    {
+      "parameters": {
+        "operation": "append",
+        "documentId": {
+          "__rl": true,
+          "value": "https://docs.google.com/spreadsheets/d/11E4tAaX6JntC1ZmrpyNeNNxSbLUJA4zCEP-bQbHr7ng/edit?usp=sharing",
+          "mode": "url"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 1132938437,
+          "mode": "list",
+          "cachedResultName": "desconto_titulo",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/11E4tAaX6JntC1ZmrpyNeNNxSbLUJA4zCEP-bQbHr7ng/edit#gid=1132938437"
+        },
+        "columns": {
+          "mappingMode": "autoMapInputData",
+          "value": {},
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "tipo_unidade",
+              "displayName": "tipo_unidade",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "unidade",
+              "displayName": "unidade",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "descricao",
+              "displayName": "descricao",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "data_hora_entregue",
+              "displayName": "data_hora_entregue",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "credito_debito",
+              "displayName": "credito_debito",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "desconto_titulo",
+              "displayName": "desconto_titulo",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.5,
+      "position": [
+        384,
+        784
+      ],
+      "id": "e662834b-7dac-4219-822d-053a44d75301",
+      "name": "Descotno em Titulo",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "8Ytd3zZKAOSyZNqC",
+          "name": "Sheets Andre"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "// Transforma N itens em 1 item com um array \"devolucao_pedidos\"\nreturn [{\n  json: {\n    desconto_titulo: items.map(i => i.json)\n  }\n}];\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -144,
+        880
+      ],
+      "id": "405baec3-4611-4227-852e-69885d775509",
+      "name": "desconto_titulo"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "2b83ee87-6163-4fe7-8807-03cbc8bf80f7",
+              "name": "unidade",
+              "value": "GM MONTESE",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        -768,
+        -16
+      ],
+      "id": "24de9687-854e-4d92-802b-5c3842d6ded5",
+      "name": "unidade"
+    },
+    {
+      "parameters": {
+        "authentication": "serviceAccount",
+        "operation": "update",
+        "documentURL": "https://docs.google.com/document/d/14Bn6ME5c9XkAWRTfWswjSS-L7LbPjkhuPaSUFs_B49U/edit?usp=sharing",
+        "actionsUi": {
+          "actionFields": [
+            {
+              "action": "insert",
+              "text": "={{ $json.choices[0].message.content }}"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.googleDocs",
+      "typeVersion": 2,
+      "position": [
+        2128,
+        224
+      ],
+      "id": "e1849ab8-df7f-4c4a-b57b-4d7b920cd5af",
+      "name": "Google Docs",
+      "credentials": {
+        "googleApi": {
+          "id": "qIoeiMdxzhwk5bcQ",
+          "name": "Google Service Account account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "// Junta todos os itens de entrada em UM único objeto:\n// { unidade, parametros, dados: { devolucao_pedidos: [...], total_pendente: [...], ... } }\n\nconst inputs = $input.all();\n\nlet unidade = $('unidade').first().json.unidade;\nlet parametros = null;\nconst dados = {};\n\nfor (const { json } of inputs) {\n  for (const [k, v] of Object.entries(json)) {\n    if (k === 'unidade') {\n      unidade = v;\n    } else if (k === 'parametros') {\n      parametros = v;\n    } else {\n      // k é o nome do dataset (ex.: devolucao_pedidos, total_pendente, descontos_titulos, etc.)\n      dados[k] = v;\n    }\n  }\n}\n\n// fallback de parâmetros caso não venham de um Set\nif (!parametros) {\n  parametros = { dias_limite_devolucao: 30, categoria_critica: 'TEMPERADO' };\n}\n\nreturn [\n  {\n    json: {\n      unidade,\n      parametros,\n      dados\n    }\n  }\n];\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1472,
+        224
+      ],
+      "id": "f4d109b4-436c-4d53-8f27-39db7d9485cf",
+      "name": "JSON CAPADO"
+    },
+    {
+      "parameters": {
+        "jsCode": "// Nó Function no n8n\n// Entrada: $json.unidade, $json.dados, $json.parametros\n// Saída: body pronto para HTTP Request\n\nconst unidade = $json.unidade || \"Unidade não informada\";\nconst dados = $json.dados || {};\nconst parametros = $json.parametros || { dias_limite_devolucao: 30, categoria_critica: \"TEMPERADO\" };\nconst hoje = new Date().toISOString().split(\"T\")[0];\n\n// Monta conteúdo do usuário\nconst userPrompt = `\nData da auditoria: ${hoje}\nUnidade: ${unidade}\n\nDados da auditoria (JSON):\n${JSON.stringify(dados, null, 2)}\n\nParâmetros:\n${JSON.stringify(parametros, null, 2)}\n\nINSTRUÇÕES POR TÓPICO\n(Considere que os datasets abaixo existem dentro de $json.dados com os nomes indicados. Caso um dataset não exista ou esteja vazio, escreva “Sem ocorrências” naquela seção.)\n\n1. **devolucao_pedidos**:\n    - Contexto: É proibido haver devolução de pedido com categoria TEMPERADO e também devolução ocorrida > 30 dias após a data do pedido.\n    - Faça:\n    a) Quantidade de casos por cada critério (TEMPERADO / > 30 dias).\n    b) Valor total de faturamento_devolvido dos registros irregulares.\n    c) Se houver muitos pedidos de um mesmo cliente (“nome_cliente”), cite até 3 clientes reincidentes com contagem.\n\n2. **finalizado_pendente**:\n    - Contexto: Pedidos já entregues que seguem com valores pendentes.\n    - Regras:\n    a) Ignore casos com data_entrega há menos de 30 dias a partir de ${hoje}.\n    b) Considere apenas pendências > 0.\n    - Faça:\n    a) Total pendente da unidade (soma).\n    b) Top 5 clientes com maior pendência (cliente + valor).\n\n3. **desconto_titulo**:\n    - Faça:\n    a) Quantidade total de descontos em título.\n    b) Valor total de descontos.\n    c) Destaque casos com valor > 30 (quantidade e valor total).\n\n4. **auditoria_despesa**:\n    - Contexto: Analisar por classificação e plano de contas, comparando mês a mês.\n    - Faça:\n    a) Agrupe por mês (“data_pagamento”) e por “classificacao”.\n    b) Identifique anomalias de variação mensal e descreva comparativamente.\n    c) Liste as principais classificações com variações atípicas (até 5 bullets).\n\n5. **temperado_pendente**:\n    - Faça:\n    a) Valor total pendente nessa condição.\n    b) Ranking dos 5 pedidos com maior valor (pedido + valor).\n    c) Quantidade total de pedidos pendentes nessa condição.\n\n6. **devolucao_saldo**:\n    - Contexto: Não deveria haver devoluções de saldo.\n    - Faça:\n    a) Valor total devolvido em saldo.\n    b) Liste os casos encontrados com: \\`vlr_pago\\`, \\`descricao\\`, \\`data_pagamento_formatada\\`.\n\nFORMATO FINAL ESPERADO (Texto para o google Doc)\n\n Relatório de Auditoria – ${unidade}\n\nData: ${hoje}\n\n Resumo Executivo\n\n- (3–5 bullets com achados críticos, agregando por tema)\n\nDevolução de Pedidos\n- Contexto breve\n- Principais achados (quantidades, valores, clientes reincidentes)\n- Recomendações\n\nFinalizado Pendente\n- Contexto breve\n- Principais achados (total e top 5 clientes)\n- Recomendações\n\nDescontos em Título\n- Contexto breve\n- Principais achados (quantidade total, total em R$, destaque > 30)\n- Recomendações\n\nAuditoria de Despesas\n- Contexto breve\n- Principais achados (variações mensais por classificação)\n- Recomendações\n\nPendência de Pedidos Temperados\n- Contexto breve\n- Principais achados (valor total, top 5 pedidos, quantidade)\n- Recomendações\n\n Devolução de Saldo\n- Contexto breve\n- Principais achados (valor total, bullets com “vlr_pago – descricao – data”)\n- Recomendações\n\nPlanilha de Apoio\nTodos os detalhes completos de cada tópico acima podem ser consultados na planilha de apoio, onde cada aba corresponde a um tópico do relatório:\n[📊 Planilha de Apoio – Relatório de Auditoria](https://docs.google.com/spreadsheets/d/11E4tAaX6JntC1ZmrpyNeNNxSbLUJA4zCEP-bQbHr7ng/edit?gid=0)\n\n Próximos Passos\n- Checklist de ações sugeridas\n`;\n\n// Monta o body para o HTTP Request\nreturn [\n  {\n    json: {\n      body: {\n        model: \"deepseek/deepseek-r1-0528\",\n        temperature: 0.7,\n        messages: [\n          {\n            role: \"system\",\n            content: \"Você é um auditor financeiro e operacional. Receberá dados em JSON e deve produzir um RELATÓRIO DE AUDITORIA em texto claro NO PADRÃO google docs, objetivo e acionável, em PT-BR. Siga exatamente as regras mas fique a vontade pra melhorar o texto e a formatação, já que vai para o docs.\"\n          },\n          {\n            role: \"user\",\n            content: userPrompt\n          }\n        ]\n      }\n    }\n  }\n];\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1680,
+        224
+      ],
+      "id": "59a3f341-0b07-4005-9a85-1a06daa45ef0",
+      "name": "FORMATA BODY"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://openrouter.ai/api/v1/chat/completions",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Authorization",
+              "value": "Bearer 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"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ $json.body }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        1920,
+        224
+      ],
+      "id": "69fe96b4-2814-4a5f-bdb2-da16955134b6",
+      "name": "LLM MODEL"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Schedule Trigger": {
+      "main": [
+        [
+          {
+            "node": "unidade",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Pendencia de Pedidos Temperados": {
+      "main": [
+        [
+          {
+            "node": "Code5",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "temperado_pendente",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Auditoria Despesa": {
+      "main": [
+        [
+          {
+            "node": "Code",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "auditoria_despesas",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code": {
+      "main": [
+        [
+          {
+            "node": "Despesas",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Devolução de Saldo": {
+      "main": [
+        [
+          {
+            "node": "Code1",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "devolucao_saldo",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Devolução de Pedido": {
+      "main": [
+        [
+          {
+            "node": "Code2",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "devolucao_pedido",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Pedidos Finalizados e Pendentes": {
+      "main": [
+        [
+          {
+            "node": "Code4",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "finalizado_pendente",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Desconto em Título": {
+      "main": [
+        [
+          {
+            "node": "Code3",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "desconto_titulo",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Estoque": {
+      "main": [
+        []
+      ]
+    },
+    "Painel Financeiro": {
+      "main": [
+        []
+      ]
+    },
+    "Code1": {
+      "main": [
+        [
+          {
+            "node": "Devolução de Saldo1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code2": {
+      "main": [
+        [
+          {
+            "node": "Devolução Pedido",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code4": {
+      "main": [
+        [
+          {
+            "node": "Finalizado_Pendente",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code5": {
+      "main": [
+        [
+          {
+            "node": "Temperado_Pendente",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code3": {
+      "main": [
+        [
+          {
+            "node": "Descotno em Titulo",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Merge": {
+      "main": [
+        [
+          {
+            "node": "JSON CAPADO",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "auditoria_despesas": {
+      "main": [
+        [
+          {
+            "node": "Merge",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "devolucao_saldo": {
+      "main": [
+        [
+          {
+            "node": "Merge",
+            "type": "main",
+            "index": 1
+          }
+        ]
+      ]
+    },
+    "devolucao_pedido": {
+      "main": [
+        [
+          {
+            "node": "Merge",
+            "type": "main",
+            "index": 2
+          }
+        ]
+      ]
+    },
+    "finalizado_pendente": {
+      "main": [
+        [
+          {
+            "node": "Merge",
+            "type": "main",
+            "index": 3
+          }
+        ]
+      ]
+    },
+    "temperado_pendente": {
+      "main": [
+        [
+          {
+            "node": "Merge",
+            "type": "main",
+            "index": 4
+          }
+        ]
+      ]
+    },
+    "desconto_titulo": {
+      "main": [
+        [
+          {
+            "node": "Merge",
+            "type": "main",
+            "index": 5
+          }
+        ]
+      ]
+    },
+    "unidade": {
+      "main": [
+        [
+          {
+            "node": "Painel Financeiro",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Estoque",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Auditoria Despesa",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Devolução de Saldo",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Devolução de Pedido",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Pedidos Finalizados e Pendentes",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Pendencia de Pedidos Temperados",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Desconto em Título",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "JSON CAPADO": {
+      "main": [
+        [
+          {
+            "node": "FORMATA BODY",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "FORMATA BODY": {
+      "main": [
+        [
+          {
+            "node": "LLM MODEL",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "LLM MODEL": {
+      "main": [
+        [
+          {
+            "node": "Google Docs",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "a4a31e51-76a6-46fd-a85c-1315733438c1",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "{{INSTANCE_ID}}"
+  },
+  "id": "cC8PnsIkMQGDvPO5",
+  "tags": [
+    {
+      "updatedAt": "2025-03-21T11:52:03.821Z",
+      "createdAt": "2025-03-21T11:52:03.821Z",
+      "id": "ro9IiNWQxt6VLDLj",
+      "name": "Setor - Controladoria"
+    },
+    {
+      "updatedAt": "2026-01-14T11:04:00.895Z",
+      "createdAt": "2025-03-21T11:47:30.374Z",
+      "id": "CvCy3KNJKyMxSQ3C",
+      "name": "GDA"
+    }
+  ]
+}

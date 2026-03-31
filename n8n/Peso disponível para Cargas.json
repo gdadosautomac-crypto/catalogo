@@ -1,0 +1,389 @@
+{
+  "name": "Peso disponível para Cargas",
+  "nodes": [
+    {
+      "parameters": {
+        "operation": "xlsx",
+        "options": {
+          "fileName": "={{ $('ARQUIVO').item.json.arq }}"
+        }
+      },
+      "id": "3f24860d-5c6e-4fe6-9971-5ab7b7991726",
+      "name": "Convert to File",
+      "type": "n8n-nodes-base.convertToFile",
+      "typeVersion": 1.1,
+      "position": [
+        1184,
+        368
+      ]
+    },
+    {
+      "parameters": {},
+      "id": "ba54c519-d64e-49ed-96fb-3f6a270f8d0c",
+      "name": "Wait",
+      "type": "n8n-nodes-base.wait",
+      "typeVersion": 1.1,
+      "position": [
+        1728,
+        368
+      ],
+      "webhookId": "{{WEBHOOK_ID}}"
+    },
+    {
+      "parameters": {
+        "operation": "upload",
+        "bucketName": "marcolanoperacoes",
+        "fileName": "={{ $('ARQUIVO').item.json.arq }}",
+        "additionalFields": {
+          "acl": "publicReadWrite"
+        }
+      },
+      "id": "336419c1-3820-45c3-83f4-56688559b229",
+      "name": "AWS S31",
+      "type": "n8n-nodes-base.awsS3",
+      "typeVersion": 2,
+      "position": [
+        1360,
+        368
+      ],
+      "credentials": {
+        "aws": {
+          "id": "wojq9Jq4bZgupPjh",
+          "name": "AWS account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "delete",
+        "bucketName": "marcolanoperacoes",
+        "fileKey": "={{ $('ARQUIVO').item.json.arq }}",
+        "options": {}
+      },
+      "id": "eacc9a69-8e22-419d-8426-aebddc338846",
+      "name": "AWS S33",
+      "type": "n8n-nodes-base.awsS3",
+      "typeVersion": 2,
+      "position": [
+        1904,
+        368
+      ],
+      "credentials": {
+        "aws": {
+          "id": "wojq9Jq4bZgupPjh",
+          "name": "AWS account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "delete",
+        "bucketName": "marcolanoperacoes",
+        "fileKey": "=Documentos Devolvidos - d25-6h0m1s",
+        "options": {}
+      },
+      "id": "e72e96cd-fbb9-436d-88cb-39958178c64e",
+      "name": "AWS S37",
+      "type": "n8n-nodes-base.awsS3",
+      "typeVersion": 2,
+      "position": [
+        1072,
+        768
+      ],
+      "credentials": {
+        "aws": {
+          "id": "wojq9Jq4bZgupPjh",
+          "name": "AWS account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "getAll",
+        "bucketName": "marcolanoperacoes",
+        "returnAll": true,
+        "options": {}
+      },
+      "id": "19373d70-0740-4798-90e3-91675172ed1c",
+      "name": "AWS S3",
+      "type": "n8n-nodes-base.awsS3",
+      "typeVersion": 2,
+      "position": [
+        848,
+        768
+      ],
+      "credentials": {
+        "aws": {
+          "id": "wojq9Jq4bZgupPjh",
+          "name": "AWS account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "c9777b34-96c3-49cb-9e8f-5171d677c039",
+              "name": "arq",
+              "value": "=PesoDisponivelCargas - d{{ $now.day }}-{{ $now.hour }}h{{ $now.minute }}m{{ $now.second }}s",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "5925f6e6-7911-4b13-932b-3badbb91a964",
+      "name": "ARQUIVO",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.3,
+      "position": [
+        832,
+        368
+      ]
+    },
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "field": "weeks",
+              "triggerAtDay": [
+                0,
+                1,
+                2,
+                3,
+                4,
+                5
+              ],
+              "triggerAtHour": 7,
+              "triggerAtMinute": 30
+            }
+          ]
+        }
+      },
+      "id": "621f1b7e-6880-4dd5-8c8f-c726e49eb6db",
+      "name": "Schedule Trigger1",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.1,
+      "position": [
+        384,
+        368
+      ]
+    },
+    {
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "select * from (\n\tselect \n\t\tx.rota, \n\t\tx.categoria,\n\t\tSUM(m2_faltante) as Metragem, SUM(peso_faltante) as peso \n\tfrom (\n\t\tselect \n\t\t\trom.NU_PVE, \n\t\t\trom.NU_DPV, \n\t\t\trom.NU_PRO, \n\t\t\trota.DS_ROT as rota, \n\t\t\tcat.DS_CAT as Categoria, \n\t\t\t(pve.QT_PRO - coalesce(rom.qtd_exp,0)) as qtd_pendente, ((pve.QT_PRO - coalesce(rom.qtd_exp,0)) * pro.FAT_CONV1 ) as m2_faltante,\n\t\t\t((pve.QT_PRO - coalesce(rom.qtd_exp,0)) * pro.FAT_CONV2 ) as peso_faltante\n\t\tfrom mgpve01011 pve \n\t\t\tleft join (\n\t\t\t\tselect \n\t\t\t\t\trom.NU_PVE, \n\t\t\t\t\trom.NU_DPV, \n\t\t\t\t\trom.NU_PRO, \n\t\t\t\t\tSUM(rom.QT_PRO) as qtd_exp\n\t\t\t\tfrom mgrom01011 rom \n\t\t\t\twhere ID_TP_PED = 1\n\t\t\t\tgroup by ROM.NU_PVE, ROM.NU_DPV, ROM.NU_PRO\n\t\t\t) rom on rom.NU_DPV = pve.NU_DPV \n\t\t\tleft join mgpve01010 pver on pver.NU_PVE = pve.NU_PVE\n\t\t\tleft join mgpro01010 pro on pro.NU_PRO = pve.NU_PRO\n\t\t\tleft join mgcat01010 cat on cat.NU_CAT = pro.NU_CAT\n\t\t\tleft join mgcli01010 cli on cli.NU_CLI = pver.NU_CLI \n\t\t\tleft join mgrot01010 rota on rota.NU_ROT = cli.NU_ROT \n\t\twhere \n\t\t\t(pve.QT_PRO - coalesce(rom.qtd_exp,0)) > 0 and pver.ID_STATUS in (1,2) and pver.ID_TP_PED = '1'\n\t) x \n\tgroup by x.rota, x.categoria\n\tunion all \n\tselect \n\t\tRota,\n\t\tcase\n\t\t\twhen (categoria like ('%TEMPERADO%') and coes like ('%PADR%')) then 'ENGENHARIA PADRÃO'\n\t\t\telse categoria \n\t\tend as categoria,\n\t\tsum(M2) as metragem,\n\t\tsum(M2 * peso) as peso  \n\tfrom (\n\t\tselect\n\t\t\trota.DS_ROT as Rota,\n\t\t\tpedido.NU_PVE as Pedido,\n\t\t\tcategoria.DS_CAT as categoria,\n\t\t\tcoes.DS_OES as coes,\n\t\t\tproduto.DS_PRO,\n\t\t\tapontamento.NU_PECA as PECA,\n\t\t\tapontamento.SEQ_PECA as SEQ,\n\t\t\tmax(apontamento.dt_ins) as Apontamento,\n\t\t\tmax(ordempecas.QT_ALTURA) as Altura,\n\t\t\tmax(ordempecas.QT_LARGURA) as Largura,\n\t\t\tmax(ordempecas.qt_metrag) as M2,\n\t\t\tmax(classe.DS_CLP) as Classe,\n\t\t\tmax(subclasse.DS_SCP) as SubClasse,\n\t\t\tproduto.FAT_CONV2 as peso\n\t\tfrom mgwkf01010 apontamento\n\t\t\tleft join mgorf01012 pecaordem on (pecaordem.NU_OF = apontamento.NU_OF and pecaordem.NU_PECA = apontamento.NU_PECA and pecaordem.SEQ_PECA = apontamento.SEQ_PECA)\n\t\t\tleft join mgorf01010 ordem on (ordem.NU_OF = pecaordem.NU_OF)\n\t\t\tleft join mgpve01010 pedido on (pedido.NU_PVE = ordem.NU_PVE)\n\t\t\tleft join mgset01010 setor on (setor.NU_SET = apontamento.NU_SET)\n\t\t\tleft join mgorf01011 ordempecas on (ordempecas.NU_OF = ordem.NU_OF and ordempecas.NU_PECA = apontamento.NU_PECA)\n\t\t\tleft join mgset01010 proxsetor on (proxsetor.NU_SET = pecaordem.PROXIMO_SET)\n\t\t\tleft join mgpro01010 produto on (produto.NU_PRO = ordempecas.NU_PRO)\n\t\t\tleft join mgcat01010 categoria on (categoria.NU_CAT = produto.NU_CAT)\n\t\t\tleft join mgclp01010 classe on (classe.NU_CLP = produto.NU_CLP)\n\t\t\tleft join mgscp01010 subclasse on (subclasse.NU_SCP = produto.NU_SCP)\n\t\t\tleft join mgoes01010 coes on (coes.NU_OES = pedido.NU_OES)\n\t\t\tleft join mgcli01010 cliente on (cliente.NU_CLI = pedido.NU_CLI)\n\t\t\tleft join mgrot01010 rota on (rota.NU_ROT = cliente.NU_ROT)\n\t\t\tleft join mgpve01016 romaneio on romaneio.SEQ_PECA = apontamento.SEQ_PECA and romaneio.NU_PECA = apontamento.NU_PECA \n\t\twhere \n\t\t\tproxsetor.DS_SET is null and pedido.ID_TP_PED = '2'and pedido.NU_PVE != '0'\n\t\t\tand romaneio.NU_ROM is null\n\t\tgroup by apontamento.NU_PECA, apontamento.SEQ_PECA\n\t\torder by subclasse.DS_SCP asc, classe.DS_CLP asc, apontamento.NU_PECA asc, apontamento.SEQ_PECA asc \n\t) x \n\tgroup by rota, \n\tcase \n\t\twhen(categoria like ('%TEMPERADO%') and coes like ('%PADR%')) then 'ENGENHARIA PADRÃO' \n\t\telse categoria \n\tend \n)\nx order by rota asc ",
+        "options": {}
+      },
+      "id": "e7da3e1c-2933-4ad4-a347-e14082f10f15",
+      "name": "MySQL",
+      "type": "n8n-nodes-base.mySql",
+      "typeVersion": 2.2,
+      "position": [
+        1008,
+        368
+      ],
+      "credentials": {
+        "mySql": {
+          "id": "2YWIGl06FwxedX0R",
+          "name": "MySQL - Fortaleza"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{ $('Token').item.json.Link }}send-document/xlsx",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "={{ $('Token').item.json.Name }}",
+              "value": "={{ $('Token').item.json.Value }}"
+            }
+          ]
+        },
+        "sendBody": true,
+        "contentType": "form-urlencoded",
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "phone",
+              "value": "=5581991150773"
+            },
+            {
+              "name": "fileName",
+              "value": "=Produtos_para_Carga"
+            },
+            {
+              "name": "document",
+              "value": "=https://marcolanoperacoes.s3.amazonaws.com/{{ $('ARQUIVO').item.json.arq }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "1a9c7c22-29d2-4437-9e0c-9dc4657176b2",
+      "name": "Eduardo Melibeu",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.1,
+      "position": [
+        1552,
+        368
+      ]
+    },
+    {
+      "parameters": {
+        "documentId": {
+          "__rl": true,
+          "value": "https://docs.google.com/spreadsheets/d/1J9xHE08UPG2QnDrjFsiy3VU3Z8ziZT9aO9MF7ct5ruA/edit?usp=sharing",
+          "mode": "url"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 564051929,
+          "mode": "list",
+          "cachedResultName": "Token",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1J9xHE08UPG2QnDrjFsiy3VU3Z8ziZT9aO9MF7ct5ruA/edit#gid=564051929"
+        },
+        "options": {}
+      },
+      "id": "928cff06-d483-418f-a891-b38e85c16b33",
+      "name": "Token",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.3,
+      "position": [
+        608,
+        368
+      ],
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "HfbTEVMQHA5O66Ya",
+          "name": "Sheets JG e Japa"
+        }
+      }
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Convert to File": {
+      "main": [
+        [
+          {
+            "node": "AWS S31",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Wait": {
+      "main": [
+        [
+          {
+            "node": "AWS S33",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "AWS S31": {
+      "main": [
+        [
+          {
+            "node": "Eduardo Melibeu",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "ARQUIVO": {
+      "main": [
+        [
+          {
+            "node": "MySQL",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Schedule Trigger1": {
+      "main": [
+        [
+          {
+            "node": "Token",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "MySQL": {
+      "main": [
+        [
+          {
+            "node": "Convert to File",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Eduardo Melibeu": {
+      "main": [
+        [
+          {
+            "node": "Wait",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Token": {
+      "main": [
+        [
+          {
+            "node": "ARQUIVO",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "f7661b1e-41ca-41fa-af87-a9528e60feda",
+  "meta": {
+    "instanceId": "{{INSTANCE_ID}}"
+  },
+  "id": "SmcXTRxKIZWy63k2",
+  "tags": [
+    {
+      "updatedAt": "2025-03-24T14:35:52.840Z",
+      "createdAt": "2025-03-24T14:35:52.840Z",
+      "id": "sPkE8K1cDKi4JAee",
+      "name": "Diretoria"
+    },
+    {
+      "updatedAt": "2025-03-24T11:42:37.665Z",
+      "createdAt": "2025-03-24T11:42:37.665Z",
+      "id": "nDS88XDFC0HV8gKr",
+      "name": "Cargas"
+    },
+    {
+      "updatedAt": "2025-03-21T11:52:03.823Z",
+      "createdAt": "2025-03-21T11:52:03.823Z",
+      "id": "VQmA23kx6h1wy92X",
+      "name": "GUIS"
+    }
+  ]
+}

@@ -1,0 +1,519 @@
+{
+  "name": "Movimentação em Contas Internas",
+  "nodes": [
+    {
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "SELECT \n    mf.tipo_unidade, \n    mf.unidade, \n    df.forma_pagamento, \n    mf.tipo_de_lancamento, \n    mf.data_pagamento::date AS data_pagamento,\n    mf.valor_titulo ,\n    mf.vlr_pago ,\n    df.valor_pago, \n    df.chave , \n    mf.chave as titulo,\n    mf.classificacao, \n    mf.descricao, \n    mf.fornecedor_cliente, \n    mf.colaborador, \n    df.nome_conta\nFROM movimentacoes_financeiras mf\nLEFT JOIN detalhamento_financeiro df \n    ON mf.chave_detalhamento  = df.chave\nLEFT JOIN mapeamento_contas_internas mci \n    ON mci.nome_cliente = df.nome_conta \n    AND mci.unidade = df.unidade\nWHERE \n    df.forma_pagamento = 'Conta Interna'\n    AND mci.tipo_conta = 'CONTROLE'\n    and df.nome_conta not in ('Saldo Têmpera', 'PAG PIX')\n    AND mf.data_pagamento::date = CURRENT_DATE - INTERVAL '1 day';",
+        "options": {}
+      },
+      "id": "a6ff7280-b19e-4e0f-9b0d-cc41a4d3d24b",
+      "name": "Postgres",
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 2.3,
+      "position": [
+        336,
+        -64
+      ],
+      "credentials": {
+        "postgres": {
+          "id": "G50fA6A0L90xaBIe",
+          "name": "Postgres account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "documentId": {
+          "__rl": true,
+          "value": "https://docs.google.com/spreadsheets/d/1avLuf5Qpu0lBIFVS-Ny0j-iIFZGkVqqufVGy-sfbqM4/edit?usp=sharing",
+          "mode": "url"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "Página1",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1avLuf5Qpu0lBIFVS-Ny0j-iIFZGkVqqufVGy-sfbqM4/edit#gid=0"
+        },
+        "options": {}
+      },
+      "id": "0724dbd9-a366-44be-bafb-7f54bd8bd49d",
+      "name": "Google Sheets",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.3,
+      "position": [
+        -208,
+        -64
+      ],
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "8Ytd3zZKAOSyZNqC",
+          "name": "Sheets Andre"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "c9777b34-96c3-49cb-9e8f-5171d677c039",
+              "name": "link",
+              "value": "={{ $json.Link }}",
+              "type": "string"
+            },
+            {
+              "id": "c29c9cfb-b76e-4088-b0ca-7748646d4779",
+              "name": "link1",
+              "value": "={{ $json.Value }}",
+              "type": "string"
+            },
+            {
+              "id": "a2465349-2aee-4dc2-8ce6-9a40bf305fa7",
+              "name": "link2",
+              "value": "={{ $json.Field }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "f239307c-5c6f-4436-941c-3b59209dedf3",
+      "name": "AUTH",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.3,
+      "position": [
+        -32,
+        -64
+      ]
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "c9777b34-96c3-49cb-9e8f-5171d677c039",
+              "name": "arq",
+              "value": "=contas_internas",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {
+          "includeBinary": "={{ data }}"
+        }
+      },
+      "id": "2e8f255a-dcde-43f0-9b7a-19289c988edb",
+      "name": "ARQUIVO",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.3,
+      "position": [
+        144,
+        -64
+      ]
+    },
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "field": "weeks",
+              "triggerAtDay": [
+                5,
+                1,
+                2,
+                3,
+                4
+              ],
+              "triggerAtHour": 8
+            }
+          ]
+        }
+      },
+      "id": "c73d0f06-2b4d-46f5-8c53-688c28698b14",
+      "name": "Schedule Trigger",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.1,
+      "position": [
+        -368,
+        -64
+      ]
+    },
+    {
+      "parameters": {
+        "operation": "xlsx",
+        "options": {}
+      },
+      "id": "36537c38-2011-495a-a8be-e30ef5ae8854",
+      "name": "Convert to File",
+      "type": "n8n-nodes-base.convertToFile",
+      "typeVersion": 1.1,
+      "position": [
+        864,
+        -64
+      ]
+    },
+    {
+      "parameters": {
+        "operation": "upload",
+        "bucketName": "marcolanoperacoes",
+        "fileName": "={{ $('ARQUIVO').item.json.arq }}",
+        "additionalFields": {
+          "acl": "publicReadWrite"
+        }
+      },
+      "id": "837d17bc-a5f0-4343-9d33-37337500b8e7",
+      "name": "AWS S31",
+      "type": "n8n-nodes-base.awsS3",
+      "typeVersion": 2,
+      "position": [
+        1040,
+        -64
+      ],
+      "credentials": {
+        "aws": {
+          "id": "wojq9Jq4bZgupPjh",
+          "name": "AWS account"
+        }
+      }
+    },
+    {
+      "parameters": {},
+      "id": "7e494f95-ec20-4bff-a34b-b8a5a0b6e8e8",
+      "name": "Wait",
+      "type": "n8n-nodes-base.wait",
+      "typeVersion": 1.1,
+      "position": [
+        1408,
+        -64
+      ],
+      "webhookId": "{{WEBHOOK_ID}}"
+    },
+    {
+      "parameters": {
+        "operation": "delete",
+        "bucketName": "marcolanoperacoes",
+        "fileKey": "={{ $('ARQUIVO').item.json.arq }}",
+        "options": {}
+      },
+      "id": "12d17599-a919-49d1-8afc-a7962861c653",
+      "name": "AWS S33",
+      "type": "n8n-nodes-base.awsS3",
+      "typeVersion": 2,
+      "position": [
+        1584,
+        -64
+      ],
+      "credentials": {
+        "aws": {
+          "id": "wojq9Jq4bZgupPjh",
+          "name": "AWS account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "// Este nó formata o campo \"data_pagamento\" vindo do banco\n// Exemplo: converte \"Wed Oct 29 2025 00:00:00 GMT-0300 (Brasilia Standard Time)\"\n// em \"29/10/2025\"\n\nreturn items.map(item => {\n  const original = item.json.data_pagamento;\n\n  // Garante que a data seja um objeto Date válido\n  const date = new Date(original);\n\n  // Monta o formato dd/mm/yyyy\n  const dia = String(date.getDate()).padStart(2, '0');\n  const mes = String(date.getMonth() + 1).padStart(2, '0');\n  const ano = date.getFullYear();\n\n  item.json.data_pagamento_formatada = `${dia}/${mes}/${ano}`;\n\n  return item;\n});\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        528,
+        -64
+      ],
+      "id": "4d5b59ef-901a-4b55-bdee-0bb90f7b4f44",
+      "name": "Code"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "a2f9df1b-f48b-468d-bf0d-d55d6c08d136",
+              "name": "tipo_unidade",
+              "value": "={{ $json.tipo_unidade }}",
+              "type": "string"
+            },
+            {
+              "id": "59e7d488-c037-4ba5-93d0-887b897f806e",
+              "name": "unidade",
+              "value": "={{ $json.unidade }}",
+              "type": "string"
+            },
+            {
+              "id": "20014d0b-ee8f-4bde-9b35-3534899cb6bf",
+              "name": "forma_pagamento",
+              "value": "={{ $json.forma_pagamento }}",
+              "type": "string"
+            },
+            {
+              "id": "466d0201-8054-434b-b551-1e300e6b269c",
+              "name": "tipo_de_lancamento",
+              "value": "={{ $json.tipo_de_lancamento }}",
+              "type": "string"
+            },
+            {
+              "id": "99a4dccb-dd97-46d0-82a2-520dc87f246f",
+              "name": "data_pagamento",
+              "value": "={{ $json.data_pagamento_formatada }}",
+              "type": "string"
+            },
+            {
+              "id": "dd36e4f6-a943-4824-8249-c6f1b016bb01",
+              "name": "valor_titulo",
+              "value": "={{ $json.valor_titulo }}",
+              "type": "string"
+            },
+            {
+              "id": "253a240e-01aa-4f20-a75b-09c6544af0e4",
+              "name": "vlr_pago",
+              "value": "={{ $json.vlr_pago }}",
+              "type": "string"
+            },
+            {
+              "id": "30a34842-48ec-41e9-b6c4-e1092620f609",
+              "name": "chave",
+              "value": "={{ $json.chave }}",
+              "type": "string"
+            },
+            {
+              "id": "4e892b1e-745d-4ead-85f0-f056ae7f1a70",
+              "name": "titulo",
+              "value": "={{ $json.titulo }}",
+              "type": "string"
+            },
+            {
+              "id": "88af0065-5ec1-4867-8270-18ca61c05fa4",
+              "name": "classificacao",
+              "value": "={{ $json.classificacao }}",
+              "type": "string"
+            },
+            {
+              "id": "7b1c6a60-2d4a-4d1a-9055-e5482a239c41",
+              "name": "descricao",
+              "value": "={{ $json.descricao }}",
+              "type": "string"
+            },
+            {
+              "id": "bc7d8e39-feb9-46f8-95fa-b26ad27c724f",
+              "name": "fornecedor_cliente",
+              "value": "={{ $json.fornecedor_cliente }}",
+              "type": "string"
+            },
+            {
+              "id": "c01bd61a-f7d2-4f45-8027-9b70b4666ef8",
+              "name": "colaborador",
+              "value": "={{ $json.colaborador }}",
+              "type": "string"
+            },
+            {
+              "id": "d0a7d2a8-e53e-40bc-9479-237b8f5f0d89",
+              "name": "nome_conta",
+              "value": "={{ $json.nome_conta }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        704,
+        -64
+      ],
+      "id": "a4ca8a79-5fc6-417b-a9ce-175c49feacdc",
+      "name": "Edit Fields"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "=https://api.z-api.io/instances/3AD47F49CE9AF04B4D43CA225862B38B/token/6EE2B07CF6D61B0059AD2125/send-document/xlsx",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "={{ $('AUTH').item.json.link2 }}",
+              "value": "={{ $('AUTH').item.json.link1 }}"
+            }
+          ]
+        },
+        "sendBody": true,
+        "contentType": "form-urlencoded",
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "phone",
+              "value": "=5581998328798"
+            },
+            {
+              "name": "fileName",
+              "value": "=mov_contas_internas {{$today.format('DD')}}"
+            },
+            {
+              "name": "document",
+              "value": "=https://marcolanoperacoes.s3.amazonaws.com/{{ $('ARQUIVO').item.json.arq }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "b2854ccc-f7b7-436f-b487-37842d66b2a9",
+      "name": "Marcelo",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.1,
+      "position": [
+        1232,
+        -64
+      ]
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Postgres": {
+      "main": [
+        [
+          {
+            "node": "Code",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Google Sheets": {
+      "main": [
+        [
+          {
+            "node": "AUTH",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "AUTH": {
+      "main": [
+        [
+          {
+            "node": "ARQUIVO",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "ARQUIVO": {
+      "main": [
+        [
+          {
+            "node": "Postgres",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Schedule Trigger": {
+      "main": [
+        [
+          {
+            "node": "Google Sheets",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Convert to File": {
+      "main": [
+        [
+          {
+            "node": "AWS S31",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "AWS S31": {
+      "main": [
+        [
+          {
+            "node": "Marcelo",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Wait": {
+      "main": [
+        [
+          {
+            "node": "AWS S33",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Edit Fields": {
+      "main": [
+        [
+          {
+            "node": "Convert to File",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Marcelo": {
+      "main": [
+        [
+          {
+            "node": "Wait",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "12530cd8-cbb1-4300-aa92-561db2a716d3",
+  "meta": {
+    "instanceId": "{{INSTANCE_ID}}"
+  },
+  "id": "zrbE6W2muzwaBxzP",
+  "tags": [
+    {
+      "updatedAt": "2025-03-21T11:52:03.821Z",
+      "createdAt": "2025-03-21T11:52:03.821Z",
+      "id": "ro9IiNWQxt6VLDLj",
+      "name": "Setor - Controladoria"
+    },
+    {
+      "updatedAt": "2026-01-14T11:04:00.895Z",
+      "createdAt": "2025-03-21T11:47:30.374Z",
+      "id": "CvCy3KNJKyMxSQ3C",
+      "name": "GDA"
+    }
+  ]
+}

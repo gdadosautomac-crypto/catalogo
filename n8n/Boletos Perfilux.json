@@ -1,0 +1,542 @@
+{
+  "name": "Boletos Perfilux",
+  "nodes": [
+    {
+      "parameters": {
+        "documentId": {
+          "__rl": true,
+          "value": "https://docs.google.com/spreadsheets/d/1avLuf5Qpu0lBIFVS-Ny0j-iIFZGkVqqufVGy-sfbqM4/edit?usp=sharing",
+          "mode": "url"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "Página1",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1avLuf5Qpu0lBIFVS-Ny0j-iIFZGkVqqufVGy-sfbqM4/edit#gid=0"
+        },
+        "options": {}
+      },
+      "id": "75d12774-5a21-41a5-8667-f359093236d0",
+      "name": "Google Sheets",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.3,
+      "position": [
+        -896,
+        240
+      ],
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "8Ytd3zZKAOSyZNqC",
+          "name": "Sheets Andre"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "c9777b34-96c3-49cb-9e8f-5171d677c039",
+              "name": "link",
+              "value": "={{ $json.Link }}",
+              "type": "string"
+            },
+            {
+              "id": "c29c9cfb-b76e-4088-b0ca-7748646d4779",
+              "name": "link1",
+              "value": "={{ $json.Value }}",
+              "type": "string"
+            },
+            {
+              "id": "a2465349-2aee-4dc2-8ce6-9a40bf305fa7",
+              "name": "link2",
+              "value": "={{ $json.Field }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "8ba6ba68-346c-449c-9275-9aa8a2ed9141",
+      "name": "AUTH",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.3,
+      "position": [
+        -672,
+        240
+      ]
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "c9777b34-96c3-49cb-9e8f-5171d677c039",
+              "name": "arq",
+              "value": "=boletos - d{{ $now.day }}-{{ $now.hour }}h{{ $now.minute }}m{{ $now.second }}s",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {
+          "includeBinary": "={{ data }}"
+        }
+      },
+      "id": "87fbefef-f0ce-4e8f-9624-cb4454eac21c",
+      "name": "ARQUIVO",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.3,
+      "position": [
+        -416,
+        240
+      ]
+    },
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "field": "weeks",
+              "triggerAtDay": [
+                1,
+                2,
+                3,
+                4,
+                5
+              ],
+              "triggerAtHour": 7,
+              "triggerAtMinute": 10
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.2,
+      "position": [
+        -1136,
+        240
+      ],
+      "id": "632bf61e-8415-4f8e-ab25-399eec0cdf9b",
+      "name": "Schedule Trigger"
+    },
+    {
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "SELECT \n    'Loja' as tipo_unidade,\n    'PERFILUX' as unidade, \n       boletos.DS_BOLETO as nu_documento,\n    boletos.DT_EMISSAO as data_emissao,\n    case \n        when boletos.ID_STATUS  = 1 then 'FINANCEIRO'\n        when boletos.ID_STATUS = 4 then 'A LIQUIDAR'\n        when boletos.ID_STATUS = 2 then 'DEVOLVIDO PENDENTE'\n        when boletos.ID_STATUS = 3 then 'DEVOLVIDO PAGO'\n        when boletos.ID_STATUS = 5 then 'LIQUIDADO'\n        when boletos.ID_STATUS = 7 then 'ESTORNADO'\n        else 'OUTRO'\n    end as status,\n    boletos.DT_VENCT as data_vencimento,\n    boletos.VLR_BOLETO as valor_titulo,\n    titulos.NU_CLI as cod_cliente,\n    clientes.DS_CLI as nome_cliente,\n    clientes.APEL_FANT ,\n    clientes.NU_CPF_CNPJ as cnpj,\n    dsf.NU_DSF as n_dsf,\n   dsf.TP_DSF,\n    case \n        when dsf.TP_DSF = 0 then 'ANTECIPACAO'\n        when dsf.TP_DSF = 1 then 'CUSTODIA'\n        when dsf.TP_DSF = 2 then 'DEPOSITO'\n        else 'DEPOSITO'\n    end as tipo_dsf,\n    boletos.Pendente_Tipo,\n    'boleto' as tipo_documento,\n    dsf.NU_BAN as cod_banco,\n    dsf.NU_CON as cod_conta,\n    con.DS_CON as conta,\n    banco.DS_BAN as inst_financeira,\n    titulos.DS_CPG as descricao,\n    titulos.ds_obs as observacao\nfrom mgcta01020 boletos\nleft join (\n    select NU_CLI, NU_CLT , nu_cta, DS_CPG, ds_obs \n    from mgcta01014 titulos \n    group by NU_CLI, NU_CLT\n) titulos on titulos.NU_CLT = boletos.NU_CLT_ORIGEM \nleft join mgcli01010 clientes on clientes.NU_CLI = titulos.NU_CLI \nleft join mgdsf01010 dsf on dsf.nu_dsf = boletos.nu_dsf \nleft join mgcon01010 con on con.NU_CON = dsf.NU_CON \nleft join mgban01010 banco on dsf.NU_BAN = banco.NU_BAN\nwhere boletos.ID_STATUS in ('1', '2', '3', '4', '6', '7')",
+        "options": {}
+      },
+      "id": "0ab2ecaf-f31c-4368-a23d-cdc74ad8ac9b",
+      "name": "MySQL - Boletos",
+      "type": "n8n-nodes-base.mySql",
+      "typeVersion": 2.2,
+      "position": [
+        -176,
+        240
+      ],
+      "executeOnce": false,
+      "retryOnFail": false,
+      "alwaysOutputData": true,
+      "credentials": {
+        "mySql": {
+          "id": "p4QeWO4xDinBPHgM",
+          "name": "MySQL Perfilux"
+        }
+      },
+      "onError": "continueRegularOutput"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "12d4f787-e3f2-4ebb-8103-b4551a8b42e9",
+              "name": "tipo_unidade",
+              "value": "={{ $json.tipo_unidade }}",
+              "type": "string"
+            },
+            {
+              "id": "35947a7b-deda-4d7c-b543-66f0bb47c12d",
+              "name": "unidade",
+              "value": "={{ $json.unidade }}",
+              "type": "string"
+            },
+            {
+              "id": "33f31e6b-27dc-4988-ab47-d22dc5cdac8e",
+              "name": "nu_documento",
+              "value": "={{ $json.nu_documento }}",
+              "type": "string"
+            },
+            {
+              "id": "2b8e1c3b-a9ca-4e9c-9edf-c8d295c569d8",
+              "name": "data_emissao",
+              "value": "={{ $json.data_emissao }}",
+              "type": "string"
+            },
+            {
+              "id": "f553d414-11be-431c-b5c4-eb88c8379a2e",
+              "name": "status",
+              "value": "={{ $json.status }}",
+              "type": "string"
+            },
+            {
+              "id": "d26c5ecc-10cb-40fd-bd14-ac8abe3e488d",
+              "name": "data_vencimento",
+              "value": "={{ $json.data_vencimento }}",
+              "type": "string"
+            },
+            {
+              "id": "e94693e3-d4c9-483f-8e1b-e8dfbf0015e0",
+              "name": "valor_titulo",
+              "value": "={{ $json.valor_titulo }}",
+              "type": "string"
+            },
+            {
+              "id": "e1744356-8831-4e50-8a89-73b1d8a72bac",
+              "name": "cod_cliente",
+              "value": "={{ $json.cod_cliente }}",
+              "type": "string"
+            },
+            {
+              "id": "89166ff1-1e3f-4d67-83aa-c99eeabd715a",
+              "name": "nome_cliente",
+              "value": "={{ $json.nome_cliente }}",
+              "type": "string"
+            },
+            {
+              "id": "a08713ba-5af7-4a78-b92e-12e38d704089",
+              "name": "APEL_FANT",
+              "value": "={{ $json.APEL_FANT }}",
+              "type": "string"
+            },
+            {
+              "id": "7f608dd9-a053-4d0d-aa4b-6adf2b73e8b1",
+              "name": "cnpj",
+              "value": "={{ $json.cnpj }}",
+              "type": "string"
+            },
+            {
+              "id": "9d37717c-59b2-4721-8c99-277d5b907d1f",
+              "name": "n_dsf",
+              "value": "={{ $json.n_dsf }}",
+              "type": "string"
+            },
+            {
+              "id": "07bdab1c-4aae-4c8b-8a50-9a30ebe2b75a",
+              "name": "tipo_dsf",
+              "value": "={{ $json.tipo_dsf }}",
+              "type": "string"
+            },
+            {
+              "id": "2090174f-1b90-41f4-b794-6a4b5392a519",
+              "name": "tipo_documento",
+              "value": "={{ $json.tipo_documento }}",
+              "type": "string"
+            },
+            {
+              "id": "2a8996f5-693f-41e9-b586-69589847cab2",
+              "name": "conta",
+              "value": "={{ $json.conta }}",
+              "type": "string"
+            },
+            {
+              "id": "4ca1a854-1111-4455-8e28-892bf8023f27",
+              "name": "inst_financeira",
+              "value": "={{ $json.inst_financeira }}",
+              "type": "string"
+            },
+            {
+              "id": "4249e85e-3970-49b5-94f4-c614fbafde63",
+              "name": "descricao",
+              "value": "={{ $json.descricao }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        48,
+        240
+      ],
+      "id": "8422dd55-ae39-4f99-b217-bd9d93b46f54",
+      "name": "format_text"
+    },
+    {
+      "parameters": {
+        "operation": "xlsx",
+        "options": {}
+      },
+      "id": "822170bf-cd38-4242-ab2e-41f21d4401fd",
+      "name": "Convert to File",
+      "type": "n8n-nodes-base.convertToFile",
+      "typeVersion": 1.1,
+      "position": [
+        464,
+        240
+      ]
+    },
+    {
+      "parameters": {
+        "operation": "upload",
+        "bucketName": "marcolanoperacoes",
+        "fileName": "={{ $('ARQUIVO').item.json.arq }}",
+        "additionalFields": {
+          "acl": "publicReadWrite"
+        }
+      },
+      "id": "39b92c5e-9284-40ca-8c1e-e72c6061d531",
+      "name": "AWS S31",
+      "type": "n8n-nodes-base.awsS3",
+      "typeVersion": 2,
+      "position": [
+        672,
+        240
+      ],
+      "credentials": {
+        "aws": {
+          "id": "wojq9Jq4bZgupPjh",
+          "name": "AWS account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "delete",
+        "bucketName": "marcolanoperacoes",
+        "fileKey": "={{ $('ARQUIVO').item.json.arq }}",
+        "options": {}
+      },
+      "id": "d0413d0b-5288-4e45-a8ea-7d80d1ddd92c",
+      "name": "AWS S33",
+      "type": "n8n-nodes-base.awsS3",
+      "typeVersion": 2,
+      "position": [
+        1200,
+        240
+      ],
+      "credentials": {
+        "aws": {
+          "id": "wojq9Jq4bZgupPjh",
+          "name": "AWS account"
+        }
+      }
+    },
+    {
+      "parameters": {},
+      "id": "b46df472-41bb-4e6c-8d67-102342313dfc",
+      "name": "Wait",
+      "type": "n8n-nodes-base.wait",
+      "typeVersion": 1.1,
+      "position": [
+        1040,
+        240
+      ],
+      "webhookId": "{{WEBHOOK_ID}}"
+    },
+    {
+      "parameters": {
+        "jsCode": "return items.filter(item => {\n  // Condição: só deixa os que têm valor no campo 'nu_documento'\n  return item.json.nu_documento !== null && item.json.nu_documento !== undefined && item.json.nu_documento !== '';\n});\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        240,
+        240
+      ],
+      "id": "78e070b4-7b3f-4661-b12b-feaf2a94e42b",
+      "name": "Code"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "=https://api.z-api.io/instances/3AD47F49CE9AF04B4D43CA225862B38B/token/6EE2B07CF6D61B0059AD2125/send-document/xlsx",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "={{ $('AUTH').item.json.link2 }}",
+              "value": "={{ $('AUTH').item.json.link1 }}"
+            }
+          ]
+        },
+        "sendBody": true,
+        "contentType": "form-urlencoded",
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "phone",
+              "value": "=5581995667070"
+            },
+            {
+              "name": "fileName",
+              "value": "=BOLETOS_PERFILUX_{{$today.format('MM-DD')}}"
+            },
+            {
+              "name": "document",
+              "value": "=https://marcolanoperacoes.s3.amazonaws.com/{{ $('ARQUIVO').item.json.arq }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "daa490c8-1105-41e0-aa2d-be8522ce89ad",
+      "name": "Diego Perfilux",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.1,
+      "position": [
+        864,
+        240
+      ]
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Google Sheets": {
+      "main": [
+        [
+          {
+            "node": "AUTH",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "AUTH": {
+      "main": [
+        [
+          {
+            "node": "ARQUIVO",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "ARQUIVO": {
+      "main": [
+        [
+          {
+            "node": "MySQL - Boletos",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Schedule Trigger": {
+      "main": [
+        [
+          {
+            "node": "Google Sheets",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "MySQL - Boletos": {
+      "main": [
+        [
+          {
+            "node": "format_text",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "format_text": {
+      "main": [
+        [
+          {
+            "node": "Code",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Convert to File": {
+      "main": [
+        [
+          {
+            "node": "AWS S31",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "AWS S31": {
+      "main": [
+        [
+          {
+            "node": "Diego Perfilux",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Wait": {
+      "main": [
+        [
+          {
+            "node": "AWS S33",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code": {
+      "main": [
+        [
+          {
+            "node": "Convert to File",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Diego Perfilux": {
+      "main": [
+        [
+          {
+            "node": "Wait",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": true,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "901db5c4-0540-4113-b01b-0599c1558d85",
+  "meta": {
+    "instanceId": "{{INSTANCE_ID}}"
+  },
+  "id": "I295MSqkxnkbLnh0",
+  "tags": [
+    {
+      "updatedAt": "2025-03-24T11:50:02.723Z",
+      "createdAt": "2025-03-24T11:50:02.723Z",
+      "id": "g1g84lMe9VWPJQMS",
+      "name": "Perfilux"
+    },
+    {
+      "updatedAt": "2026-01-14T11:04:00.895Z",
+      "createdAt": "2025-03-21T11:47:30.374Z",
+      "id": "CvCy3KNJKyMxSQ3C",
+      "name": "GDA"
+    }
+  ]
+}

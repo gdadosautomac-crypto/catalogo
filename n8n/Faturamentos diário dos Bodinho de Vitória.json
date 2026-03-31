@@ -1,0 +1,585 @@
+{
+  "name": "Faturamentos diário dos Bodinho de Vitória",
+  "nodes": [
+    {
+      "parameters": {
+        "operation": "delete",
+        "bucketName": "marcolanoperacoes",
+        "fileKey": "=Documentos Devolvidos - d25-6h0m1s",
+        "options": {}
+      },
+      "id": "ad3db61f-650c-47b5-aae1-782f2301c8b1",
+      "name": "AWS S37",
+      "type": "n8n-nodes-base.awsS3",
+      "typeVersion": 2,
+      "position": [
+        544,
+        752
+      ],
+      "credentials": {
+        "aws": {
+          "id": "JFruCydWV7liEYv1",
+          "name": "AWS Diego"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "getAll",
+        "bucketName": "marcolanoperacoes",
+        "returnAll": true,
+        "options": {}
+      },
+      "id": "1f3c5217-475c-43e9-8ac9-01e5d9d99519",
+      "name": "AWS S3",
+      "type": "n8n-nodes-base.awsS3",
+      "typeVersion": 2,
+      "position": [
+        352,
+        752
+      ],
+      "credentials": {
+        "aws": {
+          "id": "JFruCydWV7liEYv1",
+          "name": "AWS Diego"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "field": "weeks",
+              "triggerAtDay": [
+                1,
+                2,
+                3,
+                4
+              ],
+              "triggerAtHour": 18,
+              "triggerAtMinute": 1
+            },
+            {
+              "field": "weeks",
+              "triggerAtDay": [
+                5
+              ],
+              "triggerAtHour": 17,
+              "triggerAtMinute": 15
+            }
+          ]
+        }
+      },
+      "id": "191e9418-09ab-4d7d-a36a-bb3a8e5547cd",
+      "name": "Schedule Trigger1",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.1,
+      "position": [
+        400,
+        544
+      ]
+    },
+    {
+      "parameters": {
+        "documentId": {
+          "__rl": true,
+          "value": "https://docs.google.com/spreadsheets/d/1J9xHE08UPG2QnDrjFsiy3VU3Z8ziZT9aO9MF7ct5ruA/edit?usp=sharing",
+          "mode": "url"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 564051929,
+          "mode": "list",
+          "cachedResultName": "Token",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1J9xHE08UPG2QnDrjFsiy3VU3Z8ziZT9aO9MF7ct5ruA/edit#gid=564051929"
+        },
+        "options": {}
+      },
+      "id": "c9558517-dfd2-4f1b-986e-b5d211190964",
+      "name": "Token",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.3,
+      "position": [
+        608,
+        544
+      ],
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "HfbTEVMQHA5O66Ya",
+          "name": "Sheets JG e Japa"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "(select \n\teg.unidade, \n\tround(sum(valor_entregue + coalesce(acrescimo, 0) ), 2) as valor, \n\tROUND(sum(replace(metragem_entregue, ',','.')::numeric), 2) as m2\nfrom entregas_geral eg \n\tleft join unidades u on eg.tipo_unidade = u.tipo_unidade and eg.unidade = u.unidade \nwhere \n\teg.tipo_unidade = 'Bodinho' and u.matriz in ('VITORIA DE SANTO ANTAO') \n\tand data_hora_entregue::date between TO_CHAR(NOW()::DATE, 'yyyy-mm-01')::date and current_date\ngroup by eg.unidade\n) union all (\nselect \n\t'TOTAL' as unidade, \n\tround(sum(valor_entregue + coalesce(acrescimo, 0) ), 2) as total, \n\tROUND(sum(replace(metragem_entregue, ',','.')::numeric), 2) as m2_total\nfrom entregas_geral eg \n\tleft join unidades u on eg.tipo_unidade = u.tipo_unidade and eg.unidade = u.unidade \nwhere eg.tipo_unidade = 'Bodinho' and u.matriz in ('VITORIA DE SANTO ANTAO') and data_hora_entregue::date between TO_CHAR(NOW()::DATE, 'yyyy-mm-01')::date and current_date\n)",
+        "options": {}
+      },
+      "id": "40ca98d9-7740-4ad8-b407-370e4ad6b642",
+      "name": "Postgres1",
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 2.3,
+      "position": [
+        832,
+        368
+      ],
+      "credentials": {
+        "postgres": {
+          "id": "G50fA6A0L90xaBIe",
+          "name": "Postgres account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "b97c3336-9bd3-4a94-ba16-3cb561614035",
+              "name": "unidade",
+              "value": "=*{{ $json[\"unidade\"] }}*",
+              "type": "string"
+            },
+            {
+              "id": "769f5d55-b17e-4794-8c1b-3f03f6d1850a",
+              "name": "menssagem",
+              "value": "=*{{ $json[\"unidade\"] }}*\nFaturamento: *R$ {{ $json[\"valor\"] }}*\nMetragem: *{{ $json[\"m2\"] }}*",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "b67e06eb-97f5-48d4-8b98-eb47d5681daf",
+      "name": "Edit Fields1",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.3,
+      "position": [
+        1024,
+        368
+      ]
+    },
+    {
+      "parameters": {
+        "fieldsToSummarize": {
+          "values": [
+            {
+              "aggregation": "concatenate",
+              "field": "menssagem",
+              "separateBy": "\n"
+            }
+          ]
+        },
+        "fieldsToSplitBy": "unidade",
+        "options": {}
+      },
+      "id": "f9bb15bf-f38f-4480-9e94-eb0e024ac03a",
+      "name": "Summarize",
+      "type": "n8n-nodes-base.summarize",
+      "typeVersion": 1,
+      "position": [
+        1472,
+        368
+      ]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{ $('Token').item.json.Link }}send-text",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "={{ $('Token').item.json.Name }}",
+              "value": "={{ $('Token').item.json.Value }}"
+            }
+          ]
+        },
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "phone",
+              "value": "5581991596203"
+            },
+            {
+              "name": "message",
+              "value": "=*Faturamento atual - {{ $now.day }}/{{ $now.month }}/{{ $now.year }}*\n\n{{ $json[\"concatenated_concatenated_menssagem\"] }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "08c321e2-9d39-4613-b908-97092626d7f7",
+      "name": "Tiago",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.1,
+      "position": [
+        1648,
+        480
+      ]
+    },
+    {
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "(select \n\teg.unidade, \n    round(sum(valor_entregue + coalesce(acrescimo, 0) ), 2) as valor\nfrom entregas_geral eg \n\tleft join unidades u on eg.tipo_unidade = u.tipo_unidade and eg.unidade = u.unidade \nwhere \n\teg.tipo_unidade = 'Bodinho' and u.matriz in ('VITORIA DE SANTO ANTAO') \n\tand data_hora_entregue::date between TO_CHAR(NOW()::DATE, 'yyyy-mm-01')::date and current_date\n    and categoria_produto like '%CHAPARIA%'\ngroup by eg.unidade\n) union all (\nselect \n\t'TOTAL' as unidade, \n\tround(sum(valor_entregue + coalesce(acrescimo, 0) ), 2) as total\nfrom entregas_geral eg \n\tleft join unidades u on eg.tipo_unidade = u.tipo_unidade and eg.unidade = u.unidade \nwhere eg.tipo_unidade = 'Bodinho' and u.matriz in ('VITORIA DE SANTO ANTAO') and data_hora_entregue::date between TO_CHAR(NOW()::DATE, 'yyyy-mm-01')::date and current_date\nand categoria_produto like '%CHAPARIA%'\n)",
+        "options": {}
+      },
+      "id": "880b45d8-fc38-4a9a-9b2b-784eedb52725",
+      "name": "Postgres",
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 2.3,
+      "position": [
+        832,
+        544
+      ],
+      "credentials": {
+        "postgres": {
+          "id": "G50fA6A0L90xaBIe",
+          "name": "Postgres account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "b97c3336-9bd3-4a94-ba16-3cb561614035",
+              "name": "unidade",
+              "value": "=*{{ $json.unidade }}*",
+              "type": "string"
+            },
+            {
+              "id": "9365b0a4-bdeb-47f6-9939-f8a63ad659fa",
+              "name": "menssagem",
+              "value": "=Faturamento Chaparia: *R$ {{ $json.valor }}*",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "93c46439-a6f6-4fbe-81e2-bcd6028fa3b8",
+      "name": "Edit Fields",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.3,
+      "position": [
+        1024,
+        544
+      ]
+    },
+    {
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "(select \n\teg.unidade, \n    round(sum(valor_entregue + coalesce(acrescimo, 0) ), 2) as valor\nfrom entregas_geral eg \n\tleft join unidades u on eg.tipo_unidade = u.tipo_unidade and eg.unidade = u.unidade \nwhere \n\teg.tipo_unidade = 'Bodinho' and u.matriz in ('VITORIA DE SANTO ANTAO') \n\tand data_hora_entregue::date between TO_CHAR(NOW()::DATE, 'yyyy-mm-01')::date and current_date\n    and categoria_produto like 'FERRAGEM'\ngroup by eg.unidade\n) union all (\nselect \n\t'TOTAL' as unidade, \n\tround(sum(valor_entregue + coalesce(acrescimo, 0) ), 2) as total\nfrom entregas_geral eg \n\tleft join unidades u on eg.tipo_unidade = u.tipo_unidade and eg.unidade = u.unidade \nwhere eg.tipo_unidade = 'Bodinho' and u.matriz in ('VITORIA DE SANTO ANTAO') and data_hora_entregue::date between TO_CHAR(NOW()::DATE, 'yyyy-mm-01')::date and current_date\nand categoria_produto like 'FERRAGEM'\n)",
+        "options": {}
+      },
+      "id": "5321d4a4-3864-4162-82ba-63f084dfe5a8",
+      "name": "Postgres2",
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 2.3,
+      "position": [
+        832,
+        720
+      ],
+      "credentials": {
+        "postgres": {
+          "id": "G50fA6A0L90xaBIe",
+          "name": "Postgres account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "b97c3336-9bd3-4a94-ba16-3cb561614035",
+              "name": "unidade",
+              "value": "=*{{ $json.unidade }}*",
+              "type": "string"
+            },
+            {
+              "id": "206adf60-7861-44ea-b9b8-70e187218037",
+              "name": "menssagem",
+              "value": "=Faturamento Ferragem: *R$ {{ $json.valor }}*\n",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "b6acd2d5-0d89-4bdc-a3ef-58c786d181f3",
+      "name": "Edit Fields2",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.3,
+      "position": [
+        1024,
+        720
+      ]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{ $('Token').item.json.Link }}send-text",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "={{ $('Token').item.json.Name }}",
+              "value": "={{ $('Token').item.json.Value }}"
+            }
+          ]
+        },
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "phone",
+              "value": "5581981598765"
+            },
+            {
+              "name": "message",
+              "value": "=*Faturamento atual - {{ $now.day }}/{{ $now.month }}/{{ $now.year }}*\n\n{{ $json[\"concatenated_menssagem\"] }}\n{{ $json[\"concatenated_concatenated_menssagem\"] }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "251d8ca2-3f29-43b0-8bed-a3fb230d0d4c",
+      "name": "TESTE",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.1,
+      "position": [
+        1632,
+        784
+      ]
+    },
+    {
+      "parameters": {},
+      "id": "086b8e87-b1de-480b-bb1f-00a7b1a1aecb",
+      "name": "Merge",
+      "type": "n8n-nodes-base.merge",
+      "typeVersion": 2.1,
+      "position": [
+        1248,
+        448
+      ]
+    },
+    {
+      "parameters": {},
+      "id": "3993bbfc-8190-449e-b15c-e057637d6270",
+      "name": "Merge1",
+      "type": "n8n-nodes-base.merge",
+      "typeVersion": 2.1,
+      "position": [
+        1232,
+        704
+      ]
+    },
+    {
+      "parameters": {
+        "fieldsToSummarize": {
+          "values": [
+            {
+              "aggregation": "concatenate",
+              "field": "concatenated_menssagem",
+              "separateBy": "\n"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "2c0e1fd0-88d2-458f-8804-b867519b1444",
+      "name": "Summarize1",
+      "type": "n8n-nodes-base.summarize",
+      "typeVersion": 1,
+      "position": [
+        1488,
+        608
+      ]
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Schedule Trigger1": {
+      "main": [
+        [
+          {
+            "node": "Token",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Token": {
+      "main": [
+        [
+          {
+            "node": "Postgres",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Postgres2",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Postgres1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Postgres1": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Edit Fields1": {
+      "main": [
+        [
+          {
+            "node": "Merge",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "AWS S3": {
+      "main": [
+        [
+          {
+            "node": "AWS S37",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Postgres": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Edit Fields": {
+      "main": [
+        [
+          {
+            "node": "Merge",
+            "type": "main",
+            "index": 1
+          }
+        ]
+      ]
+    },
+    "Postgres2": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Edit Fields2": {
+      "main": [
+        [
+          {
+            "node": "Merge1",
+            "type": "main",
+            "index": 1
+          }
+        ]
+      ]
+    },
+    "Merge": {
+      "main": [
+        [
+          {
+            "node": "Merge1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Merge1": {
+      "main": [
+        [
+          {
+            "node": "Summarize",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Summarize": {
+      "main": [
+        [
+          {
+            "node": "Summarize1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Summarize1": {
+      "main": [
+        []
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "ed5c61fe-a432-42f9-8add-335ef199c625",
+  "meta": {
+    "instanceId": "{{INSTANCE_ID}}"
+  },
+  "id": "fOTWhk2bWDh9yC7F",
+  "tags": [
+    {
+      "updatedAt": "2025-03-24T14:24:48.667Z",
+      "createdAt": "2025-03-24T14:24:48.667Z",
+      "id": "DRs3JJesnD7xa1AS",
+      "name": "Setor - Comercial"
+    },
+    {
+      "updatedAt": "2025-03-24T14:13:38.023Z",
+      "createdAt": "2025-03-24T14:13:38.023Z",
+      "id": "4ZyNuatpCj0NdhLU",
+      "name": "Bodinhos"
+    },
+    {
+      "updatedAt": "2025-03-21T11:52:03.823Z",
+      "createdAt": "2025-03-21T11:52:03.823Z",
+      "id": "VQmA23kx6h1wy92X",
+      "name": "GUIS"
+    }
+  ]
+}

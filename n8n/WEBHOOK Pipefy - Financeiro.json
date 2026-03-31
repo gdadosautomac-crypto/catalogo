@@ -1,0 +1,305 @@
+{
+  "name": "WEBHOOK Pipefy - Financeiro",
+  "nodes": [
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "897a9a1a-3870-4374-b539-3863e8d9a32d",
+              "name": "Alerta",
+              "value": "={{ $json.body.alerta }}",
+              "type": "string"
+            },
+            {
+              "id": "57d2fff4-f86a-44b9-a31d-d8fe6293feaa",
+              "name": "unidade",
+              "value": "={{ $json.body.Unidade }}",
+              "type": "string"
+            },
+            {
+              "id": "77c16ead-013f-4d7e-add0-7a0dbbdf0189",
+              "name": "solicitante",
+              "value": "={{ $json.body.Solicitante }}",
+              "type": "string"
+            },
+            {
+              "id": "61bd6a55-fbc6-4ff5-869e-270a2075401a",
+              "name": "contato",
+              "value": "={{ $json.body.Contato }}",
+              "type": "string"
+            },
+            {
+              "id": "5367e7cd-1959-4894-b630-c9e01a212861",
+              "name": "body['Tipo de Solicitação']",
+              "value": "={{ $json.body['Tipo de Solicitação'] }}",
+              "type": "string"
+            },
+            {
+              "id": "666416b3-5c38-4de9-bb89-ab5c2dee46a3",
+              "name": "body['Solicitação']",
+              "value": "={{ $json.body['Solicitação'] }}",
+              "type": "string"
+            },
+            {
+              "id": "e323d638-02d0-437a-a4b9-fd04e950d08c",
+              "name": "body.Cliente",
+              "value": "={{ $json.body.Cliente }}",
+              "type": "string"
+            },
+            {
+              "id": "41f8bf31-e696-444e-8e24-0f1245379d8a",
+              "name": "body.CNPJ",
+              "value": "={{ $json.body.CNPJ }}",
+              "type": "string"
+            },
+            {
+              "id": "484bc0f7-2116-44e1-a5f3-e91ad7f6549f",
+              "name": "body.Comentário",
+              "value": "={{ $json.body.Comentário }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "35209f33-0fdf-4fcd-abae-0f256a6c5bf5",
+      "name": "Edit Fields",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.3,
+      "position": [
+        -432,
+        144
+      ]
+    },
+    {
+      "parameters": {
+        "rules": {
+          "values": [
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 1
+                },
+                "conditions": [
+                  {
+                    "id": "bcb3f761-0392-41ae-b2a7-dac7e3b008f2",
+                    "leftValue": "={{ $json.Alerta }}",
+                    "rightValue": "=aprovado",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals",
+                      "name": "filter.operator.equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              }
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 1
+                },
+                "conditions": [
+                  {
+                    "id": "7103ce71-c06a-4dd4-b9d5-23c2041152c9",
+                    "leftValue": "={{ $json.Alerta }}",
+                    "rightValue": "=reprovado",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals",
+                      "name": "filter.operator.equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              }
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "0ad583f3-b501-4983-8338-d25783cf468b",
+      "name": "Switch",
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 3,
+      "position": [
+        -256,
+        144
+      ]
+    },
+    {
+      "parameters": {
+        "phone": "={{ $json.telefoneFormatado }}",
+        "text": "=------- *SOLICITAÇÃO: {{ $json.body['Solicitação'] }} -------\n\nOlá, {{ $json.solicitante }}.\nSua solicitação de {{ $json.body['Tipo de Solicitação'] }},  referente a unidade:{{ $json.unidade }}  foi analisada e APROVADA pelo Financeiro.\n\nCliente: {{ $json.body.Cliente }}\nCNPJ: {{ $json.body.CNPJ }}",
+        "additionalFields": {}
+      },
+      "type": "n8n-nodes-zapi.zapi",
+      "typeVersion": 1,
+      "position": [
+        192,
+        64
+      ],
+      "id": "621ca33b-d675-4292-9b36-cfbda57c2798",
+      "name": "solicitante Aprovado",
+      "credentials": {
+        "zapiApi": {
+          "id": "cGI15AvSkFAV8Qrr",
+          "name": "Z-API account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "phone": "={{ $json.telefoneFormatado }}",
+        "text": "=------- *SOLICITAÇÃO: {{ $json.body['Solicitação'] }} -------\n\nOlá, {{ $json.solicitante }}.\nSua solicitação de {{ $json.body['Tipo de Solicitação'] }},  referente a unidade:{{ $json.unidade }}  foi analisada e *REPROVADA* pelo Financeiro.\n\nCliente: {{ $json.body.Cliente }}\nCNPJ: {{ $json.body.CNPJ }}\n\nObservações: {{ $json.body.Comentário }}",
+        "additionalFields": {}
+      },
+      "type": "n8n-nodes-zapi.zapi",
+      "typeVersion": 1,
+      "position": [
+        192,
+        240
+      ],
+      "id": "9acf54bd-ef11-4897-a681-4f09d05610e0",
+      "name": "solicitante reprovado",
+      "credentials": {
+        "zapiApi": {
+          "id": "cGI15AvSkFAV8Qrr",
+          "name": "Z-API account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "return items.map(item => {\n  const numeroOriginal = item.json.contato || \"\"; // ou o nome correto do campo do Pipefy\n  const numeroLimpo = numeroOriginal.replace(/[^0-9]/g, \"\"); // remove tudo que não for número\n\n  return {\n    json: {\n      ...item.json,\n      telefoneFormatado: numeroLimpo\n    }\n  };\n});\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        0,
+        64
+      ],
+      "id": "0c647bfe-8af2-420f-bf07-1a4d766e87f9",
+      "name": "limpa)numero"
+    },
+    {
+      "parameters": {
+        "jsCode": "return items.map(item => {\n  const numeroOriginal = item.json.contato || \"\"; // ou o nome correto do campo do Pipefy\n  const numeroLimpo = numeroOriginal.replace(/[^0-9]/g, \"\"); // remove tudo que não for número\n\n  return {\n    json: {\n      ...item.json,\n      telefoneFormatado: numeroLimpo\n    }\n  };\n});\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        0,
+        240
+      ],
+      "id": "5b258ce4-d3df-4d8a-8325-144403f6e52b",
+      "name": "limpa_numero"
+    },
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "82dafdaa-7eff-4c0a-a529-a6c6f061b53c",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2.1,
+      "position": [
+        -608,
+        144
+      ],
+      "id": "05881d2f-8dc6-4c55-b4c0-081d7d19f2d0",
+      "name": "Webhook",
+      "webhookId": "{{WEBHOOK_ID}}"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Edit Fields": {
+      "main": [
+        [
+          {
+            "node": "Switch",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Switch": {
+      "main": [
+        [
+          {
+            "node": "limpa)numero",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "limpa_numero",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "limpa)numero": {
+      "main": [
+        [
+          {
+            "node": "solicitante Aprovado",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "limpa_numero": {
+      "main": [
+        [
+          {
+            "node": "solicitante reprovado",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Webhook": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": true,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "19d85430-97f4-4843-8314-74dab1babcb7",
+  "meta": {
+    "instanceId": "{{INSTANCE_ID}}"
+  },
+  "id": "xAopPeeeENMWbJCD",
+  "tags": [
+    {
+      "updatedAt": "2026-01-14T11:04:00.895Z",
+      "createdAt": "2025-03-21T11:47:30.374Z",
+      "id": "CvCy3KNJKyMxSQ3C",
+      "name": "GDA"
+    }
+  ]
+}

@@ -1,0 +1,459 @@
+{
+  "name": "Entregues e Pendentes BI - 12Meses",
+  "nodes": [
+    {
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "WITH pedidos_distintos AS (\n    SELECT \n        eg.cod_pedido,\n        eg.tipo_unidade,\n        eg.unidade,\n        eg.origem,\n        eg.nome_cliente,\n        eg.cod_cliente,\n        MIN(eg.data_hora_entregue) AS data_hora_entregue\n    FROM \n        entregas_geral eg\n    WHERE \n        eg.data_hora_entregue >= CURRENT_DATE - INTERVAL '12 months'\n    GROUP BY \n        eg.cod_pedido, \n        eg.tipo_unidade,\n        eg.unidade, \n        eg.origem,\n        eg.nome_cliente, \n        eg.cod_cliente\n),\nentregas_totais AS (\n    SELECT \n        ec.cod_pedido,\n        ec.unidade,  \n        SUM(ec.valor_entregue) AS valor_entregue_total \n    FROM \n        entregas_completa ec\n    GROUP BY \n        ec.cod_pedido, \n        ec.unidade  \n),\nvalor_total_pedidos AS (\n    SELECT \n        cod_pedido,\n        unidade,\n        SUM(valor_unitario_total_com_desconto::numeric) AS valor_total_pedido\n    FROM pedidos\n    GROUP BY cod_pedido, unidade\n),\ncondicoes_por_cliente AS (\n    SELECT \n        cod_cliente,\n        unidade,\n        STRING_AGG(DISTINCT cond_pagamento, ' / ') AS condicoes_pagamento\n    FROM pedidos p\n    WHERE p.cond_pagamento IS NOT NULL\n    GROUP BY cod_cliente, unidade\n)\nSELECT \n    pd.tipo_unidade,\n    pd.unidade,\n    pd.cod_cliente,\n    pd.nome_cliente,\n    pd.origem,\n    MAX(CURRENT_DATE - pd.data_hora_entregue::date) AS tempo_pendente,\n    MAX(msc.saldo) AS saldo,\n    mc.ramo_atividade,\n    mc.bloqueado,\n    COALESCE(cpc.condicoes_pagamento, 'N/A') AS condicoes_pagamento,\n    SUM(CASE \n            WHEN COALESCE(spp.totalpendente, 0) > COALESCE(et.valor_entregue_total, 0) \n            THEN COALESCE(et.valor_entregue_total, 0) \n            ELSE COALESCE(spp.totalpendente, 0) \n        END) AS total_pendente,\n    GREATEST(\n        SUM(COALESCE(et.valor_entregue_total, 0)) - \n        (SUM(COALESCE(vtp.valor_total_pedido, 0)) - SUM(COALESCE(spp.totalpendente, 0))),\n        0\n    ) AS total_devido\nFROM \n    pedidos_distintos pd\nLEFT JOIN \n    status_pagamento_pedidos spp\n    ON pd.cod_pedido = spp.cod_pedido\n    AND pd.unidade = spp.unidade\nLEFT JOIN \n    main_saldo_cliente msc\n    ON pd.unidade = msc.unidade\n    AND pd.nome_cliente = msc.nome\nLEFT JOIN \n    mapeamento_clientes mc\n    ON pd.unidade = mc.unidade \n    AND pd.cod_cliente = mc.codcliente\nLEFT JOIN \n    entregas_totais et\n    ON pd.cod_pedido = et.cod_pedido  \n    AND pd.unidade = et.unidade  \nLEFT JOIN \n    valor_total_pedidos vtp\n    ON vtp.cod_pedido = pd.cod_pedido\n    AND vtp.unidade = pd.unidade\nLEFT JOIN condicoes_por_cliente cpc\n    ON pd.cod_cliente = cpc.cod_cliente\n    AND pd.unidade = cpc.unidade\nWHERE \n    spp.totalpendente != 0\n    AND ramo_atividade != 'INTERCOMPANY'\nGROUP BY \n    pd.cod_cliente,\n    pd.nome_cliente,\n    pd.unidade,\n    pd.tipo_unidade,\n    pd.origem,\n    mc.ramo_atividade,\n    mc.bloqueado,\n    cpc.condicoes_pagamento\nHAVING \n    SUM(COALESCE(et.valor_entregue_total, 0)) - \n    (SUM(COALESCE(vtp.valor_total_pedido, 0)) - SUM(COALESCE(spp.totalpendente, 0))) > 0\n    AND MAX(CURRENT_DATE - pd.data_hora_entregue::date) > 1;",
+        "options": {}
+      },
+      "id": "70403ce6-df85-4906-904c-2cce6f9c22f0",
+      "name": "Postgres",
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 2.3,
+      "position": [
+        -816,
+        112
+      ],
+      "credentials": {
+        "postgres": {
+          "id": "G50fA6A0L90xaBIe",
+          "name": "Postgres account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "xlsx",
+        "options": {
+          "fileName": "=entregue_pendente_novo"
+        }
+      },
+      "id": "a6d444b2-1069-4e97-8476-937b1c6a8cb5",
+      "name": "Convert to File",
+      "type": "n8n-nodes-base.convertToFile",
+      "typeVersion": 1.1,
+      "position": [
+        -416,
+        112
+      ]
+    },
+    {
+      "parameters": {
+        "operation": "upload",
+        "bucketName": "marcolanoperacoes",
+        "fileName": "={{ $('ARQUIVO').item.json.arq }}",
+        "additionalFields": {
+          "acl": "publicReadWrite"
+        }
+      },
+      "id": "53c6e2e3-e5f3-4ee6-b2b9-9ded8bb55f52",
+      "name": "AWS S31",
+      "type": "n8n-nodes-base.awsS3",
+      "typeVersion": 2,
+      "position": [
+        -208,
+        112
+      ],
+      "credentials": {
+        "aws": {
+          "id": "wojq9Jq4bZgupPjh",
+          "name": "AWS account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "documentId": {
+          "__rl": true,
+          "value": "https://docs.google.com/spreadsheets/d/1avLuf5Qpu0lBIFVS-Ny0j-iIFZGkVqqufVGy-sfbqM4/edit?usp=sharing",
+          "mode": "url"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "Página1",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1avLuf5Qpu0lBIFVS-Ny0j-iIFZGkVqqufVGy-sfbqM4/edit#gid=0"
+        },
+        "options": {}
+      },
+      "id": "d3dbd193-43c8-404b-99c7-03b3e1ba63c7",
+      "name": "Google Sheets",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.3,
+      "position": [
+        -1456,
+        112
+      ],
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "8Ytd3zZKAOSyZNqC",
+          "name": "Sheets Andre"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "c9777b34-96c3-49cb-9e8f-5171d677c039",
+              "name": "link",
+              "value": "={{ $json.Link }}",
+              "type": "string"
+            },
+            {
+              "id": "c29c9cfb-b76e-4088-b0ca-7748646d4779",
+              "name": "link1",
+              "value": "={{ $json.Value }}",
+              "type": "string"
+            },
+            {
+              "id": "a2465349-2aee-4dc2-8ce6-9a40bf305fa7",
+              "name": "link2",
+              "value": "={{ $json.Field }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "22c4c445-0bd5-4812-93c8-e0413de6d6bb",
+      "name": "AUTH",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.3,
+      "position": [
+        -1216,
+        112
+      ]
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "c9777b34-96c3-49cb-9e8f-5171d677c039",
+              "name": "arq",
+              "value": "=entregue_pendente_novo",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {
+          "includeBinary": "={{ data }}"
+        }
+      },
+      "id": "548e4ebe-d1c8-40d7-b486-54288c0f1839",
+      "name": "ARQUIVO",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.3,
+      "position": [
+        -1024,
+        112
+      ]
+    },
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "field": "weeks",
+              "triggerAtDay": [
+                5,
+                1,
+                2,
+                3,
+                4,
+                6
+              ],
+              "triggerAtHour": 7,
+              "triggerAtMinute": 3
+            }
+          ]
+        }
+      },
+      "id": "60b4c92e-5272-49b9-9e29-fe3d73208298",
+      "name": "Schedule Trigger",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.1,
+      "position": [
+        -1664,
+        112
+      ]
+    },
+    {
+      "parameters": {
+        "operation": "delete",
+        "bucketName": "marcolanoperacoes",
+        "fileKey": "={{ $('ARQUIVO').item.json.arq }}",
+        "options": {}
+      },
+      "id": "064a6d85-a7f7-490a-8cef-cdfd6f93e466",
+      "name": "AWS S33",
+      "type": "n8n-nodes-base.awsS3",
+      "typeVersion": 2,
+      "position": [
+        432,
+        112
+      ],
+      "credentials": {
+        "aws": {
+          "id": "wojq9Jq4bZgupPjh",
+          "name": "AWS account"
+        }
+      }
+    },
+    {
+      "parameters": {},
+      "id": "c591e5c2-b229-44ae-a8b0-4a88847cd7bd",
+      "name": "Wait",
+      "type": "n8n-nodes-base.wait",
+      "typeVersion": 1.1,
+      "position": [
+        208,
+        112
+      ],
+      "webhookId": "{{WEBHOOK_ID}}"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "=https://api.z-api.io/instances/3AD47F49CE9AF04B4D43CA225862B38B/token/6EE2B07CF6D61B0059AD2125/send-document/xlsx",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "={{ $('AUTH').item.json.link2 }}",
+              "value": "={{ $('AUTH').item.json.link1 }}"
+            }
+          ]
+        },
+        "sendBody": true,
+        "contentType": "form-urlencoded",
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "phone",
+              "value": "=5581987473570"
+            },
+            {
+              "name": "fileName",
+              "value": "=entregue_pendente_{{$today.format('MM-DD')}}"
+            },
+            {
+              "name": "document",
+              "value": "=https://marcolanoperacoes.s3.amazonaws.com/{{ $('ARQUIVO').item.json.arq }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "5f3b2183-64e1-4cce-abba-8e6a9080dfe0",
+      "name": "André",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.1,
+      "position": [
+        0,
+        192
+      ],
+      "disabled": true
+    },
+    {
+      "parameters": {
+        "jsCode": "return items.map(item => {\n  return {\n    ...item,\n    json: {\n      ...item.json,\n      total_pendente: item.json.total_pendente !== null && item.json.total_pendente !== undefined \n        ? Number(item.json.total_pendente).toFixed(2).replace('.', ',') \n        : null,\n      total_devido: item.json.total_devido !== null && item.json.total_devido !== undefined \n        ? Number(item.json.total_devido).toFixed(2).replace('.', ',') \n        : null,\n      saldo: item.json.saldo !== null && item.json.saldo !== undefined \n        ? Number(item.json.saldo).toFixed(2).replace('.', ',') \n        : null\n    }\n  };\n});\n"
+      },
+      "id": "b7b65567-2eb1-4c06-804a-1617549c59a1",
+      "name": "Code",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -624,
+        112
+      ]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "=https://api.z-api.io/instances/3AD47F49CE9AF04B4D43CA225862B38B/token/6EE2B07CF6D61B0059AD2125/send-document/xlsx",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "={{ $('AUTH').item.json.link2 }}",
+              "value": "={{ $('AUTH').item.json.link1 }}"
+            }
+          ]
+        },
+        "sendBody": true,
+        "contentType": "form-urlencoded",
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "phone",
+              "value": "=5581994541473"
+            },
+            {
+              "name": "fileName",
+              "value": "=pedido_entregue_pendenteBI_NOVO{{$today.format('MM-DD')}}"
+            },
+            {
+              "name": "document",
+              "value": "=https://marcolanoperacoes.s3.amazonaws.com/{{ $('ARQUIVO').item.json.arq }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "6b6022f0-3ec3-4c93-ba55-d2d0405a04b2",
+      "name": "Joanne",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.1,
+      "position": [
+        0,
+        0
+      ]
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Postgres": {
+      "main": [
+        [
+          {
+            "node": "Code",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Convert to File": {
+      "main": [
+        [
+          {
+            "node": "AWS S31",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "AWS S31": {
+      "main": [
+        [
+          {
+            "node": "Joanne",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Google Sheets": {
+      "main": [
+        [
+          {
+            "node": "AUTH",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "AUTH": {
+      "main": [
+        [
+          {
+            "node": "ARQUIVO",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "ARQUIVO": {
+      "main": [
+        [
+          {
+            "node": "Postgres",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Schedule Trigger": {
+      "main": [
+        [
+          {
+            "node": "Google Sheets",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Wait": {
+      "main": [
+        [
+          {
+            "node": "AWS S33",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "André": {
+      "main": [
+        [
+          {
+            "node": "Wait",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code": {
+      "main": [
+        [
+          {
+            "node": "Convert to File",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Joanne": {
+      "main": [
+        [
+          {
+            "node": "Wait",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": true,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "22c3f05a-23e4-4303-8913-be717832be9d",
+  "meta": {
+    "instanceId": "{{INSTANCE_ID}}"
+  },
+  "id": "P3eVpSzXjuTmMpNU",
+  "tags": [
+    {
+      "updatedAt": "2026-01-14T11:04:00.895Z",
+      "createdAt": "2025-03-21T11:47:30.374Z",
+      "id": "CvCy3KNJKyMxSQ3C",
+      "name": "GDA"
+    }
+  ]
+}

@@ -1,0 +1,471 @@
+{
+  "name": "pedido_entregue_pendenteBI > 15 dias < 6 Meses",
+  "nodes": [
+    {
+      "parameters": {
+        "operation": "delete",
+        "bucketName": "marcolanoperacoes",
+        "fileKey": "=dinheiro_bds - d23-8h43m34s",
+        "options": {}
+      },
+      "id": "f8b1b655-fb24-4400-9057-f83bbad37599",
+      "name": "AWS S37",
+      "type": "n8n-nodes-base.awsS3",
+      "typeVersion": 2,
+      "position": [
+        1184,
+        640
+      ],
+      "credentials": {
+        "aws": {
+          "id": "wojq9Jq4bZgupPjh",
+          "name": "AWS account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "getAll",
+        "bucketName": "marcolanoperacoes",
+        "returnAll": true,
+        "options": {}
+      },
+      "id": "d83b15bc-3e6d-477d-98b8-bfd14bff6194",
+      "name": "AWS S3",
+      "type": "n8n-nodes-base.awsS3",
+      "typeVersion": 2,
+      "position": [
+        784,
+        640
+      ],
+      "credentials": {
+        "aws": {
+          "id": "wojq9Jq4bZgupPjh",
+          "name": "AWS account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "WITH pedidos_distintos AS (\n    SELECT \n        eg.cod_pedido,\n        eg.unidade,\n        eg.origem,\n        eg.nome_cliente,\n        eg.cod_cliente,\n        MIN(eg.data_hora_entregue) AS data_hora_entregue\n    FROM \n        entregas_geral eg\n    WHERE \n        eg.data_hora_entregue >= CURRENT_DATE - INTERVAL '12 MONTHS'\n    GROUP BY \n        eg.cod_pedido, \n        eg.unidade, \n        eg.origem,\n        eg.nome_cliente, \n        eg.cod_cliente\n)\nSELECT \n    pd.unidade,\n    pd.nome_cliente,\n    pd.cod_cliente,\n    COALESCE(SUM(spp.totalpendente), 0) AS total_pendente,\n    CURRENT_DATE - MIN(pd.data_hora_entregue)::date AS tempo_pendente, \n    COALESCE(msc.saldo, 0) AS saldo, \n    mc.ramo_atividade,\n    mc.bloqueado,\n    pd.origem,\n    COALESCE(\n        (SELECT STRING_AGG(DISTINCT p.cond_pagamento, ', ')\n         FROM pedidos p\n         JOIN status_pagamento_pedidos spp2  -- Filtro para pedidos pendentes\n           ON p.unidade = spp2.unidade\n          AND p.cod_pedido = spp2.cod_pedido\n         WHERE p.unidade = pd.unidade\n           AND p.cod_cliente = pd.cod_cliente\n           AND spp2.totalpendente != 0),  -- Apenas pedidos pendentes\n        'N/A'\n    ) AS condicoes_pagamento\nFROM \n    pedidos_distintos pd\nLEFT JOIN \n    status_pagamento_pedidos spp\n    ON pd.cod_pedido = spp.cod_pedido\n    AND pd.unidade = spp.unidade\nLEFT JOIN \n    main_saldo_cliente msc\n    ON pd.unidade = msc.unidade\n    AND pd.nome_cliente = msc.nome\nLEFT JOIN \n    mapeamento_clientes mc\n    ON pd.unidade = mc.unidade \n    AND pd.cod_cliente = mc.codcliente\nWHERE \n    spp.totalpendente != 0  -- Filtro para pedidos pendentes\n    and mc.ramo_atividade != 'INTERCOMPANY'\nGROUP BY \n    pd.unidade,\n    pd.origem,\n    pd.cod_cliente,\n    pd.nome_cliente,\n    msc.saldo,\n    mc.ramo_atividade,\n    mc.bloqueado;",
+        "options": {}
+      },
+      "id": "1003f96e-6bdf-4420-8c4d-4009e1846fe0",
+      "name": "Postgres",
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 2.3,
+      "position": [
+        784,
+        464
+      ],
+      "credentials": {
+        "postgres": {
+          "id": "G50fA6A0L90xaBIe",
+          "name": "Postgres account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "xls",
+        "options": {}
+      },
+      "id": "e73f0c55-e0ad-46e4-ac4d-b81d4f8966b4",
+      "name": "Convert to File",
+      "type": "n8n-nodes-base.convertToFile",
+      "typeVersion": 1.1,
+      "position": [
+        1184,
+        464
+      ]
+    },
+    {
+      "parameters": {
+        "operation": "upload",
+        "bucketName": "marcolanoperacoes",
+        "fileName": "={{ $('ARQUIVO').item.json.arq }}",
+        "additionalFields": {
+          "acl": "publicReadWrite"
+        }
+      },
+      "id": "d161feb6-d0a9-42d3-9656-66d45b2215f6",
+      "name": "AWS S31",
+      "type": "n8n-nodes-base.awsS3",
+      "typeVersion": 2,
+      "position": [
+        1376,
+        464
+      ],
+      "credentials": {
+        "aws": {
+          "id": "wojq9Jq4bZgupPjh",
+          "name": "AWS account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "c9777b34-96c3-49cb-9e8f-5171d677c039",
+              "name": "arq",
+              "value": "=entregue_pendente d{{ $now.day }}-{{ $now.hour }}h{{ $now.minute }}m{{ $now.second }}s",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {
+          "includeBinary": "={{ data }}"
+        }
+      },
+      "id": "b5b8c938-d751-4964-b0bb-867a16b70f2c",
+      "name": "ARQUIVO",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.3,
+      "position": [
+        592,
+        464
+      ]
+    },
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "field": "weeks",
+              "triggerAtDay": [
+                5,
+                1,
+                2,
+                3,
+                4,
+                6
+              ],
+              "triggerAtHour": 8,
+              "triggerAtMinute": 7
+            }
+          ]
+        }
+      },
+      "id": "b54c1e4c-695d-44b5-a2bc-c5873682c518",
+      "name": "Schedule Trigger",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.1,
+      "position": [
+        176,
+        464
+      ]
+    },
+    {
+      "parameters": {
+        "operation": "delete",
+        "bucketName": "marcolanoperacoes",
+        "fileKey": "={{ $('ARQUIVO').item.json.arq }}",
+        "options": {}
+      },
+      "id": "dd5b3129-678b-4718-a79a-ff897024dabe",
+      "name": "AWS S33",
+      "type": "n8n-nodes-base.awsS3",
+      "typeVersion": 2,
+      "position": [
+        2032,
+        464
+      ],
+      "credentials": {
+        "aws": {
+          "id": "wojq9Jq4bZgupPjh",
+          "name": "AWS account"
+        }
+      }
+    },
+    {
+      "parameters": {},
+      "id": "9bb7f2b5-95a3-4cd8-8377-45a2826f4ed2",
+      "name": "Wait",
+      "type": "n8n-nodes-base.wait",
+      "typeVersion": 1.1,
+      "position": [
+        1808,
+        464
+      ],
+      "webhookId": "{{WEBHOOK_ID}}"
+    },
+    {
+      "parameters": {
+        "jsCode": "return items.map(item => {\n  return {\n    ...item,\n    json: {\n      ...item.json,\n      total_pendente: item.json.total_pendente?.toString().replace('.', ','),\n      saldo: item.json.saldo?.toString().replace('.', ',')\n    }\n  };\n});\n"
+      },
+      "id": "5a016a54-dc0e-4126-b0b5-1b858b3e5a9b",
+      "name": "Code",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        992,
+        464
+      ]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{ $('Token').item.json.Link }}send-document/xlsx",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "={{ $('Token').item.json.Name }}",
+              "value": "={{ $('Token').item.json.Value }}"
+            }
+          ]
+        },
+        "sendBody": true,
+        "contentType": "form-urlencoded",
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "phone",
+              "value": "=5581994541473"
+            },
+            {
+              "name": "fileName",
+              "value": "=pedido_entregue_pendenteBI_{{$today.format('MM-DD')}}"
+            },
+            {
+              "name": "document",
+              "value": "=https://marcolanoperacoes.s3.amazonaws.com/{{ $('ARQUIVO').item.json.arq }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "d6f6be43-ac28-4aa2-a5f3-481b9a411567",
+      "name": "Joanne",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.1,
+      "position": [
+        1600,
+        368
+      ]
+    },
+    {
+      "parameters": {
+        "documentId": {
+          "__rl": true,
+          "value": "https://docs.google.com/spreadsheets/d/1J9xHE08UPG2QnDrjFsiy3VU3Z8ziZT9aO9MF7ct5ruA/edit?usp=sharing",
+          "mode": "url"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 564051929,
+          "mode": "list",
+          "cachedResultName": "Token",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1J9xHE08UPG2QnDrjFsiy3VU3Z8ziZT9aO9MF7ct5ruA/edit#gid=564051929"
+        },
+        "options": {}
+      },
+      "id": "77f2440c-78a4-4cfa-830a-44de01cd7043",
+      "name": "Token",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.3,
+      "position": [
+        384,
+        464
+      ],
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "8Ytd3zZKAOSyZNqC",
+          "name": "Sheets Andre"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{ $('Token').item.json.Link }}send-document/xlsx",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "={{ $('Token').item.json.Name }}",
+              "value": "={{ $('Token').item.json.Value }}"
+            }
+          ]
+        },
+        "sendBody": true,
+        "contentType": "form-urlencoded",
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "phone",
+              "value": "5581981598765"
+            },
+            {
+              "name": "fileName",
+              "value": "=pedido_entregue_pendenteBI_{{$today.format('MM-DD')}}"
+            },
+            {
+              "name": "document",
+              "value": "=https://marcolanoperacoes.s3.amazonaws.com/{{ $('ARQUIVO').item.json.arq }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "ae282e3c-06ca-4368-ba90-dcbdde9cb646",
+      "name": "TESTE",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.1,
+      "position": [
+        1600,
+        560
+      ]
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "AWS S3": {
+      "main": [
+        [
+          {
+            "node": "AWS S37",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Postgres": {
+      "main": [
+        [
+          {
+            "node": "Code",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Convert to File": {
+      "main": [
+        [
+          {
+            "node": "AWS S31",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "AWS S31": {
+      "main": [
+        [
+          {
+            "node": "Joanne",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "ARQUIVO": {
+      "main": [
+        [
+          {
+            "node": "Postgres",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Schedule Trigger": {
+      "main": [
+        [
+          {
+            "node": "Token",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Wait": {
+      "main": [
+        [
+          {
+            "node": "AWS S33",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code": {
+      "main": [
+        [
+          {
+            "node": "Convert to File",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Joanne": {
+      "main": [
+        [
+          {
+            "node": "Wait",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Token": {
+      "main": [
+        [
+          {
+            "node": "ARQUIVO",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "TESTE": {
+      "main": [
+        [
+          {
+            "node": "Wait",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": true,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "4b093895-bf79-4432-95ea-e02d5dfa803e",
+  "meta": {
+    "instanceId": "{{INSTANCE_ID}}"
+  },
+  "id": "I5xg599SV0rve4yt",
+  "tags": [
+    {
+      "updatedAt": "2025-03-24T11:52:02.582Z",
+      "createdAt": "2025-03-24T11:52:02.582Z",
+      "id": "uPLi4lJcaKHP324Z",
+      "name": "Setor - Financeiro"
+    },
+    {
+      "updatedAt": "2026-01-14T11:04:00.895Z",
+      "createdAt": "2025-03-21T11:47:30.374Z",
+      "id": "CvCy3KNJKyMxSQ3C",
+      "name": "GDA"
+    }
+  ]
+}

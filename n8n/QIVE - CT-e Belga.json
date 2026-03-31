@@ -1,0 +1,339 @@
+{
+  "name": "QIVE - CT-e Belga",
+  "nodes": [
+    {
+      "parameters": {},
+      "id": "f9f74ec6-d04c-4b24-b4a9-e65b7ba9c2a7",
+      "name": "Manual Trigger",
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        208,
+        256
+      ]
+    },
+    {
+      "parameters": {
+        "url": "https://api.arquivei.com.br/v1/cte/taker",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpCustomAuth",
+        "sendQuery": true,
+        "queryParameters": {
+          "parameters": [
+            {
+              "name": "created_at[from]",
+              "value": "2025-01-18"
+            },
+            {
+              "name": "created_at[to]",
+              "value": "2025-01-20"
+            },
+            {
+              "name": "limit",
+              "value": "50"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "4310ca15-360d-4b5b-ab37-591ba512f331",
+      "name": "Buscar CT-e Qive",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4,
+      "position": [
+        464,
+        256
+      ],
+      "credentials": {
+        "httpCustomAuth": {
+          "id": "YXqBxqFp6SpiX18V",
+          "name": "QIVE ACCOUNT"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "dataPropertyName": "xml",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.xml",
+      "typeVersion": 1,
+      "position": [
+        1104,
+        256
+      ],
+      "id": "acce0d08-4515-4144-8ab8-0bd8e2ab0cd9",
+      "name": "XML"
+    },
+    {
+      "parameters": {
+        "jsCode": "const output = [];\n\n// no seu print, o array está em items[0].json.data (data[0], data[1]...)\nconst list = items[0].json?.data || [];\n\nfor (const cte of list) {\n  output.push({ json: cte });\n}\n\nreturn output;\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        656,
+        256
+      ],
+      "id": "060da6e7-c3a0-493d-bdfc-20c0cebda8ce",
+      "name": "Extrair XML"
+    },
+    {
+      "parameters": {
+        "mode": "runOnceForEachItem",
+        "jsCode": "// pega o xml do lugar correto\nconst rawXml = item.json.xml;\n\n// se não existir xml, descarta só este item\nif (!rawXml || typeof rawXml !== 'string') {\n  return;\n}\n\n// decodifica base64 → XML texto\nitem.json.xml = Buffer.from(rawXml, 'base64').toString('utf-8');\n\n// retorno correto\nreturn item;\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        864,
+        256
+      ],
+      "id": "bbdd3bea-a18c-498c-ade9-c3b43d416c6b",
+      "name": "Separar Items"
+    },
+    {
+      "parameters": {
+        "mode": "runOnceForEachItem",
+        "jsCode": "const infCte = item.json?.cteProc?.CTe?.infCte;\n\n// se não existir estrutura de CT-e válida\nif (!infCte) {\n  return {\n    json: {\n      valido: false\n    }\n  };\n}\n\n// dados básicos\nconst chave_cte = infCte.Id?.replace('CTe', '') || null;\nconst ide = infCte.ide || {};\n\n// valores\nconst valor_frete = infCte.vPrest?.vTPrest || null;\n\n// participantes\nconst emit = infCte.emit || {};\nconst rem  = infCte.rem  || {};\nconst dest = infCte.dest || {};\nconst toma4 = ide?.toma4 || null;\nconst toma3 = ide?.toma3 || null;\n\nreturn {\n  json: {\n    valido: true,\n    chave_cte,\n    numero_cte: ide.nCT || null,\n    serie: ide.serie || null,\n    data_emissao: ide.dhEmi || null,\n    valor_frete,\n    cnpj_emitente: emit.CNPJ || null,\n    cnpj_remetente: rem.CNPJ || null,\n    cnpj_destinatario: dest.CNPJ || null,\n    cnpj_tomador:\n      toma4?.CNPJ ||\n      (toma3 ? 'TOMA3' : null),\n    data_ingestao: new Date().toISOString()\n  }\n};\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1312,
+        256
+      ],
+      "id": "00c8ac86-d378-4054-8c40-b5e0d4cb70b4",
+      "name": "Extrair campo"
+    },
+    {
+      "parameters": {
+        "operation": "append",
+        "documentId": {
+          "__rl": true,
+          "value": "https://docs.google.com/spreadsheets/d/1K8Tb8U58Nn_cjfyGKHEZfXM3PWx6dZkt2Dk4YhBAFHI/edit?usp=sharing",
+          "mode": "url"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "Página1",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1K8Tb8U58Nn_cjfyGKHEZfXM3PWx6dZkt2Dk4YhBAFHI/edit#gid=0"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "chave_cte": "={{ $json.chave_cte }}",
+            "numero_cte": "={{ $json.numero_cte }}",
+            "serie": "={{ $json.serie }}",
+            "data_emissao": "={{ $json.data_emissao }}",
+            "valor_frete": "={{ $json.valor_frete }}",
+            "cnpj_emitente": "={{ $json.cnpj_emitente }}",
+            "cnpj_remetente": "={{ $json.cnpj_remetente }}",
+            "cnpj_destinatario": "={{ $json.cnpj_destinatario }}",
+            "cnpj_tomador": "={{ $json.cnpj_tomador }}",
+            "data_ingestao": "={{ $json.data_ingestao }}"
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "chave_cte",
+              "displayName": "chave_cte",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "numero_cte",
+              "displayName": "numero_cte",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "serie",
+              "displayName": "serie",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "data_emissao",
+              "displayName": "data_emissao",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "valor_frete",
+              "displayName": "valor_frete",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "cnpj_emitente",
+              "displayName": "cnpj_emitente",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "cnpj_tomador",
+              "displayName": "cnpj_tomador",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "cnpj_remetente",
+              "displayName": "cnpj_remetente",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "cnpj_destinatario",
+              "displayName": "cnpj_destinatario",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "data_ingestao",
+              "displayName": "data_ingestao",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        1520,
+        256
+      ],
+      "id": "c3205d9a-43d9-41cc-9556-9ed5ef1ddc73",
+      "name": "Append row in sheet",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "8Ytd3zZKAOSyZNqC",
+          "name": "Sheets Andre"
+        }
+      }
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Manual Trigger": {
+      "main": [
+        [
+          {
+            "node": "Buscar CT-e Qive",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Buscar CT-e Qive": {
+      "main": [
+        [
+          {
+            "node": "Extrair XML",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "XML": {
+      "main": [
+        [
+          {
+            "node": "Extrair campo",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Extrair XML": {
+      "main": [
+        [
+          {
+            "node": "Separar Items",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Separar Items": {
+      "main": [
+        [
+          {
+            "node": "XML",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Extrair campo": {
+      "main": [
+        [
+          {
+            "node": "Append row in sheet",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "49bddd01-47fb-403e-b7e2-77daeb0e5792",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "{{INSTANCE_ID}}"
+  },
+  "id": "6atdozUYg0Av7Fsy",
+  "tags": [
+    {
+      "updatedAt": "2026-01-14T11:04:00.895Z",
+      "createdAt": "2025-03-21T11:47:30.374Z",
+      "id": "CvCy3KNJKyMxSQ3C",
+      "name": "GDA"
+    }
+  ]
+}

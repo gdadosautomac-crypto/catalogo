@@ -1,0 +1,121 @@
+{
+  "name": "Alteração Custo - Belga",
+  "nodes": [
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "field": "hours",
+              "triggerAtMinute": 59
+            }
+          ]
+        }
+      },
+      "id": "3c3d0d0f-d982-4e2f-8ca1-4971cd8fea96",
+      "name": "Schedule Trigger",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.1,
+      "position": [
+        -1600,
+        16
+      ]
+    },
+    {
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "SELECT \n    'Belga' as Unidade,\n    m.NU_LOG,\n    m.NU_USU,\n    usuario.DS_LOGIN AS login,\n    usuario.NOM_USU AS nome_usuario,\n    m.DTH AS data_operacao,\n    m.tipo,\n    m.TABELA,\n    m.DS_LOG\nFROM mglog01011 m\nLEFT JOIN mgusu01010 usuario ON m.NU_USU = usuario.NU_USU\nWHERE m.TABELA = 'mgpro01010'\nAND m.TIPO = '3'\nAND m.DTH >= DATE_SUB(NOW(), INTERVAL 1 HOUR);\n",
+        "options": {
+          "connectionTimeoutMillis": 10
+        }
+      },
+      "id": "f0f37a1b-c424-45fa-b648-cad70063bf9c",
+      "name": "MySQL1",
+      "type": "n8n-nodes-base.mySql",
+      "typeVersion": 2.2,
+      "position": [
+        -1376,
+        16
+      ],
+      "executeOnce": false,
+      "retryOnFail": false,
+      "alwaysOutputData": false,
+      "credentials": {
+        "mySql": {
+          "id": "EY1CH7IcANXbiyVO",
+          "name": "MySQL belga"
+        }
+      },
+      "onError": "continueRegularOutput"
+    },
+    {
+      "parameters": {
+        "phone": "558198747-3570",
+        "text": "=---- ALERTA ALTERAÇÃO CUSTO ----\nUnidade: {{ $json.Unidade }}\nUsuário: {{ $json.nome_usuario }}\nDescrição: {{ $json.DS_LOG }}\n",
+        "additionalFields": {}
+      },
+      "type": "n8n-nodes-zapi.zapi",
+      "typeVersion": 1,
+      "position": [
+        -1168,
+        16
+      ],
+      "id": "99bd9646-2f24-4b9d-9153-5e27bb9d62de",
+      "name": "Z-API",
+      "credentials": {
+        "zapiApi": {
+          "id": "cGI15AvSkFAV8Qrr",
+          "name": "Z-API account"
+        }
+      }
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Schedule Trigger": {
+      "main": [
+        [
+          {
+            "node": "MySQL1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "MySQL1": {
+      "main": [
+        [
+          {
+            "node": "Z-API",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": true,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "b0537dd7-e88e-4c1b-8809-ee22d38f38f9",
+  "meta": {
+    "instanceId": "{{INSTANCE_ID}}"
+  },
+  "id": "79mic6A7BpJd6Rkq",
+  "tags": [
+    {
+      "updatedAt": "2025-03-24T14:40:59.830Z",
+      "createdAt": "2025-03-24T14:40:59.830Z",
+      "id": "vK8d40ObLmVSMtwq",
+      "name": "Belga Polímeros"
+    },
+    {
+      "updatedAt": "2026-01-14T11:04:00.895Z",
+      "createdAt": "2025-03-21T11:47:30.374Z",
+      "id": "CvCy3KNJKyMxSQ3C",
+      "name": "GDA"
+    }
+  ]
+}

@@ -1,0 +1,945 @@
+{
+  "name": "Documentos em Depósito",
+  "nodes": [
+    {
+      "parameters": {
+        "documentId": {
+          "__rl": true,
+          "value": "https://docs.google.com/spreadsheets/d/1avLuf5Qpu0lBIFVS-Ny0j-iIFZGkVqqufVGy-sfbqM4/edit?usp=sharing",
+          "mode": "url"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "Página1",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1avLuf5Qpu0lBIFVS-Ny0j-iIFZGkVqqufVGy-sfbqM4/edit#gid=0"
+        },
+        "options": {}
+      },
+      "id": "da227130-fc39-4977-818f-18b40f52155b",
+      "name": "Google Sheets",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.3,
+      "position": [
+        -896,
+        224
+      ],
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "8Ytd3zZKAOSyZNqC",
+          "name": "Sheets Andre"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "c9777b34-96c3-49cb-9e8f-5171d677c039",
+              "name": "link",
+              "value": "={{ $json.Link }}",
+              "type": "string"
+            },
+            {
+              "id": "c29c9cfb-b76e-4088-b0ca-7748646d4779",
+              "name": "link1",
+              "value": "={{ $json.Value }}",
+              "type": "string"
+            },
+            {
+              "id": "a2465349-2aee-4dc2-8ce6-9a40bf305fa7",
+              "name": "link2",
+              "value": "={{ $json.Field }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "5167cd54-026c-4d92-920d-81de25eba54f",
+      "name": "AUTH",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.3,
+      "position": [
+        -720,
+        224
+      ]
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "c9777b34-96c3-49cb-9e8f-5171d677c039",
+              "name": "arq",
+              "value": "=doc_deposito - d{{ $now.day }}-{{ $now.hour }}h{{ $now.minute }}m{{ $now.second }}s",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {
+          "includeBinary": "={{ data }}"
+        }
+      },
+      "id": "55c61d93-08f8-4861-a34a-273a4f220cf0",
+      "name": "ARQUIVO",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.3,
+      "position": [
+        -544,
+        224
+      ]
+    },
+    {
+      "parameters": {
+        "documentId": {
+          "__rl": true,
+          "value": "https://docs.google.com/spreadsheets/d/1-POicyrzt3pF737lETypFKUwZu1wf9iQwqYqQnse5bk/edit?hl=pt-br&gid=0#gid=0",
+          "mode": "url"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "Página1",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1-POicyrzt3pF737lETypFKUwZu1wf9iQwqYqQnse5bk/edit#gid=0"
+        },
+        "options": {}
+      },
+      "id": "96e5d2e4-7552-4d23-b537-a32d1b80f0a3",
+      "name": "Google Sheets1",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.3,
+      "position": [
+        -368,
+        224
+      ],
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "8Ytd3zZKAOSyZNqC",
+          "name": "Sheets Andre"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "id": "7d7a0494-d094-4909-b4aa-40f54f18c164",
+      "name": "Loop Over Items",
+      "type": "n8n-nodes-base.splitInBatches",
+      "typeVersion": 3,
+      "position": [
+        144,
+        -16
+      ]
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "2bae94fc-16e6-422b-a70d-b488666e0510",
+              "name": "tipo_unidade",
+              "value": "={{ $json.tipo_unidade }}",
+              "type": "string"
+            },
+            {
+              "id": "674a349e-fc00-4c9b-ada6-0d216d0a80db",
+              "name": "unidade",
+              "value": "={{ $json.unidade }}",
+              "type": "string"
+            },
+            {
+              "id": "67ac34de-fd36-4b6c-b797-f6837ea7d981",
+              "name": "host",
+              "value": "={{ $json.host }}",
+              "type": "string"
+            },
+            {
+              "id": "f022d193-0473-4fbc-9a48-3f29487dd5fa",
+              "name": "name",
+              "value": "={{ $json.name }}",
+              "type": "string"
+            },
+            {
+              "id": "4146a9c6-c7a0-4231-adea-914085fef4f6",
+              "name": "port",
+              "value": "={{ $json.port }}",
+              "type": "number"
+            },
+            {
+              "id": "e9f4fa0c-455b-4366-9988-b45c6a53615d",
+              "name": "user",
+              "value": "={{ $json.user }}",
+              "type": "string"
+            },
+            {
+              "id": "e973f1f7-c07d-4409-8617-4d8e9735a819",
+              "name": "senha",
+              "value": "={{ $json.senha }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "027dc2e2-356f-4942-816b-daf221146869",
+      "name": "Edit Fields",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.3,
+      "position": [
+        -208,
+        224
+      ]
+    },
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "field": "weeks",
+              "triggerAtDay": [
+                1,
+                2,
+                3,
+                4,
+                5
+              ],
+              "triggerAtHour": 7,
+              "triggerAtMinute": 18
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.2,
+      "position": [
+        -1088,
+        224
+      ],
+      "id": "a8cb4b45-6d4b-474d-b133-de2b0e126e2c",
+      "name": "Schedule Trigger"
+    },
+    {
+      "parameters": {},
+      "id": "4b67571d-7c79-4965-8621-7e59d30cccb6",
+      "name": "Merge Resultados",
+      "type": "n8n-nodes-base.merge",
+      "typeVersion": 1,
+      "position": [
+        768,
+        224
+      ]
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "id": "7bea7f54-a943-486f-902d-0ab51076daec",
+      "name": "Loop Over Items2",
+      "type": "n8n-nodes-base.splitInBatches",
+      "typeVersion": 3,
+      "position": [
+        128,
+        448
+      ]
+    },
+    {
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "SELECT \n    '{{ $json[\"tipo_unidade\"] }}' as tipo_unidade,\n    '{{ $json[\"unidade\"] }}' as unidade, \n  boletos.DS_BOLETO as nu_documento, \n    titulos.NU_CLI as cod_cliente,\n    clientes.DS_CLI as nome_cliente, \n    clientes.APEL_FANT as nome_fantasia,\n    boletos.ID_STATUS as status, \n    'EM DEPOSITO' AS status_documento,\n    'boleto' as tipo_documento, \n    boletos.DT_EMISSAO as data_emissao,\n    boletos.DT_VENCT as data_vencimento,\n    boletos.VLR_BOLETO as valor_titulo,\n    null as tipo, \n    CURRENT_DATE as last_updated,\n    dsf.NU_DSF,\n    con.DS_CON \nfrom mgcta01020 boletos \nleft join (\n    select NU_CLI, NU_CLT \n    from mgcta01014 titulos \n    group by NU_CLI, NU_CLT\n) titulos on titulos.NU_CLT = boletos.NU_CLT_ORIGEM \nleft join mgcli01010 clientes on clientes.NU_CLI = titulos.NU_CLI \nleft join mgdsf01010 dsf on dsf.nu_dsf = boletos.nu_dsf \nleft join mgcon01010 con on con.NU_CON = dsf.NU_CON \nwhere boletos.ID_STATUS = 4 -- em deposito\n  and dsf.tp_dsf = 2 \n  and clientes.DS_CLI is not null",
+        "options": {}
+      },
+      "id": "ff58c583-3c03-4364-92af-8ed590e2a4cf",
+      "name": "MySQL - Boletos",
+      "type": "n8n-nodes-base.mySql",
+      "typeVersion": 2.2,
+      "position": [
+        272,
+        128
+      ],
+      "executeOnce": false,
+      "retryOnFail": false,
+      "alwaysOutputData": true,
+      "credentials": {
+        "mySql": {
+          "id": "INDKBtYNaYfBC3it",
+          "name": "MySQL Connection"
+        }
+      },
+      "onError": "continueRegularOutput"
+    },
+    {
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "SELECT \n    '{{ $json[\"tipo_unidade\"] }}' as tipo_unidade,\n    '{{ $json[\"unidade\"] }}' as unidade,\n   cheques.nu_cheque as nu_documento, \n    titulos.NU_CLI as cod_cliente,\n    clientes.DS_CLI as nome_cliente, \n    clientes.APEL_FANT as nome_fantasia,\n    cheques.ID_STATUS as status, \n    'EM DEPOSITO' AS status_documento,\n    'cheque' as tipo_documento, \n    titulos.DT_EMISSAO as data_emissao,\n    cheques.DT_CHEQUE as data_vencimento,\n    cheques.VLR_CHEQUE as valor_titulo, \n    null as tipo, \n    CURRENT_DATE as last_updated,\n    dsf.NU_DSF,\n    con.DS_CON \nfrom mgcta01016 cheques \nleft join (\n    select NU_CLI, NU_CLT, MAX(DT_EMISSAO) as dt_emissao \n    from mgcta01014 titulos \n    group by NU_CLI, NU_CLT\n) titulos on titulos.NU_CLT = cheques.NU_CLT_ORIGEM \nleft join mgcli01010 clientes on clientes.NU_CLI = titulos.NU_CLI \nleft join mgdsf01010 dsf on dsf.nu_dsf = cheques.nu_dsf \nleft join mgcon01010 con on con.NU_CON = dsf.NU_CON\nwhere cheques.ID_STATUS = 4 -- em depósito\n  and clientes.DS_CLI is not null",
+        "options": {}
+      },
+      "id": "f0858e16-aae7-4963-a1ae-e8c5b430b332",
+      "name": "MySQL - Cheques",
+      "type": "n8n-nodes-base.mySql",
+      "typeVersion": 2.2,
+      "position": [
+        256,
+        592
+      ],
+      "executeOnce": false,
+      "retryOnFail": false,
+      "alwaysOutputData": true,
+      "credentials": {
+        "mySql": {
+          "id": "INDKBtYNaYfBC3it",
+          "name": "MySQL Connection"
+        }
+      },
+      "onError": "continueRegularOutput"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "12d4f787-e3f2-4ebb-8103-b4551a8b42e9",
+              "name": "tipo_unidade",
+              "value": "={{ $json.tipo_unidade }}",
+              "type": "string"
+            },
+            {
+              "id": "d1ae7e95-5611-476d-8ba5-0ba403245da0",
+              "name": "unidade",
+              "value": "={{ $json.unidade }}",
+              "type": "string"
+            },
+            {
+              "id": "2fe59996-d660-4ea6-89a5-87177c9f0b9c",
+              "name": "nu_documento",
+              "value": "={{ $json.nu_documento }}",
+              "type": "string"
+            },
+            {
+              "id": "3ba9120b-ffa8-4758-9b4b-7fca5e52906c",
+              "name": "cod_cliente",
+              "value": "={{ $json.cod_cliente }}",
+              "type": "string"
+            },
+            {
+              "id": "0becda8d-7437-4159-8fab-0452dace732c",
+              "name": "nome_cliente",
+              "value": "={{ $json.nome_cliente }}",
+              "type": "string"
+            },
+            {
+              "id": "f3194f7f-3232-4149-9570-80c8e51028ca",
+              "name": "nome_fantasia",
+              "value": "={{ $json.nome_fantasia }}",
+              "type": "string"
+            },
+            {
+              "id": "8f2db80d-3e1b-47b3-ad71-658d48f44ae0",
+              "name": "status_documento",
+              "value": "={{ $json.status_documento }}",
+              "type": "string"
+            },
+            {
+              "id": "c9ed9b6b-e3ee-45ac-83d2-56753b4822e7",
+              "name": "tipo_documento",
+              "value": "={{ $json.tipo_documento }}",
+              "type": "string"
+            },
+            {
+              "id": "118c6751-24b8-4a5b-a116-c8eb3d43b47d",
+              "name": "data_emissao",
+              "value": "={{ $json.data_emissao }}",
+              "type": "string"
+            },
+            {
+              "id": "6bd29e3f-0e44-493d-b2f4-42ff55ef8d05",
+              "name": "data_vencimento",
+              "value": "={{ $json.data_vencimento }}",
+              "type": "string"
+            },
+            {
+              "id": "06bbf476-8751-4bbd-866f-02904c69d12b",
+              "name": "valor_titulo",
+              "value": "={{ $json.valor_titulo }}",
+              "type": "string"
+            },
+            {
+              "id": "b1d445af-3fd0-4c97-9ff2-6eaa5af7bfc9",
+              "name": "tipo",
+              "value": "={{ $json.tipo }}",
+              "type": "string"
+            },
+            {
+              "id": "ffc0b013-88ee-495b-b5d9-391ee4e294e9",
+              "name": "last_updated",
+              "value": "={{ $json.last_updated }}",
+              "type": "string"
+            },
+            {
+              "id": "2ab3adcd-2c44-4841-aad1-88b66728ac66",
+              "name": "NU_DSF",
+              "value": "={{ $json.NU_DSF }}",
+              "type": "string"
+            },
+            {
+              "id": "c60f1fe8-c676-4c0c-84de-a4b7fa037d16",
+              "name": "conta",
+              "value": "={{ $json.DS_CON }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        432,
+        -16
+      ],
+      "id": "98d175cd-76de-4b34-a67b-6fc41e01a893",
+      "name": "format_text"
+    },
+    {
+      "parameters": {
+        "operation": "xlsx",
+        "options": {
+          "fileName": "=doc_devolvido"
+        }
+      },
+      "id": "523b7053-e932-4973-9b22-8d2d47283360",
+      "name": "Convert to File",
+      "type": "n8n-nodes-base.convertToFile",
+      "typeVersion": 1.1,
+      "position": [
+        1200,
+        224
+      ]
+    },
+    {
+      "parameters": {
+        "operation": "upload",
+        "bucketName": "marcolanoperacoes",
+        "fileName": "={{ $('ARQUIVO').item.json.arq }}",
+        "additionalFields": {
+          "acl": "publicReadWrite"
+        }
+      },
+      "id": "d68da517-a182-4570-8c3d-bdb68a8f5409",
+      "name": "AWS S31",
+      "type": "n8n-nodes-base.awsS3",
+      "typeVersion": 2,
+      "position": [
+        1408,
+        224
+      ],
+      "credentials": {
+        "aws": {
+          "id": "wojq9Jq4bZgupPjh",
+          "name": "AWS account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "delete",
+        "bucketName": "marcolanoperacoes",
+        "fileKey": "={{ $('ARQUIVO').item.json.arq }}",
+        "options": {}
+      },
+      "id": "53007ad5-3d2a-41dd-abbb-5068c3a29ebc",
+      "name": "AWS S33",
+      "type": "n8n-nodes-base.awsS3",
+      "typeVersion": 2,
+      "position": [
+        1952,
+        224
+      ],
+      "credentials": {
+        "aws": {
+          "id": "wojq9Jq4bZgupPjh",
+          "name": "AWS account"
+        }
+      }
+    },
+    {
+      "parameters": {},
+      "id": "ec7eb2fa-186e-4fc8-bd21-a8fd1b67d091",
+      "name": "Wait",
+      "type": "n8n-nodes-base.wait",
+      "typeVersion": 1.1,
+      "position": [
+        1792,
+        224
+      ],
+      "webhookId": "{{WEBHOOK_ID}}"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "12d4f787-e3f2-4ebb-8103-b4551a8b42e9",
+              "name": "tipo_unidade",
+              "value": "={{ $json.tipo_unidade }}",
+              "type": "string"
+            },
+            {
+              "id": "d1ae7e95-5611-476d-8ba5-0ba403245da0",
+              "name": "unidade",
+              "value": "={{ $json.unidade }}",
+              "type": "string"
+            },
+            {
+              "id": "c9bf9163-afc5-45b4-90ab-07fe533869e8",
+              "name": "nu_documento",
+              "value": "={{ $json.nu_documento }}",
+              "type": "string"
+            },
+            {
+              "id": "cb725565-82cc-4445-8b54-b65b29ed1ac9",
+              "name": "cod_cliente",
+              "value": "={{ $json.cod_cliente }}",
+              "type": "string"
+            },
+            {
+              "id": "58b8ca19-8bce-4fee-a18d-ffb39461d261",
+              "name": "nome_cliente",
+              "value": "={{ $json.nome_cliente }}",
+              "type": "string"
+            },
+            {
+              "id": "2536f82e-073e-429f-9dbf-c4814189178f",
+              "name": "nome_fantasia",
+              "value": "={{ $json.nome_fantasia }}",
+              "type": "string"
+            },
+            {
+              "id": "f320985c-66bf-4026-9f10-1a045386708b",
+              "name": "status_documento",
+              "value": "={{ $json.status_documento }}",
+              "type": "string"
+            },
+            {
+              "id": "36a9706f-6279-427a-9ddf-61a37cd6f89a",
+              "name": "tipo_documento",
+              "value": "={{ $json.tipo_documento }}",
+              "type": "string"
+            },
+            {
+              "id": "72a81916-3cc8-4125-9008-98be979f72f9",
+              "name": "data_emissao",
+              "value": "={{ $json.data_emissao }}",
+              "type": "string"
+            },
+            {
+              "id": "aaad8198-336f-45bc-b560-0ab30aa28f3b",
+              "name": "data_vencimento",
+              "value": "={{ $json.data_vencimento }}",
+              "type": "string"
+            },
+            {
+              "id": "137e6d31-99cf-460a-934c-a5f8349a4f11",
+              "name": "valor_titulo",
+              "value": "={{ $json.valor_titulo }}",
+              "type": "string"
+            },
+            {
+              "id": "81a14c4e-18ad-4de1-a1c3-104a6ffab224",
+              "name": "tipo",
+              "value": "={{ $json.tipo }}",
+              "type": "string"
+            },
+            {
+              "id": "08fdc0ce-931d-45dc-b2a5-3caa569dafd9",
+              "name": "last_updated",
+              "value": "={{ $json.last_updated }}",
+              "type": "string"
+            },
+            {
+              "id": "d53d2ce2-a212-4ab6-9f85-c77c7dc8d0b9",
+              "name": "NU_DSF",
+              "value": "={{ $json.NU_DSF }}",
+              "type": "string"
+            },
+            {
+              "id": "75559616-840d-4c18-ba12-87c8e2da07d4",
+              "name": "conta",
+              "value": "={{ $json.DS_CON }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        448,
+        448
+      ],
+      "id": "976eefc9-7a88-47eb-8535-8f94ee9b6ea2",
+      "name": "format_text1"
+    },
+    {
+      "parameters": {
+        "jsCode": "return items.filter(item => {\n  // Condição: só deixa os que têm valor no campo 'nu_documento'\n  return item.json.nu_documento !== null && item.json.nu_documento !== undefined && item.json.nu_documento !== '';\n});\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        992,
+        224
+      ],
+      "id": "f398a8db-2cbe-4ec2-bf63-cae5e0552971",
+      "name": "Code"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "=https://api.z-api.io/instances/3AD47F49CE9AF04B4D43CA225862B38B/token/6EE2B07CF6D61B0059AD2125/send-document/xlsx",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "={{ $('AUTH').item.json.link2 }}",
+              "value": "={{ $('AUTH').item.json.link1 }}"
+            }
+          ]
+        },
+        "sendBody": true,
+        "contentType": "form-urlencoded",
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "phone",
+              "value": "=120363179106106819-group"
+            },
+            {
+              "name": "fileName",
+              "value": "=docs_em_deposito_{{$today.format('MM-DD')}}"
+            },
+            {
+              "name": "document",
+              "value": "=https://marcolanoperacoes.s3.amazonaws.com/{{ $('ARQUIVO').item.json.arq }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "ec50d737-24e5-417d-b807-8b387de4da19",
+      "name": "Grupo Financeiro",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.1,
+      "position": [
+        1600,
+        80
+      ]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "=https://api.z-api.io/instances/3AD47F49CE9AF04B4D43CA225862B38B/token/6EE2B07CF6D61B0059AD2125/send-document/xlsx",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "={{ $('AUTH').item.json.link2 }}",
+              "value": "={{ $('AUTH').item.json.link1 }}"
+            }
+          ]
+        },
+        "sendBody": true,
+        "contentType": "form-urlencoded",
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "phone",
+              "value": "=5581985524512"
+            },
+            {
+              "name": "fileName",
+              "value": "=docs_em_deposito_{{$today.format('MM-DD')}}"
+            },
+            {
+              "name": "document",
+              "value": "=https://marcolanoperacoes.s3.amazonaws.com/{{ $('ARQUIVO').item.json.arq }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "cfcb850d-396f-4483-aff1-70dbf86116f4",
+      "name": "Modesto",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.1,
+      "position": [
+        1600,
+        352
+      ]
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Google Sheets": {
+      "main": [
+        [
+          {
+            "node": "AUTH",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "AUTH": {
+      "main": [
+        [
+          {
+            "node": "ARQUIVO",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "ARQUIVO": {
+      "main": [
+        [
+          {
+            "node": "Google Sheets1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Google Sheets1": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Loop Over Items": {
+      "main": [
+        [
+          {
+            "node": "format_text",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "MySQL - Boletos",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Edit Fields": {
+      "main": [
+        [
+          {
+            "node": "Loop Over Items",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Loop Over Items2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Schedule Trigger": {
+      "main": [
+        [
+          {
+            "node": "Google Sheets",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Merge Resultados": {
+      "main": [
+        [
+          {
+            "node": "Code",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Loop Over Items2": {
+      "main": [
+        [
+          {
+            "node": "format_text1",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "MySQL - Cheques",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "MySQL - Boletos": {
+      "main": [
+        [
+          {
+            "node": "Loop Over Items",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "MySQL - Cheques": {
+      "main": [
+        [
+          {
+            "node": "Loop Over Items2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "format_text": {
+      "main": [
+        [
+          {
+            "node": "Merge Resultados",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Convert to File": {
+      "main": [
+        [
+          {
+            "node": "AWS S31",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "AWS S31": {
+      "main": [
+        [
+          {
+            "node": "Grupo Financeiro",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Modesto",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Wait": {
+      "main": [
+        [
+          {
+            "node": "AWS S33",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "format_text1": {
+      "main": [
+        [
+          {
+            "node": "Merge Resultados",
+            "type": "main",
+            "index": 1
+          }
+        ]
+      ]
+    },
+    "Code": {
+      "main": [
+        [
+          {
+            "node": "Convert to File",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Grupo Financeiro": {
+      "main": [
+        [
+          {
+            "node": "Wait",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Modesto": {
+      "main": [
+        [
+          {
+            "node": "Wait",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": true,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "68a3587e-112c-4ba9-9b5b-bbefceddef33",
+  "meta": {
+    "instanceId": "{{INSTANCE_ID}}"
+  },
+  "id": "IGGLq31HfpQknZCK",
+  "tags": [
+    {
+      "updatedAt": "2025-03-24T11:52:02.582Z",
+      "createdAt": "2025-03-24T11:52:02.582Z",
+      "id": "uPLi4lJcaKHP324Z",
+      "name": "Setor - Financeiro"
+    },
+    {
+      "updatedAt": "2026-01-14T11:04:00.895Z",
+      "createdAt": "2025-03-21T11:47:30.374Z",
+      "id": "CvCy3KNJKyMxSQ3C",
+      "name": "GDA"
+    }
+  ]
+}

@@ -1,0 +1,1081 @@
+{
+  "name": "Relatórios Guilhermino",
+  "nodes": [
+    {
+      "parameters": {
+        "operation": "xlsx",
+        "options": {
+          "fileName": "={{ $('ARQUIVO').item.json.arq }}"
+        }
+      },
+      "id": "808edb36-d45d-4316-a934-2617b7f7e74d",
+      "name": "Convert to File",
+      "type": "n8n-nodes-base.convertToFile",
+      "typeVersion": 1.1,
+      "position": [
+        960,
+        192
+      ]
+    },
+    {
+      "parameters": {},
+      "id": "183ad22c-c017-4e75-9344-bdb1e008d0ea",
+      "name": "Wait",
+      "type": "n8n-nodes-base.wait",
+      "typeVersion": 1.1,
+      "position": [
+        1568,
+        192
+      ],
+      "webhookId": "{{WEBHOOK_ID}}"
+    },
+    {
+      "parameters": {
+        "operation": "upload",
+        "bucketName": "marcolanoperacoes",
+        "fileName": "={{ $('ARQUIVO').item.json.arq }}",
+        "additionalFields": {
+          "acl": "publicReadWrite"
+        }
+      },
+      "id": "cd24373b-4797-4d5e-ab11-56fca3c6e941",
+      "name": "AWS S31",
+      "type": "n8n-nodes-base.awsS3",
+      "typeVersion": 2,
+      "position": [
+        1200,
+        192
+      ],
+      "credentials": {
+        "aws": {
+          "id": "wojq9Jq4bZgupPjh",
+          "name": "AWS account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "delete",
+        "bucketName": "marcolanoperacoes",
+        "fileKey": "={{ $('ARQUIVO').item.json.arq }}",
+        "options": {}
+      },
+      "id": "3aeb7259-a41a-48f3-89e2-8c33acacac85",
+      "name": "AWS S33",
+      "type": "n8n-nodes-base.awsS3",
+      "typeVersion": 2,
+      "position": [
+        1744,
+        192
+      ],
+      "credentials": {
+        "aws": {
+          "id": "wojq9Jq4bZgupPjh",
+          "name": "AWS account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "delete",
+        "bucketName": "marcolanoperacoes",
+        "fileKey": "={{ $json.Key }}",
+        "options": {}
+      },
+      "id": "7603a81f-80c6-4eba-8f87-16e9f2405311",
+      "name": "AWS S37",
+      "type": "n8n-nodes-base.awsS3",
+      "typeVersion": 2,
+      "position": [
+        208,
+        800
+      ],
+      "credentials": {
+        "aws": {
+          "id": "wojq9Jq4bZgupPjh",
+          "name": "AWS account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "getAll",
+        "bucketName": "marcolanoperacoes",
+        "returnAll": true,
+        "options": {}
+      },
+      "id": "ee727900-f05f-4027-b3d6-16b3aac21ada",
+      "name": "AWS S3",
+      "type": "n8n-nodes-base.awsS3",
+      "typeVersion": 2,
+      "position": [
+        32,
+        800
+      ],
+      "credentials": {
+        "aws": {
+          "id": "wojq9Jq4bZgupPjh",
+          "name": "AWS account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "c9777b34-96c3-49cb-9e8f-5171d677c039",
+              "name": "arq",
+              "value": "=Pedidos Pagos e Pendentes - d{{ $now.day }}-{{ $now.hour }}h{{ $now.minute }}m{{ $now.second }}s",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "12ae20fb-0f6c-46b8-b6ed-98ceae89478c",
+      "name": "ARQUIVO",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.3,
+      "position": [
+        608,
+        192
+      ]
+    },
+    {
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "select * from ( \n\tselect \n\t\tp.unidade, \n\t\tcod_pedido, \n\t\tcod_cliente, \n\t\tp.vendedor, \n\t\tp.nome_cliente, \n\t\tcond_pagamento, \n\t\tmc.uf, \n\t\tmc.cidade, \n\t\tROUND(MAX(replace(Valor_final_pedido,',','.')::numeric),2) as ValorPedido \n\tfrom pedidos p \n\t\tleft join coes c on p.coes = c.nome \n\t\tleft join mapeamento_clientes mc on mc.unidade = p.unidade and mc.codcliente = p.cod_cliente \n\twhere \n\t\tdata_pedido::date between date_trunc('month', current_date - interval '1 month') + interval '20 days' and date_trunc('month', current_date) + interval '20 days' and p.unidade= 'BELGA POLIMEROS' \n\tgroup by p.unidade,cod_pedido,cod_cliente,p.vendedor,p.nome_cliente,cond_pagamento,mc.uf,mc.cidade \n) X \nleft join \n( \n\tselect \n\t\tunidade, \n\t\tcod_pedido, \n\t\tROUND(SUM(case \n\t\t\twhen status_pagamento = 'Pago' then replace(total_titulo,',','.')::numeric \n\t\t\telse 0::numeric \n\t\tend),2) as total_pago, \n\t\tROUND(SUM(case \n\t\t\twhen status_pagamento = 'Pendente' then replace(total_titulo,',','.')::numeric \n\t\t\telse 0::numeric \n\t\tend),2) as total_pendente \n\tfrom pagamentos_pedidos pp \n\twhere \n\t\tunidade = 'BELGA POLIMEROS' and data_pagamento::date between date_trunc('month', current_date - interval '1 month') + interval '20 days' and date_trunc('month', current_date) + interval '20 days' \n\tgroup by unidade,cod_pedido \n) Y on x.unidade = y.unidade and x.cod_pedido = y.cod_pedido",
+        "options": {}
+      },
+      "id": "10376cd9-ba36-42bc-9804-2fda457e9e3f",
+      "name": "Postgres",
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 2.3,
+      "position": [
+        784,
+        192
+      ],
+      "credentials": {
+        "postgres": {
+          "id": "G50fA6A0L90xaBIe",
+          "name": "Postgres account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "xlsx",
+        "options": {
+          "fileName": "={{ $('ARQUIVO1').item.json.arq }}"
+        }
+      },
+      "id": "a5172554-b407-45c6-8895-d70bb3d76d37",
+      "name": "Convert to File1",
+      "type": "n8n-nodes-base.convertToFile",
+      "typeVersion": 1.1,
+      "position": [
+        960,
+        544
+      ]
+    },
+    {
+      "parameters": {},
+      "id": "e47a9366-478f-48a0-b563-d3eb268ed3c3",
+      "name": "Wait1",
+      "type": "n8n-nodes-base.wait",
+      "typeVersion": 1.1,
+      "position": [
+        1568,
+        544
+      ],
+      "webhookId": "{{WEBHOOK_ID}}"
+    },
+    {
+      "parameters": {
+        "operation": "upload",
+        "bucketName": "marcolanoperacoes",
+        "fileName": "={{ $('ARQUIVO1').item.json.arq }}",
+        "additionalFields": {
+          "acl": "publicReadWrite"
+        }
+      },
+      "id": "7c04c91e-8bf2-46c3-ac50-a260d95cbd7b",
+      "name": "AWS S32",
+      "type": "n8n-nodes-base.awsS3",
+      "typeVersion": 2,
+      "position": [
+        1200,
+        544
+      ],
+      "credentials": {
+        "aws": {
+          "id": "wojq9Jq4bZgupPjh",
+          "name": "AWS account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "delete",
+        "bucketName": "marcolanoperacoes",
+        "fileKey": "={{ $('ARQUIVO1').item.json.arq }}",
+        "options": {}
+      },
+      "id": "fd008a78-f5cc-40e8-a568-985a70e6a79e",
+      "name": "AWS S34",
+      "type": "n8n-nodes-base.awsS3",
+      "typeVersion": 2,
+      "position": [
+        1744,
+        544
+      ],
+      "credentials": {
+        "aws": {
+          "id": "wojq9Jq4bZgupPjh",
+          "name": "AWS account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "c9777b34-96c3-49cb-9e8f-5171d677c039",
+              "name": "arq",
+              "value": "=Sugestao Belga Loja e Tepera - d{{ $now.day }}-{{ $now.hour }}h{{ $now.minute }}m{{ $now.second }}s",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "f55f5178-8558-4f4c-b9d5-a2501e03767e",
+      "name": "ARQUIVO1",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.3,
+      "position": [
+        608,
+        544
+      ]
+    },
+    {
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "-- LOJA E TEMPERA\n\nWITH reservado_aberto AS (\n         SELECT p.tipo_unidade,\n            p.unidade,\n            p.cod_produto,\n            p.categoria_produto,\n            p.classe_produto,\n            p.sub_classe_produto,\n            p.sub_classe_produto,\n            sum(replace(p.qtd_produto, ','::text, '.'::text)::numeric) AS qtd_produto\n           FROM pedidos p\n          WHERE p.status_pedido = 'Aberto'::text AND p.tipo_pedido = 'Serie'::text\n          GROUP BY p.tipo_unidade, p.unidade, p.cod_produto, p.categoria_produto, p.classe_produto, p.sub_classe_produto\n        ), reservado_separacao AS (\n         SELECT vendas_1.tipo_unidade,\n            vendas_1.unidade,\n            vendas_1.cod_produto,\n            vendas_1.categoria_produto,\n            vendas_1.classe_produto,\n            vendas_1.sub_classe_produto,\n            sum(replace(vendas_1.qtd_produto, ','::text, '.'::text)::numeric) AS qtd_produto_vendido,\n            sum(entregas.qtd_entregue) AS qtd_entregue\n           FROM pedidos vendas_1\n             LEFT JOIN ( SELECT entregas_1.unidade,\n                    entregas_1.cod_pedido,\n                    entregas_1.cod_item,\n                    sum(replace(entregas_1.qtd_entregue::text, ','::text, '.'::text)::numeric) AS qtd_entregue\n                   FROM entregas entregas_1\n                  GROUP BY entregas_1.unidade, entregas_1.cod_pedido, entregas_1.cod_item) entregas ON vendas_1.unidade = entregas.unidade::text AND vendas_1.id_item::text = concat(entregas.cod_pedido, entregas.cod_item)\n          WHERE vendas_1.status_pedido = 'Em Separacao'::text AND vendas_1.tipo_pedido = 'Serie'::text\n          GROUP BY vendas_1.tipo_unidade, vendas_1.unidade, vendas_1.cod_produto, vendas_1.categoria_produto, vendas_1.classe_produto, vendas_1.sub_classe_produto\n        ), estoque_total AS (\n         SELECT ecp.tipo_unidade,\n            ecp.unidade,\n            ecp.categoria,\n            ecp.classe,\n            ecp.subclasse,\n            ecp.nome_produto,\n            ecp.estoque_qtd,\n            ecp.estoque_metro,\n            ecp.estoque_peso,\n            ecp.custo,\n            ecp.id_produto,\n            ecp.custo_unt,\n            ecp.fator_conversao,\n            ecp.preco_venda\n           FROM estoque_completo_produtos ecp\n        ), vendas_total AS (\n         SELECT p.unidade,\n            p.cod_produto,\n            round(sum(replace(p.qtd_produto, ','::text, '.'::text)::numeric), 2) AS qtd_vendido,\n            round(sum(replace(p.qtd_produto, ','::text, '.'::text)::numeric) / 11::numeric, 0) AS qtd_vendido_semanas,\n            round(sum(replace(p.valor_unitario_total_com_desconto, ','::text, '.'::text)::numeric), 2) AS valor_vendido,\n            round(sum(replace(p.custo_unitario_total_produto, ','::text, '.'::text)::numeric), 2) AS custo_vendido\n           FROM pedidos p\n             LEFT JOIN coes c ON c.nome::text = p.coes\n          WHERE c.gerafaturamento::text = 'SIM'::text AND p.data_pedido::date >= (now()::date - '45 days'::interval)\n          GROUP BY p.unidade, p.cod_produto\n        ), qtd_comprada AS (\n         SELECT pc.unidade,\n            pc.cod_produto,\n            ecp.categoria,\n            ecp.classe,\n            ecp.subclasse,\n            ecp.nome_produto,\n            sum(replace(pc.qtd_comprada::text, ','::text, '.'::text)::numeric) AS qtd_comprada\n           FROM pedidos_compras pc\n             LEFT JOIN estoque_completo_produtos ecp ON pc.cod_produto::text = ecp.id_produto::text AND pc.unidade::text = ecp.unidade::text\n          WHERE pc.status::text = '1'::text AND pc.tipo_unidade::text <> 'Bodinho'::text\n          GROUP BY pc.unidade, pc.cod_produto, ecp.categoria, ecp.classe, ecp.subclasse, ecp.nome_produto\n        )\n SELECT u.matriz,\n    estoque.tipo_unidade,\n    estoque.unidade::text AS unidade,\n    estoque.categoria::text AS categoria,\n    estoque.classe::text AS classe,\n    estoque.subclasse,\n    estoque.nome_produto::text AS nome_produto,\n    COALESCE(estoque.custo_unt::text, 0::text) AS custo_unitario,\n    COALESCE(COALESCE(estoque.estoque_qtd - COALESCE(sep.qtd_produto_vendido - sep.qtd_entregue, 0::numeric) - COALESCE(abt.qtd_produto, 0::numeric), 0::numeric)::text, 0::text) AS estoque_disponivel,\n    COALESCE(qtd.qtd_comprada, 0::numeric)::text AS qtd_comprada,\n    COALESCE(vendas.qtd_vendido, 0::numeric)::text AS qtd_total_vendas,\n    COALESCE(vendas.qtd_vendido_semanas, 0::numeric)::text AS qtd_vendido_semanas,\n    COALESCE((estoque.estoque_qtd - COALESCE(sep.qtd_produto_vendido - sep.qtd_entregue, 0::numeric) - COALESCE(abt.qtd_produto, 0::numeric) + COALESCE(qtd.qtd_comprada, 0::numeric) - COALESCE(vendas.qtd_vendido, 0::numeric))::text, 0::text) AS sugestao\n   FROM estoque_total estoque\n     LEFT JOIN vendas_total vendas ON vendas.unidade = estoque.unidade::text AND vendas.cod_produto = estoque.id_produto::text\n     LEFT JOIN reservado_aberto abt(tipo_unidade, unidade, cod_produto, categoria_produto, classe_produto, sub_classe_produto, sub_classe_produto_1, qtd_produto) ON abt.unidade = estoque.unidade::text AND abt.cod_produto = estoque.id_produto::text\n     LEFT JOIN reservado_separacao sep ON sep.unidade = estoque.unidade::text AND sep.cod_produto = estoque.id_produto::text\n     LEFT JOIN qtd_comprada qtd ON qtd.unidade::text = estoque.unidade::text AND qtd.cod_produto::text = estoque.id_produto::text\n     LEFT JOIN unidades u ON u.unidade::text = estoque.unidade::text\nWHERE estoque.tipo_unidade::text <> 'Bodinho'::text AND (estoque.categoria::text = ANY (\nARRAY['TRINCO'::text, 'CONTRA FECHADURA'::text, 'SUPORTE'::text, 'PUXADOR'::text, 'KIT FERRAGEM'::text, 'DOBRADIÇA'::text, 'FECHADURA'::text, 'ACESSÓRIO PARA FERRAGEM'::text]))",
+        "options": {}
+      },
+      "id": "22efdd6e-8d5a-4a5a-9167-d3b5f49ab12a",
+      "name": "Postgres1",
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 2.3,
+      "position": [
+        784,
+        544
+      ],
+      "credentials": {
+        "postgres": {
+          "id": "G50fA6A0L90xaBIe",
+          "name": "Postgres account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "xlsx",
+        "options": {
+          "fileName": "={{ $('ARQUIVO2').item.json.arq }}"
+        }
+      },
+      "id": "a39aa5d2-4b87-442b-9ce4-dd4959c062ce",
+      "name": "Convert to File2",
+      "type": "n8n-nodes-base.convertToFile",
+      "typeVersion": 1.1,
+      "position": [
+        960,
+        880
+      ]
+    },
+    {
+      "parameters": {},
+      "id": "648f3cca-344b-468c-9a95-f2d1430c4bef",
+      "name": "Wait2",
+      "type": "n8n-nodes-base.wait",
+      "typeVersion": 1.1,
+      "position": [
+        1568,
+        880
+      ],
+      "webhookId": "{{WEBHOOK_ID}}"
+    },
+    {
+      "parameters": {
+        "operation": "upload",
+        "bucketName": "marcolanoperacoes",
+        "fileName": "={{ $('ARQUIVO2').item.json.arq }}",
+        "additionalFields": {
+          "acl": "publicReadWrite"
+        }
+      },
+      "id": "0a1cd4bb-40aa-4ca4-be84-a987c92219fa",
+      "name": "AWS S35",
+      "type": "n8n-nodes-base.awsS3",
+      "typeVersion": 2,
+      "position": [
+        1200,
+        880
+      ],
+      "credentials": {
+        "aws": {
+          "id": "wojq9Jq4bZgupPjh",
+          "name": "AWS account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "delete",
+        "bucketName": "marcolanoperacoes",
+        "fileKey": "={{ $('ARQUIVO2').item.json.arq }}",
+        "options": {}
+      },
+      "id": "cff5333f-5e95-4553-9bfd-707a560d4d48",
+      "name": "AWS S36",
+      "type": "n8n-nodes-base.awsS3",
+      "typeVersion": 2,
+      "position": [
+        1744,
+        880
+      ],
+      "credentials": {
+        "aws": {
+          "id": "wojq9Jq4bZgupPjh",
+          "name": "AWS account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "c9777b34-96c3-49cb-9e8f-5171d677c039",
+              "name": "arq",
+              "value": "=Sugestao Belga Bodinho - d{{ $now.day }}-{{ $now.hour }}h{{ $now.minute }}m{{ $now.second }}s",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "6b2457f7-2d09-4b99-ab95-6ae98266d698",
+      "name": "ARQUIVO2",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.3,
+      "position": [
+        608,
+        880
+      ]
+    },
+    {
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "-- BODINHOS\n\nWITH reservado_aberto AS (\n         SELECT p.tipo_unidade,\n            p.unidade,\n            p.cod_produto,\n            p.categoria_produto,\n            p.classe_produto,\n            p.sub_classe_produto,\n            p.sub_classe_produto,\n            sum(replace(p.qtd_produto, ','::text, '.'::text)::numeric) AS qtd_produto\n           FROM pedidos p\n          WHERE p.status_pedido = 'Aberto'::text AND p.tipo_pedido = 'Serie'::text\n          GROUP BY p.tipo_unidade, p.unidade, p.cod_produto, p.categoria_produto, p.classe_produto, p.sub_classe_produto\n        ), reservado_separacao AS (\n         SELECT vendas_1.tipo_unidade,\n            vendas_1.unidade,\n            vendas_1.cod_produto,\n            vendas_1.categoria_produto,\n            vendas_1.classe_produto,\n            vendas_1.sub_classe_produto,\n            sum(replace(vendas_1.qtd_produto, ','::text, '.'::text)::numeric) AS qtd_produto_vendido,\n            sum(entregas.qtd_entregue) AS qtd_entregue\n           FROM pedidos vendas_1\n             LEFT JOIN ( SELECT entregas_1.unidade,\n                    entregas_1.cod_pedido,\n                    entregas_1.cod_item,\n                    sum(replace(entregas_1.qtd_entregue::text, ','::text, '.'::text)::numeric) AS qtd_entregue\n                   FROM entregas entregas_1\n                  GROUP BY entregas_1.unidade, entregas_1.cod_pedido, entregas_1.cod_item) entregas ON vendas_1.unidade = entregas.unidade::text AND vendas_1.id_item::text = concat(entregas.cod_pedido, entregas.cod_item)\n          WHERE vendas_1.status_pedido = 'Em Separacao'::text AND vendas_1.tipo_pedido = 'Serie'::text\n          GROUP BY vendas_1.tipo_unidade, vendas_1.unidade, vendas_1.cod_produto, vendas_1.categoria_produto, vendas_1.classe_produto, vendas_1.sub_classe_produto\n        ), estoque_total AS (\n         SELECT ecp.tipo_unidade,\n            ecp.unidade,\n            ecp.categoria,\n            ecp.classe,\n            ecp.subclasse,\n            ecp.nome_produto,\n            ecp.estoque_qtd,\n            ecp.estoque_metro,\n            ecp.estoque_peso,\n            ecp.custo,\n            ecp.id_produto,\n            ecp.custo_unt,\n            ecp.fator_conversao,\n            ecp.preco_venda\n           FROM estoque_completo_produtos ecp\n        ), vendas_total AS (\n         SELECT p.unidade,\n            p.cod_produto,\n            round(sum(replace(p.qtd_produto, ','::text, '.'::text)::numeric), 2) AS qtd_vendido,\n            round(sum(replace(p.qtd_produto, ','::text, '.'::text)::numeric) / 11::numeric, 0) AS qtd_vendido_semanas,\n            round(sum(replace(p.valor_unitario_total_com_desconto, ','::text, '.'::text)::numeric), 2) AS valor_vendido,\n            round(sum(replace(p.custo_unitario_total_produto, ','::text, '.'::text)::numeric), 2) AS custo_vendido\n           FROM pedidos p\n             LEFT JOIN coes c ON c.nome::text = p.coes\n          WHERE c.gerafaturamento::text = 'SIM'::text AND p.data_pedido::date >= (now()::date - '45 days'::interval)\n          GROUP BY p.unidade, p.cod_produto\n        ), qtd_comprada AS (\n         SELECT pc.unidade,\n            pc.cod_produto,\n            ecp.categoria,\n            ecp.classe,\n            ecp.subclasse,\n            ecp.nome_produto,\n            sum(replace(pc.qtd_comprada::text, ','::text, '.'::text)::numeric) AS qtd_comprada\n           FROM pedidos_compras pc\n             LEFT JOIN estoque_completo_produtos ecp ON pc.cod_produto::text = ecp.id_produto::text AND pc.unidade::text = ecp.unidade::text\n          WHERE pc.status::text = '1'::text AND pc.tipo_unidade::text = 'Bodinho'::text\n          GROUP BY pc.unidade, pc.cod_produto, ecp.categoria, ecp.classe, ecp.subclasse, ecp.nome_produto\n        )\n SELECT u.matriz,\n    estoque.tipo_unidade,\n    estoque.unidade::text AS unidade,\n    estoque.categoria::text AS categoria,\n    estoque.classe::text AS classe,\n    estoque.subclasse,\n    estoque.nome_produto::text AS nome_produto,\n    COALESCE(estoque.custo_unt::text, 0::text) AS custo_unitario,\n    COALESCE(COALESCE(estoque.estoque_qtd - COALESCE(sep.qtd_produto_vendido - sep.qtd_entregue, 0::numeric) - COALESCE(abt.qtd_produto, 0::numeric), 0::numeric)::text, 0::text) AS estoque_disponivel,\n    COALESCE(qtd.qtd_comprada, 0::numeric)::text AS qtd_comprada,\n    COALESCE(vendas.qtd_vendido, 0::numeric)::text AS qtd_total_vendas,\n    COALESCE(vendas.qtd_vendido_semanas, 0::numeric)::text AS qtd_vendido_semanas,\n    COALESCE((estoque.estoque_qtd - COALESCE(sep.qtd_produto_vendido - sep.qtd_entregue, 0::numeric) - COALESCE(abt.qtd_produto, 0::numeric) + COALESCE(qtd.qtd_comprada, 0::numeric) - COALESCE(vendas.qtd_vendido, 0::numeric))::text, 0::text) AS sugestao\n   FROM estoque_total estoque\n     LEFT JOIN vendas_total vendas ON vendas.unidade = estoque.unidade::text AND vendas.cod_produto = estoque.id_produto::text\n     LEFT JOIN reservado_aberto abt(tipo_unidade, unidade, cod_produto, categoria_produto, classe_produto, sub_classe_produto, sub_classe_produto_1, qtd_produto) ON abt.unidade = estoque.unidade::text AND abt.cod_produto = estoque.id_produto::text\n     LEFT JOIN reservado_separacao sep ON sep.unidade = estoque.unidade::text AND sep.cod_produto = estoque.id_produto::text\n     LEFT JOIN qtd_comprada qtd ON qtd.unidade::text = estoque.unidade::text AND qtd.cod_produto::text = estoque.id_produto::text\n     LEFT JOIN unidades u ON u.unidade::text = estoque.unidade::text\nWHERE estoque.tipo_unidade::text = 'Bodinho'::text AND (estoque.categoria::text = ANY (\nARRAY['TRINCO'::text, 'CONTRA FECHADURA'::text, 'SUPORTE'::text, 'PUXADOR'::text, 'KIT FERRAGEM'::text, 'DOBRADIÇA'::text, 'FECHADURA'::text, 'ACESSÓRIO PARA FERRAGEM'::text]))",
+        "options": {}
+      },
+      "id": "5ce5ef04-3545-41cb-8b80-9c6ab433ab09",
+      "name": "Postgres2",
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 2.3,
+      "position": [
+        784,
+        880
+      ],
+      "credentials": {
+        "postgres": {
+          "id": "G50fA6A0L90xaBIe",
+          "name": "Postgres account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "triggerAtHour": 7,
+              "triggerAtMinute": 25
+            }
+          ]
+        }
+      },
+      "id": "d91b95af-977e-4213-8573-74d474a6cfea",
+      "name": "Dias",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.1,
+      "position": [
+        -48,
+        544
+      ]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{ $('Token').item.json.Link }}send-document/xlsx",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "={{ $('Token').item.json.Name }}",
+              "value": "={{ $('Token').item.json.Value }}"
+            }
+          ]
+        },
+        "sendBody": true,
+        "contentType": "form-urlencoded",
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "phone",
+              "value": "=5581982111972"
+            },
+            {
+              "name": "fileName",
+              "value": "Pedidos Pagos e Pendentes - Belga"
+            },
+            {
+              "name": "document",
+              "value": "=https://marcolanoperacoes.s3.amazonaws.com/{{ $('ARQUIVO').item.json.arq }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "680b7fce-97e6-456d-a2be-a7729a4a0383",
+      "name": "Guilhermino",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.1,
+      "position": [
+        1392,
+        80
+      ]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{ $('Token').item.json.Link }}send-document/xlsx",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "={{ $('Token').item.json.Name }}",
+              "value": "={{ $('Token').item.json.Value }}"
+            }
+          ]
+        },
+        "sendBody": true,
+        "contentType": "form-urlencoded",
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "phone",
+              "value": "=5581982111972"
+            },
+            {
+              "name": "fileName",
+              "value": "Sugestão de Ferragens - Loja e Tempera"
+            },
+            {
+              "name": "document",
+              "value": "=https://marcolanoperacoes.s3.amazonaws.com/{{ $('ARQUIVO1').item.json.arq }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "a2656cc3-0c4d-4916-8dfb-836d2ac92632",
+      "name": "Guilhermino1",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.1,
+      "position": [
+        1392,
+        448
+      ]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{ $('Token').item.json.Link }}send-document/xlsx",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "={{ $('Token').item.json.Name }}",
+              "value": "={{ $('Token').item.json.Value }}"
+            }
+          ]
+        },
+        "sendBody": true,
+        "contentType": "form-urlencoded",
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "phone",
+              "value": "=5581982111972"
+            },
+            {
+              "name": "fileName",
+              "value": "Sugestão de Ferragens - Bodinho"
+            },
+            {
+              "name": "document",
+              "value": "=https://marcolanoperacoes.s3.amazonaws.com/{{ $('ARQUIVO2').item.json.arq }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "7682bd62-4ec4-4d8d-b1bc-da37184358f5",
+      "name": "Guilhermino2",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.1,
+      "position": [
+        1392,
+        800
+      ]
+    },
+    {
+      "parameters": {
+        "documentId": {
+          "__rl": true,
+          "value": "https://docs.google.com/spreadsheets/d/1J9xHE08UPG2QnDrjFsiy3VU3Z8ziZT9aO9MF7ct5ruA/edit?usp=sharing",
+          "mode": "url"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 564051929,
+          "mode": "list",
+          "cachedResultName": "Token",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1J9xHE08UPG2QnDrjFsiy3VU3Z8ziZT9aO9MF7ct5ruA/edit#gid=564051929"
+        },
+        "options": {}
+      },
+      "id": "2ee06fa9-3d71-435e-b8f5-b3433e41b038",
+      "name": "Token",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.3,
+      "position": [
+        160,
+        544
+      ],
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "HfbTEVMQHA5O66Ya",
+          "name": "Sheets JG e Japa"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "b97c3336-9bd3-4a94-ba16-3cb561614035",
+              "name": "Vendedor",
+              "value": "=*{{ $json[\"vendedor\"] }}*\n\nValor: R$ {{ $json[\"venda\"] }}\nMargem: {{$json[\"margem\"]}}%\n____________________________________________\n",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "449487e1-0c7b-49c8-8752-dc05e1f1ab19",
+      "name": "Edit Fields1",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.3,
+      "position": [
+        832,
+        1312
+      ]
+    },
+    {
+      "parameters": {
+        "fieldsToSummarize": {
+          "values": [
+            {
+              "aggregation": "concatenate",
+              "field": "Vendedor",
+              "separateBy": "\n"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "3a5efd95-3f13-4227-9c0b-87db70fd08be",
+      "name": "Summarize",
+      "type": "n8n-nodes-base.summarize",
+      "typeVersion": 1,
+      "position": [
+        1024,
+        1312
+      ]
+    },
+    {
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "select \n\t*, \n\tROUND(abs(custo/venda - 1) * 100, 2) as margem\nfrom (\n\tselect \n\t\tunidade,\n\t\tvendedor,\n\t\tround(sum(replace(p.valor_unitario_total_com_desconto,',','.')::numeric),2) as venda,\n\t\tround(sum(replace(p.custo_unitario_total_produto,',','.')::numeric),2) as custo,\n\t\tround(sum(replace(p.qtd_produto,',','.')::numeric),2) as qtd\n\tfrom pedidos p \n\t\tleft join coes c on p.coes = c.nome \n\twhere \n\t\tc.gerafaturamento = 'SIM' and unidade = 'BELGA POLIMEROS' \n\t\tand data_pedido::Date >= to_char(NOW()::DATE, 'yyyy-mm-01')::date \n        --and data_pedido::Date BETWEEN '2024-11-01' and '2024-11-30'\n\t\tand vendedor in ('CAROLINE BONFIM','KARINA SOUZA','MARCELA LINDACI','CAMILA OLIVEIRA')\n\tgroup by unidade, vendedor \n) X",
+        "options": {}
+      },
+      "id": "c676a7a2-7146-47b8-b7f1-2bfb4790b231",
+      "name": "Postgres3",
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 2.3,
+      "position": [
+        624,
+        1312
+      ],
+      "credentials": {
+        "postgres": {
+          "id": "G50fA6A0L90xaBIe",
+          "name": "Postgres account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{ $('Token').item.json.Link }}send-text",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "={{ $('Token').item.json.Name }}",
+              "value": "={{ $('Token').item.json.Value }}"
+            }
+          ]
+        },
+        "sendBody": true,
+        "contentType": "form-urlencoded",
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "phone",
+              "value": "=5581982111972"
+            },
+            {
+              "name": "message",
+              "value": "={{ $json.concatenated_Vendedor }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "96c43e5f-4083-45cf-b01b-7e5decc149b9",
+      "name": "Guilhermino3",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.1,
+      "position": [
+        1280,
+        1312
+      ]
+    },
+    {
+      "parameters": {
+        "rules": {
+          "values": [
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict"
+                },
+                "conditions": [
+                  {
+                    "leftValue": "={{ $('Dias').item.json['Day of month'] }}",
+                    "rightValue": "=21",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              }
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict"
+                },
+                "conditions": [
+                  {
+                    "id": "ae0081da-7842-42a3-adfc-cc74c8851455",
+                    "leftValue": "={{ $('Dias').item.json['Day of month'] }}",
+                    "rightValue": "=10",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals",
+                      "name": "filter.operator.equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              }
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict"
+                },
+                "conditions": [
+                  {
+                    "id": "757980ea-c963-471c-9b97-4a93de2d3ca8",
+                    "leftValue": "={{ $('Dias').item.json['Day of month'] }}",
+                    "rightValue": "=5",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals",
+                      "name": "filter.operator.equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              }
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict"
+                },
+                "conditions": [
+                  {
+                    "id": "044fff60-4164-4d97-ab79-63a89aae48dc",
+                    "leftValue": "=Monday, Tuesday, Wednesday, Thursday, Friday",
+                    "rightValue": "={{ $('Dias').item.json['Day of week'] }}",
+                    "operator": {
+                      "type": "string",
+                      "operation": "contains"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              }
+            }
+          ]
+        },
+        "options": {
+          "allMatchingOutputs": true
+        }
+      },
+      "id": "d4ac599c-d67d-4ce0-a820-e2b6af98bbab",
+      "name": "Switch",
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 3,
+      "position": [
+        368,
+        544
+      ]
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Wait": {
+      "main": [
+        [
+          {
+            "node": "AWS S33",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "ARQUIVO": {
+      "main": [
+        [
+          {
+            "node": "Postgres",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "AWS S31": {
+      "main": [
+        [
+          {
+            "node": "Guilhermino",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Postgres": {
+      "main": [
+        [
+          {
+            "node": "Convert to File",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Wait1": {
+      "main": [
+        [
+          {
+            "node": "AWS S34",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "AWS S32": {
+      "main": [
+        [
+          {
+            "node": "Guilhermino1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Postgres1": {
+      "main": [
+        [
+          {
+            "node": "Convert to File1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Wait2": {
+      "main": [
+        [
+          {
+            "node": "AWS S36",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "AWS S35": {
+      "main": [
+        [
+          {
+            "node": "Guilhermino2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "ARQUIVO2": {
+      "main": [
+        [
+          {
+            "node": "Postgres2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Postgres2": {
+      "main": [
+        [
+          {
+            "node": "Convert to File2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Dias": {
+      "main": [
+        [
+          {
+            "node": "Token",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Guilhermino": {
+      "main": [
+        [
+          {
+            "node": "Wait",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Guilhermino1": {
+      "main": [
+        [
+          {
+            "node": "Wait1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Guilhermino2": {
+      "main": [
+        [
+          {
+            "node": "Wait2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Token": {
+      "main": [
+        [
+          {
+            "node": "Switch",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Convert to File": {
+      "main": [
+        []
+      ]
+    },
+    "Convert to File1": {
+      "main": [
+        []
+      ]
+    },
+    "Convert to File2": {
+      "main": [
+        []
+      ]
+    },
+    "Edit Fields1": {
+      "main": [
+        [
+          {
+            "node": "Summarize",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Postgres3": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Summarize": {
+      "main": [
+        []
+      ]
+    },
+    "Switch": {
+      "main": [
+        [
+          {
+            "node": "ARQUIVO",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "ARQUIVO1",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "ARQUIVO2",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Postgres3",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "ARQUIVO1": {
+      "main": [
+        [
+          {
+            "node": "Postgres1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "1382f26e-606b-45af-84c5-29e073308f66",
+  "meta": {
+    "instanceId": "{{INSTANCE_ID}}"
+  },
+  "id": "mqmSUAXSWSFZyFvG",
+  "tags": [
+    {
+      "updatedAt": "2025-03-21T11:52:03.823Z",
+      "createdAt": "2025-03-21T11:52:03.823Z",
+      "id": "VQmA23kx6h1wy92X",
+      "name": "GUIS"
+    },
+    {
+      "updatedAt": "2025-03-24T14:24:48.667Z",
+      "createdAt": "2025-03-24T14:24:48.667Z",
+      "id": "DRs3JJesnD7xa1AS",
+      "name": "Setor - Comercial"
+    },
+    {
+      "updatedAt": "2025-03-24T14:40:59.830Z",
+      "createdAt": "2025-03-24T14:40:59.830Z",
+      "id": "vK8d40ObLmVSMtwq",
+      "name": "Belga Polímeros"
+    }
+  ]
+}
